@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "FontMaker": {
+      "commandName": "Project",
+      "commandLineArgs": "D:\\Projects\\Cerebus\\Atari\\FontMakerData\\DschumpTileSamplesV2.atrview"
+    }
+  }
+}
