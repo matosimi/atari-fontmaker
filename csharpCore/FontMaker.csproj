@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ImplicitUsings>enable</ImplicitUsings>
+
+	<ApplicationVisualStyles>true</ApplicationVisualStyles>
+	<ApplicationUseCompatibleTextRendering>false</ApplicationUseCompatibleTextRendering>
+	<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
+	<ApplicationDefaultFont>Microsoft Sans Serif, 8.25pt</ApplicationDefaultFont>
+	<ApplicationIcon>Resources\FontMaker.ico</ApplicationIcon>
+	<FileVersion>1.6.0.0</FileVersion>
+	<AssemblyVersion>1.6.0.0</AssemblyVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Resources\basicremfont.lst" />
+    <None Remove="Resources\default.atrview" />
+    <None Remove="Resources\Default.fnt" />
+    <None Remove="Resources\laoo.act" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Resources\FontMaker.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\basicremfont.lst" />
+    <EmbeddedResource Include="Resources\default.atrview" />
+    <EmbeddedResource Include="Resources\Default.fnt" />
+    <EmbeddedResource Include="Resources\laoo.act" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Properties\Resources.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>
