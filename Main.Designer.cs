@@ -197,7 +197,7 @@
 			ImageMegacopy.TabStop = false;
 			ImageMegacopy.Visible = false;
 			ImageMegacopy.MouseDown += ImageMegaCopyMouseDown;
-			ImageMegacopy.MouseMove += ImageMegacopyMouseMove;
+			ImageMegacopy.MouseMove += ImageMegaCopyMouseMove;
 			// 
 			// ImageMegaCopyV
 			// 
@@ -214,7 +214,7 @@
 			// 
 			Label_char_view.AutoSize = true;
 			Label_char_view.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-			Label_char_view.Location = new Point(525, 444);
+			Label_char_view.Location = new Point(525, 446);
 			Label_char_view.Name = "Label_char_view";
 			Label_char_view.Size = new Size(99, 13);
 			Label_char_view.TabIndex = 6;
@@ -708,7 +708,7 @@
 			// 
 			l_char.AutoSize = true;
 			l_char.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-			l_char.Location = new Point(8, 8);
+			l_char.Location = new Point(8, 7);
 			l_char.Name = "l_char";
 			l_char.Size = new Size(102, 13);
 			l_char.TabIndex = 1;
@@ -718,7 +718,7 @@
 			// 
 			l_col.AutoSize = true;
 			l_col.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-			l_col.Location = new Point(199, 8);
+			l_col.Location = new Point(199, 7);
 			l_col.Name = "l_col";
 			l_col.Size = new Size(34, 13);
 			l_col.TabIndex = 2;
@@ -727,7 +727,7 @@
 			// cb_dupes
 			// 
 			cb_dupes.AutoSize = true;
-			cb_dupes.Location = new Point(366, 4);
+			cb_dupes.Location = new Point(366, 5);
 			cb_dupes.Name = "cb_dupes";
 			cb_dupes.Size = new Size(49, 17);
 			cb_dupes.TabIndex = 11;
@@ -740,7 +740,7 @@
 			// 
 			SpeedButtonMegaCopy.Appearance = Appearance.Button;
 			SpeedButtonMegaCopy.CheckAlign = ContentAlignment.MiddleCenter;
-			SpeedButtonMegaCopy.Location = new Point(426, 4);
+			SpeedButtonMegaCopy.Location = new Point(426, 3);
 			SpeedButtonMegaCopy.Name = "SpeedButtonMegaCopy";
 			SpeedButtonMegaCopy.Size = new Size(89, 21);
 			SpeedButtonMegaCopy.TabIndex = 3;
@@ -752,7 +752,7 @@
 			// SpeedButtonUndo
 			// 
 			SpeedButtonUndo.Image = (Image)resources.GetObject("SpeedButtonUndo.Image");
-			SpeedButtonUndo.Location = new Point(298, 1);
+			SpeedButtonUndo.Location = new Point(298, 2);
 			SpeedButtonUndo.Name = "SpeedButtonUndo";
 			SpeedButtonUndo.Size = new Size(22, 22);
 			SpeedButtonUndo.TabIndex = 4;
@@ -762,7 +762,7 @@
 			// SpeedButtonRedo
 			// 
 			SpeedButtonRedo.Image = (Image)resources.GetObject("SpeedButtonRedo.Image");
-			SpeedButtonRedo.Location = new Point(326, 1);
+			SpeedButtonRedo.Location = new Point(326, 2);
 			SpeedButtonRedo.Name = "SpeedButtonRedo";
 			SpeedButtonRedo.Size = new Size(22, 22);
 			SpeedButtonRedo.TabIndex = 5;
@@ -774,7 +774,7 @@
 			ComboBoxWriteMode.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxWriteMode.FormattingEnabled = true;
 			ComboBoxWriteMode.Items.AddRange(new object[] { "Rewrite", "Insert" });
-			ComboBoxWriteMode.Location = new Point(122, 2);
+			ComboBoxWriteMode.Location = new Point(122, 3);
 			ComboBoxWriteMode.Name = "ComboBoxWriteMode";
 			ComboBoxWriteMode.Size = new Size(66, 21);
 			ComboBoxWriteMode.TabIndex = 0;
@@ -895,6 +895,7 @@
 			Shape1.MouseDown += Shape1MouseDown;
 			Shape1.MouseMove += Shape1MouseMove;
 			Shape1.MouseUp += Shape1MouseUp;
+			Shape1.Resize += Shape1_Resize;
 			// 
 			// Shape1v
 			// 
@@ -949,7 +950,7 @@
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
-			ClientSize = new Size(1184, 467);
+			ClientSize = new Size(1048, 465);
 			Controls.Add(i_abo);
 			Controls.Add(p_color_switch);
 			Controls.Add(ImageMegacopy);
@@ -978,6 +979,7 @@
 			Name = "TMainForm";
 			Text = "MainForm";
 			FormClosing += FormCloseQuery;
+			KeyDown += TMainForm_KeyDown;
 			MouseWheel += FormMouseWheel;
 			((System.ComponentModel.ISupportInitialize)i_view).EndInit();
 			((System.ComponentModel.ISupportInitialize)I_fn).EndInit();

@@ -12,8 +12,18 @@
 	<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
 	<ApplicationDefaultFont>Microsoft Sans Serif, 8.25pt</ApplicationDefaultFont>
 	<ApplicationIcon>Resources\FontMaker.ico</ApplicationIcon>
-	<FileVersion>1.6.0.0</FileVersion>
-	<AssemblyVersion>1.6.0.0</AssemblyVersion>
+	<FileVersion>1.6.0.1</FileVersion>
+	<AssemblyVersion>1.6.0.1</AssemblyVersion>
+	<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
+	<Version>1.6.0.1</Version>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
   <ItemGroup>

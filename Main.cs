@@ -18,6 +18,7 @@ namespace FontMaker
 		private static SolidBrush blackBrush = new(Color.Black);
 		private static SolidBrush whiteBrush = new(Color.White);
 		private static SolidBrush cyanBrush = new(Color.Cyan);
+		private static SolidBrush redBrush = new(Color.Red);
 
 		private List<System.Windows.Forms.Button> ActionListNormalModeOnly = new();
 
@@ -100,11 +101,11 @@ namespace FontMaker
 						{
 							LoadViewFile(Environment.GetCommandLineArgs()[1], true);
 							UpdateFormCaption();
-							redrawset();
+							RedrawSet();
 							RedrawLineTypes();
 							RedrawView();
 							RedrawPal();
-							redrawviewchar();
+							RedrawViewChar();
 							RedrawChar();
 							fname2 = pathf + Path.DirectorySeparatorChar + "Default.fnt";
 
@@ -126,11 +127,11 @@ namespace FontMaker
 
 				LoadViewFile("default.atrview", true);
 				UpdateFormCaption();
-				redrawset();
+				RedrawSet();
 				RedrawLineTypes();
 				RedrawView();
 				RedrawPal();
-				redrawviewchar();
+				RedrawViewChar();
 				RedrawChar();
 				ext = ".atrview";
 				b_save1Click(null, EventArgs.Empty);
@@ -153,7 +154,7 @@ namespace FontMaker
 					UpdateFormCaption();
 				}
 
-				redrawset();
+				RedrawSet();
 				DefaultView();
 				RedrawView();
 			}
@@ -185,8 +186,7 @@ namespace FontMaker
 			var img = GetImage(Shape1);
 			using (var gr = Graphics.FromImage(img))
 			{
-				var trans = new SolidBrush(Color.Red);
-				gr.FillRectangle(trans, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(redBrush, new Rectangle(0, 0, img.Width, img.Height));
 			}
 			GraphicsPath graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 2));
@@ -210,7 +210,7 @@ namespace FontMaker
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 2, 20));
 
 			Shape1v.Region = new Region(graphicsPath);
-			
+
 			Shape1v.Refresh();
 
 			// Paint something into the window
@@ -269,6 +269,7 @@ namespace FontMaker
 
 		private void FormCloseQuery(object sender, FormClosingEventArgs e)
 		{
+			
 			e.Cancel = true;
 			MainUnit.exitowiec();
 		}
@@ -382,7 +383,7 @@ namespace FontMaker
 					DoChar();
 				}
 
-				redrawviewchar();
+				RedrawViewChar();
 				UpdateUndoButtons(CharacterEdited());
 				CheckDuplicate();
 			}
@@ -627,7 +628,7 @@ namespace FontMaker
 			}
 
 			RedrawPal();
-			redrawset();
+			RedrawSet();
 			RedrawChar();
 			RedrawView();
 			lb_cs1Click(null, EventArgs.Empty);
@@ -662,7 +663,7 @@ namespace FontMaker
 				}
 
 				UpdateFormCaption();
-				redrawset();
+				RedrawSet();
 				I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 0, (selectedCharacterIndex % 32) * 16, (selectedCharacterIndex / 32) * 16, 0));
 				RedrawView();
 				Add2UndoFullDifferenceScan(); //full font scan
@@ -684,7 +685,7 @@ namespace FontMaker
 				pathf = Path.GetDirectoryName(d_open.FileName) + "\\";
 				fname2 = d_open.FileName;
 				UpdateFormCaption();
-				redrawset();
+				RedrawSet();
 				I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 0, (selectedCharacterIndex % 32) * 16, (selectedCharacterIndex / 32) * 16, 0));
 				RedrawView();
 				Add2UndoFullDifferenceScan(); //full font scan
@@ -814,7 +815,7 @@ namespace FontMaker
 				if (e.Button == MouseButtons.Left)
 				{
 					vw[rx, ry] = (byte)(selectedCharacterIndex % 256);
-					redrawviewchar();
+					RedrawViewChar();
 				}
 
 				if (e.Button == MouseButtons.Right)
@@ -916,7 +917,6 @@ namespace FontMaker
 								w = temp;
 
 							temp = (ry - copyRange.Y + 1) * 16 + 4;
-
 							if (temp >= 20)
 								h = temp;
 
@@ -986,13 +986,13 @@ namespace FontMaker
 			Label_char_view.Text = $@"Char: Font {chsline[ry]} ${fontchar:X2} #{fontchar}";
 		}
 
-		private static bool inResize = false;
+		private static bool inShape1VResize = false;
 
 		private void Shape1v_Resize(object sender, EventArgs e)
 		{
-			if (inResize)
+			if (inShape1VResize)
 				return;
-			inResize = true;
+			inShape1VResize = true;
 
 			var img = NewImage(Shape1v);
 			using (var gr = Graphics.FromImage(img))
@@ -1009,7 +1009,7 @@ namespace FontMaker
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 2, Shape1v.Height));
 			Shape1v.Region = new Region(graphicsPath);
 
-			inResize = false;
+			inShape1VResize = false;
 		}
 
 		private void i_viewMouseDoubleClick(object sender, MouseEventArgs e)
@@ -1025,7 +1025,7 @@ namespace FontMaker
 		public void b_gfxClick(object sender, EventArgs e)
 		{
 			gfx = !gfx;
-			redrawset();
+			RedrawSet();
 			RedrawView();
 			I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 0, (selectedCharacterIndex % 32) * 16, (selectedCharacterIndex / 32) * 16, 0));
 
@@ -1251,7 +1251,7 @@ namespace FontMaker
 		}
 
 		// redraws whole font area
-		public void redrawset()
+		public void RedrawSet()
 		{
 			var img = GetImage(I_fn);
 			using (var gr = Graphics.FromImage(img))
@@ -1597,7 +1597,7 @@ namespace FontMaker
 			int fontchar = 0;
 			int fontnr = 0;
 
-			if ((e.X >= I_fn.Width) || (e.Y >= I_fn.Height))
+			if (e.X < 0 || e.X >= I_fn.Width || e.Y < 0 || e.Y >= I_fn.Height)
 			{
 				return;
 			}
@@ -1632,7 +1632,7 @@ namespace FontMaker
 					case TMegaCopyStatus.None:
 					case TMegaCopyStatus.Selected:
 						{
-							if (Control.ModifierKeys == Keys.Shift)
+							if (e.Button == MouseButtons.Left)
 							{
 								//define copy origin point
 								copyRange.Y = ry;
@@ -1716,7 +1716,7 @@ namespace FontMaker
 							}
 							else
 							{
-								copyRange.Height = copyRange.Bottom - ry + copyRange.Height;
+								copyRange.Height = ry - copyRange.Y;
 							}
 
 							if (rx <= copyRange.X)
@@ -1725,7 +1725,7 @@ namespace FontMaker
 							}
 							else
 							{
-								copyRange.Width = copyRange.Right - rx + copyRange.Width;
+								copyRange.Width = rx - copyRange.X;
 							}
 
 							megaCopyStatus = TMegaCopyStatus.Selected;
@@ -1746,7 +1746,6 @@ namespace FontMaker
 		{
 			int rx = 0;
 			int ry = 0;
-			int temp = 0;
 
 			/*memo1.Text := inttostr(copyrange.left) + '-' + inttostr(copyrange.Right) +
 			    ' : ' + inttostr(copyRange.Width) + sLineBreak + inttostr(copyrange.top) + '-' + inttostr(copyrange.Bottom) +
@@ -1758,33 +1757,30 @@ namespace FontMaker
 				{
 					case TMegaCopyStatus.Selecting:
 						{
-							if ((e.X >= I_fn.Width) || (e.Y >= I_fn.Height))
+							if (e.X < 0 || e.X >= I_fn.Width || e.Y < 0 || e.Y >= I_fn.Height)
 							{
 								return;
 							}
 
 							rx = e.X / 16;
 							ry = e.Y / 16;
-							temp = (rx - copyRange.X + 1) * 16 + 4;
 
-							if (temp < 20)
-							{
-								Shape1.Width = 20;
-							}
-							else
-							{
-								Shape1.Width = temp;
-							}
+							int origWidth = Shape1.Width;
+							int origHeight = Shape1.Height;
+
+							int w = 20;
+							int h = 20;
+							var temp = (rx - copyRange.X + 1) * 16 + 4;
+							if (temp >= 20)
+								w = temp;
 
 							temp = (ry - copyRange.Y + 1) * 16 + 4;
+							if (temp >= 20)
+								h = temp;
 
-							if (temp < 20)
+							if (w != origWidth || h != origHeight)
 							{
-								Shape1.Height = 20;
-							}
-							else
-							{
-								Shape1.Height = temp;
+								Shape1.Size = new Size(w, h);
 							}
 						}
 						break;
@@ -1810,6 +1806,32 @@ namespace FontMaker
 						break;
 				}
 			}
+		}
+
+		private static bool inShape1Resize = false;
+
+		private void Shape1_Resize(object sender, EventArgs e)
+		{
+			if (inShape1Resize)
+				return;
+			inShape1Resize = true;
+
+			var img = NewImage(Shape1);
+			using (var gr = Graphics.FromImage(img))
+			{
+				gr.FillRectangle(redBrush, new Rectangle(0, 0, img.Width, img.Height));
+				Shape1.Region?.Dispose();
+				Shape1.Size = new Size(img.Width, img.Height);
+
+			}
+			var graphicsPath = new GraphicsPath();
+			graphicsPath.AddRectangle(new Rectangle(0, 0, Shape1.Width, 2));
+			graphicsPath.AddRectangle(new Rectangle(Shape1.Width - 2, 0, 2, Shape1.Height));
+			graphicsPath.AddRectangle(new Rectangle(0, Shape1.Height - 2, Shape1.Width, 2));
+			graphicsPath.AddRectangle(new Rectangle(0, 0, 2, Shape1.Height));
+			Shape1.Region = new Region(graphicsPath);
+
+			inShape1Resize = false;
 		}
 
 		public void drawTxt(Graphics ic, int x, int y, int num, Color color)
@@ -1925,6 +1947,7 @@ namespace FontMaker
 						|| ((fortyBytes == "0") && (CheckBox40bytes.Checked == true)))
 					{
 						CheckBox40bytes.Checked = !CheckBox40bytes.Checked;
+						CheckBox40bytesClick(null, null);
 					}
 				}
 
@@ -2211,7 +2234,7 @@ namespace FontMaker
 							//SetCharCursor;
 							DoChar();
 							RedrawChar();
-							redrawviewchar();
+							RedrawViewChar();
 						}
 					}
 
@@ -2237,7 +2260,7 @@ namespace FontMaker
 				SetCharCursor();
 				DoChar();
 				RedrawChar();
-				redrawviewchar();
+				RedrawViewChar();
 			}
 
 			CheckDuplicate();
@@ -2265,7 +2288,7 @@ namespace FontMaker
 		}
 
 		// Redraw all occurrences of character (selectedCharacterIndex) in view area
-		public void redrawviewchar()
+		public void RedrawViewChar()
 		{
 			var img = GetImage(i_view);
 			using (var gr = Graphics.FromImage(img))
@@ -2424,7 +2447,7 @@ namespace FontMaker
 			undoBufferIndex = prevUndoIndex;
 			UpdateUndoButtons(CharacterEdited());
 			RedrawChar();
-			redrawset();
+			RedrawSet();
 			RedrawView();
 			return true;
 		}
@@ -2444,7 +2467,7 @@ namespace FontMaker
 			undoBufferIndex = nextUndoIndex;
 			UpdateUndoButtons(CharacterEdited());
 			RedrawChar();
-			redrawset();
+			RedrawSet();
 			RedrawView();
 			return true;
 		}
@@ -2534,9 +2557,8 @@ namespace FontMaker
 			return character;
 		}
 
-		public void ImageMegacopyMouseMove(object sender, MouseEventArgs e)
+		public void ImageMegaCopyMouseMove(object sender, MouseEventArgs e)
 		{
-			// TODO: Fix the shift key here
 			I_fnMouseMove(sender, new MouseEventArgs(MouseButtons.None, 0, e.X + ImageMegacopy.Left - I_fn.Left, e.Y + ImageMegacopy.Top - I_fn.Top, 0));
 		}
 
@@ -2594,7 +2616,7 @@ namespace FontMaker
 
 		private void b_shuClick(object sender, EventArgs e)
 		{
-			byte[,] tmp = new byte[8, 8];
+			var tmp = new byte[8, 8];
 
 			int h = 0;
 			var src = MainUnit.Get2ColorCharacter(selectedCharacterIndex);
@@ -2619,14 +2641,13 @@ namespace FontMaker
 			MainUnit.Set2ColorCharacter(tmp, selectedCharacterIndex);
 			DoChar();
 			RedrawChar();
-			redrawviewchar();
+			RedrawViewChar();
 			CheckDuplicate();
 		}
 
 		public void b_shrClick(object sender, EventArgs e)
 		{
-			byte[,] tmp = new byte[8, 8];
-			int h;
+			var tmp = new byte[8, 8];
 			int repeatTime = repeatTime = gfx ? 1 : 0;  // perform same shift twice in mode 4
 			var src = MainUnit.Get2ColorCharacter(selectedCharacterIndex);
 
@@ -2636,6 +2657,7 @@ namespace FontMaker
 				{
 					for (var b = 0; b < 8; b++)
 					{
+						int h;
 						if (b > 0)
 						{
 							h = b - 1;
@@ -2656,14 +2678,13 @@ namespace FontMaker
 			MainUnit.Set2ColorCharacter(tmp, selectedCharacterIndex);
 			DoChar();
 			RedrawChar();
-			redrawviewchar();
+			RedrawViewChar();
 			CheckDuplicate();
 		}
 
 		private void Shift_leftExecute(object sender, EventArgs e)
 		{
-			byte[,] tmp = new byte[8, 8];
-			int h;
+			var tmp = new byte[8, 8];
 			int repeatTime = repeatTime = gfx ? 1 : 0;   // perform same shift twice in mode 4
 			var src = MainUnit.Get2ColorCharacter(selectedCharacterIndex);
 
@@ -2673,6 +2694,7 @@ namespace FontMaker
 				{
 					for (var b = 0; b < 8; b++)
 					{
+						int h;
 						if (b < 7)
 						{
 							h = b + 1;
@@ -2693,20 +2715,20 @@ namespace FontMaker
 			MainUnit.Set2ColorCharacter(tmp, selectedCharacterIndex);
 			DoChar();
 			RedrawChar();
-			redrawviewchar();
+			RedrawViewChar();
 			CheckDuplicate();
 		}
 
 		public void b_shdClick(object sender, EventArgs e)
 		{
-			byte[,] tmp = new byte[8, 8];
-			int h = 0;
+			var tmp = new byte[8, 8];
 			var src = MainUnit.Get2ColorCharacter(selectedCharacterIndex);
 
 			for (var a = 0; a < 8; a++)
 			{
 				for (var b = 0; b < 8; b++)
 				{
+					var h = 0;
 					if (a > 0)
 					{
 						h = a - 1;
@@ -2723,13 +2745,13 @@ namespace FontMaker
 			MainUnit.Set2ColorCharacter(tmp, selectedCharacterIndex);
 			DoChar();
 			RedrawChar();
-			redrawviewchar();
+			RedrawViewChar();
 			CheckDuplicate();
 		}
 
 		public void Rotate_rightExecute(object sender, EventArgs e)
 		{
-			byte[,] tmp2 = new byte[8, 8];
+			var tmp2 = new byte[8, 8];
 
 			if (!gfx)
 			{
@@ -2746,7 +2768,7 @@ namespace FontMaker
 				MainUnit.Set2ColorCharacter(tmp2, selectedCharacterIndex);
 				DoChar();
 				RedrawChar();
-				redrawviewchar();
+				RedrawViewChar();
 			}
 
 			CheckDuplicate();
@@ -2754,7 +2776,7 @@ namespace FontMaker
 
 		public void Rotate_leftExecute(object sender, EventArgs e)
 		{
-			byte[,] tmp2 = new byte[8, 8];
+			var tmp2 = new byte[8, 8];
 
 			if (!gfx)
 			{
@@ -2771,7 +2793,7 @@ namespace FontMaker
 				MainUnit.Set2ColorCharacter(tmp2, selectedCharacterIndex);
 				DoChar();
 				RedrawChar();
-				redrawviewchar();
+				RedrawViewChar();
 			}
 
 			CheckDuplicate();
@@ -2801,7 +2823,7 @@ namespace FontMaker
 				}
 
 				DoChar();
-				redrawviewchar();
+				RedrawViewChar();
 				I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 1, (selectedCharacterIndex % 32) * 16, (selectedCharacterIndex / 32) * 16, 0));
 				CheckDuplicate();
 			}
@@ -2834,7 +2856,7 @@ namespace FontMaker
 				}
 
 				DoChar();
-				redrawviewchar();
+				RedrawViewChar();
 				I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 1, (selectedCharacterIndex % 32) * 16, (selectedCharacterIndex / 32) * 16, 0));
 				CheckDuplicate();
 			}
@@ -2857,7 +2879,7 @@ namespace FontMaker
 
 				DoChar();
 				RedrawChar();
-				redrawviewchar();
+				RedrawViewChar();
 				CheckDuplicate();
 			}
 			else
@@ -2901,7 +2923,7 @@ namespace FontMaker
 
 			DoChar();
 			RedrawChar();
-			redrawviewchar();
+			RedrawViewChar();
 			CheckDuplicate();
 		}
 
@@ -2922,7 +2944,7 @@ namespace FontMaker
 			MainUnit.Set2ColorCharacter(tmp, selectedCharacterIndex);
 			DoChar();
 			RedrawChar();
-			redrawviewchar();
+			RedrawViewChar();
 			CheckDuplicate();
 		}
 
@@ -2937,7 +2959,7 @@ namespace FontMaker
 
 			DoChar();
 			RedrawChar();
-			redrawviewchar();
+			RedrawViewChar();
 			CheckDuplicate();
 		}
 
@@ -2951,11 +2973,11 @@ namespace FontMaker
 				MainUnit.CheckResources();
 				LoadViewFile("default.atrview", true);
 				UpdateFormCaption();
-				redrawset();
+				RedrawSet();
 				RedrawLineTypes();
 				RedrawView();
 				RedrawPal();
-				redrawviewchar();
+				RedrawViewChar();
 				RedrawChar();
 				b_save1Click(null, EventArgs.Empty);
 			}
@@ -3002,6 +3024,11 @@ namespace FontMaker
 			RedrawView();
 		}
 
+		/// <summary>
+		/// Load data into the view area
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
 		public void b_lviewClick(object sender, EventArgs e)
 		{
 			FileStream fs = null;
@@ -3015,7 +3042,7 @@ namespace FontMaker
 			byte gg = 0;
 			byte bb = 0;
 
-			byte[] buf = new byte[2048];
+			var buf = new byte[2048];
 
 			d_open.FileName = string.Empty;
 			d_open.InitialDirectory = pathf;
@@ -3031,11 +3058,11 @@ namespace FontMaker
 				{
 					LoadViewFile(d_open.FileName);
 					pathf = Path.GetDirectoryName(d_open.FileName) + Path.DirectorySeparatorChar;
-					redrawset();
+					RedrawSet();
 					RedrawLineTypes();
 					RedrawView();
 					RedrawPal();
-					redrawviewchar();
+					RedrawViewChar();
 					RedrawChar();
 					return;
 				}
@@ -3069,11 +3096,11 @@ namespace FontMaker
 					}
 
 					pathf = Path.GetDirectoryName(d_open.FileName) + Path.DirectorySeparatorChar;
-					redrawset();
+					RedrawSet();
 					RedrawLineTypes();
 					RedrawView();
 					RedrawPal();
-					redrawviewchar();
+					RedrawViewChar();
 					RedrawChar();
 					return;
 				}
@@ -3234,10 +3261,10 @@ namespace FontMaker
 
 				fs.Close();
 				fs = null;
-				redrawset();
+				RedrawSet();
 				RedrawView();
 				RedrawPal();
-				redrawviewchar();
+				RedrawViewChar();
 				RedrawLineTypes();
 				pathf = Path.GetDirectoryName(d_open.FileName) + Path.DirectorySeparatorChar;
 			}
@@ -3248,7 +3275,7 @@ namespace FontMaker
 			d_save.FileName = string.Empty;
 			d_save.InitialDirectory = pathf;
 			d_save.DefaultExt = "atrview";
-			d_save.Filter = "Atari FontMaker View (*.atrview)|*.atrview|Raw data (*.dat)|*.dat";
+			d_save.Filter = @"Atari FontMaker View (*.atrview)|*.atrview|Raw data (*.dat)|*.dat";
 
 			if (d_save.ShowDialog() == DialogResult.OK)
 			{
@@ -3399,11 +3426,11 @@ namespace FontMaker
 		{
 			if (CheckBox40bytes.Checked)
 			{
-				MainUnit.MainForm.Width = MainUnit.MainForm.Width + 128;
+				MainUnit.MainForm.Width = MainUnit.MainForm.Width + 130;
 			}
 			else
 			{
-				MainUnit.MainForm.Width = MainUnit.MainForm.Width - 128;
+				MainUnit.MainForm.Width = MainUnit.MainForm.Width - 130;
 			}
 		}
 
@@ -3480,7 +3507,7 @@ namespace FontMaker
 		}
 
 
-		private void FormMouseWheel(object sender, System.Windows.Forms.MouseEventArgs e)
+		private void FormMouseWheel(object sender, MouseEventArgs e)
 		{
 			int bx = 0;
 			int by = 0;
@@ -3513,6 +3540,9 @@ namespace FontMaker
 					}
 
 					nextCharacterIndex = nextCharacterIndex % 512;
+					if (nextCharacterIndex < 0)
+						nextCharacterIndex += 512;
+
 					bx = nextCharacterIndex % 32;
 					by = nextCharacterIndex / 32;
 					I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 0, bx * 16 + 4, by * 16 + 4, 0));
@@ -3631,5 +3661,163 @@ namespace FontMaker
 				}
 			}
 		}
+		#region Keyboard shotcuts
+
+		private void TMainForm_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Oemcomma)
+			{
+				Previous_charExecute();
+				return;
+			}
+
+			if (e.KeyCode == Keys.OemPeriod)
+			{
+				Next_charExecute();
+				return;
+			}
+
+			if (e.KeyCode == Keys.R)
+			{
+				if (e.Shift)
+					Rotate_rightExecute(null, null);
+				else
+					Rotate_leftExecute(null, null);
+				return;
+			}
+
+			if (e.KeyCode == Keys.M)
+			{
+				if (e.Shift)
+					Mirror_verticalExecute(null, null);
+				else
+					Mirror_horizontalExecute(null, null);
+				return;
+			}
+
+			if (e.KeyCode == Keys.D1)
+			{
+				Color1Execute(null, null);
+				return;
+			}
+			if (e.KeyCode == Keys.D2)
+			{
+				Color2Execute(null, null);
+				return;
+			}
+			if (e.KeyCode == Keys.D3)
+			{
+				Color3Execute(null, null);
+				return;
+			}
+
+			if (e.KeyCode == Keys.I)
+			{
+				b_invClick(null, null);
+				return;
+			}
+
+			if (e.KeyCode == Keys.Escape)
+			{
+				EscapePressedExecute(null, null);
+				return;
+			}
+
+			if (e.Control && e.KeyCode == Keys.C)
+			{
+				Clipboard_copyExecute(null, null);
+				return;
+			}
+
+			if (e.Control && e.KeyCode == Keys.V)
+			{
+				b_pstClick(null, null);
+				return;
+			}
+
+			if (e.Control && e.KeyCode == Keys.Z)
+			{
+				Undo_FontExecute(null, null);
+				return;
+			}
+			// Ctrl + Y = Redo font change
+			if (e.Control && e.KeyCode == Keys.Y)
+			{
+				Redo_FontExecute(null, null);
+				return;
+			}
+
+
+
+		}
+
+		public void Previous_charExecute()
+		{
+			if (!SpeedButtonMegaCopy.Checked)
+			{
+				if (CharacterEdited())
+				{
+					Add2Undo(true);
+				}
+			}
+
+			selectedCharacterIndex--;
+			if (selectedCharacterIndex < 0) selectedCharacterIndex += 512;
+			SetCharCursor();
+		}
+
+		public void Next_charExecute()
+		{
+			if (!SpeedButtonMegaCopy.Checked)
+			{
+				if (CharacterEdited())
+				{
+					Add2Undo(true);
+				}
+			}
+
+			selectedCharacterIndex++;
+			if (selectedCharacterIndex >= 512) selectedCharacterIndex -= 512;
+			SetCharCursor();
+		}
+
+		public void Color1Execute(object sender, EventArgs e)
+		{
+			SetColor(2);
+		}
+		public void Color2Execute(object sender, EventArgs e)
+		{
+			SetColor(3);
+		}
+		public void Color3Execute(object sender, EventArgs e)
+		{
+			SetColor(4);
+		}
+
+		public void EscapePressedExecute(object sender, EventArgs e)
+		{
+			if (SpeedButtonMegaCopy.Checked)
+			{
+				switch (megaCopyStatus)
+				{
+					case TMegaCopyStatus.None:
+						break;
+
+					case TMegaCopyStatus.Selecting:
+						ResetMegaCopyStatus();
+						break;
+
+					case TMegaCopyStatus.Selected:
+						break;
+
+					case TMegaCopyStatus.Pasting:
+						ResetMegaCopyStatus();
+						break;
+				}
+			}
+		}
+
+
+		#endregion
 	}
 }

@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-
-namespace FontMaker
+﻿namespace FontMaker
 {
 	public class MainData { }
 
@@ -158,6 +150,14 @@ namespace FontMaker
 			src.Image = new Bitmap(w, h);
 
 			return src.Image;
+		}
+
+		public void Exit()
+		{
+			Visible = false;
+			Timer1.Enabled = false;
+			i_abo.Visible = false;
+			Environment.Exit(Environment.ExitCode);
 		}
 	}
 }
