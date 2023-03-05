@@ -133,15 +133,14 @@
 		public byte selectedColorIndex;
 		public byte actualColorIndex;
 		public Color actualColor = Color.Empty;
-	}
 
-	public partial class AtariColorSelectorUnit
-	{
-		public static TAtariColorSelectorForm AtariColorSelectorForm
+		private void TAtariColorSelectorForm_KeyDown(object sender, KeyEventArgs e)
 		{
-			get;
-			set;
-		} = new TAtariColorSelectorForm();
+			if (e.KeyCode == Keys.Escape)
+			{
+				Close();
+			}
 
+		}
 	}
 }

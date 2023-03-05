@@ -28,72 +28,72 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			this.ImagePalette = new System.Windows.Forms.PictureBox();
-			this.ImageSelected = new System.Windows.Forms.PictureBox();
-			this.LabelActualColor = new System.Windows.Forms.Label();
-			this.LabelOldColor = new System.Windows.Forms.Label();
-			((System.ComponentModel.ISupportInitialize)(this.ImagePalette)).BeginInit();
-			((System.ComponentModel.ISupportInitialize)(this.ImageSelected)).BeginInit();
-			this.SuspendLayout();
+			ImagePalette = new PictureBox();
+			ImageSelected = new PictureBox();
+			LabelActualColor = new Label();
+			LabelOldColor = new Label();
+			((System.ComponentModel.ISupportInitialize)ImagePalette).BeginInit();
+			((System.ComponentModel.ISupportInitialize)ImageSelected).BeginInit();
+			SuspendLayout();
 			// 
 			// ImagePalette
 			// 
-			this.ImagePalette.Location = new System.Drawing.Point(8, 0);
-			this.ImagePalette.Name = "ImagePalette";
-			this.ImagePalette.Size = new System.Drawing.Size(145, 272);
-			this.ImagePalette.TabIndex = 0;
-			this.ImagePalette.TabStop = false;
-			this.ImagePalette.MouseDown += new System.Windows.Forms.MouseEventHandler(this.ImagePaletteMouseDown);
-			this.ImagePalette.MouseMove += new System.Windows.Forms.MouseEventHandler(this.ImagePaletteMouseMove);
+			ImagePalette.Location = new Point(8, 0);
+			ImagePalette.Name = "ImagePalette";
+			ImagePalette.Size = new Size(145, 272);
+			ImagePalette.TabIndex = 0;
+			ImagePalette.TabStop = false;
+			ImagePalette.MouseDown += ImagePaletteMouseDown;
+			ImagePalette.MouseMove += ImagePaletteMouseMove;
 			// 
 			// ImageSelected
 			// 
-			this.ImageSelected.Location = new System.Drawing.Point(159, 72);
-			this.ImageSelected.Name = "ImageSelected";
-			this.ImageSelected.Size = new System.Drawing.Size(105, 121);
-			this.ImageSelected.TabIndex = 1;
-			this.ImageSelected.TabStop = false;
+			ImageSelected.Location = new Point(159, 72);
+			ImageSelected.Name = "ImageSelected";
+			ImageSelected.Size = new Size(105, 121);
+			ImageSelected.TabIndex = 1;
+			ImageSelected.TabStop = false;
 			// 
 			// LabelActualColor
 			// 
-			this.LabelActualColor.AutoSize = true;
-			this.LabelActualColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.LabelActualColor.Location = new System.Drawing.Point(192, 199);
-			this.LabelActualColor.Name = "LabelActualColor";
-			this.LabelActualColor.Size = new System.Drawing.Size(40, 13);
-			this.LabelActualColor.TabIndex = 2;
-			this.LabelActualColor.Text = "$01 - 1";
-			this.LabelActualColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			LabelActualColor.AutoSize = true;
+			LabelActualColor.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+			LabelActualColor.Location = new Point(192, 199);
+			LabelActualColor.Name = "LabelActualColor";
+			LabelActualColor.Size = new Size(40, 13);
+			LabelActualColor.TabIndex = 2;
+			LabelActualColor.Text = "$01 - 1";
+			LabelActualColor.TextAlign = ContentAlignment.MiddleCenter;
 			// 
 			// LabelOldColor
 			// 
-			this.LabelOldColor.AutoSize = true;
-			this.LabelOldColor.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-			this.LabelOldColor.Location = new System.Drawing.Point(192, 53);
-			this.LabelOldColor.Name = "LabelOldColor";
-			this.LabelOldColor.Size = new System.Drawing.Size(40, 13);
-			this.LabelOldColor.TabIndex = 3;
-			this.LabelOldColor.Text = "$00 - 0";
-			this.LabelOldColor.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+			LabelOldColor.AutoSize = true;
+			LabelOldColor.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+			LabelOldColor.Location = new Point(192, 53);
+			LabelOldColor.Name = "LabelOldColor";
+			LabelOldColor.Size = new Size(40, 13);
+			LabelOldColor.TabIndex = 3;
+			LabelOldColor.Text = "$00 - 0";
+			LabelOldColor.TextAlign = ContentAlignment.MiddleCenter;
 			// 
-			// AtariColorSelector
+			// TAtariColorSelectorForm
 			// 
-			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
-			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-			this.ClientSize = new System.Drawing.Size(284, 280);
-			this.Controls.Add(this.ImagePalette);
-			this.Controls.Add(this.ImageSelected);
-			this.Controls.Add(this.LabelActualColor);
-			this.Controls.Add(this.LabelOldColor);
-			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-			this.Name = "AtariColorSelector";
-			this.Text = "AtariColorSelector";
-			((System.ComponentModel.ISupportInitialize)(this.ImagePalette)).EndInit();
-			((System.ComponentModel.ISupportInitialize)(this.ImageSelected)).EndInit();
-			this.ResumeLayout(false);
-			this.PerformLayout();
-
+			AutoScaleDimensions = new SizeF(6F, 13F);
+			AutoScaleMode = AutoScaleMode.Font;
+			BackgroundImageLayout = ImageLayout.None;
+			ClientSize = new Size(284, 280);
+			Controls.Add(ImagePalette);
+			Controls.Add(ImageSelected);
+			Controls.Add(LabelActualColor);
+			Controls.Add(LabelOldColor);
+			FormBorderStyle = FormBorderStyle.FixedDialog;
+			Name = "TAtariColorSelectorForm";
+			Text = "AtariColorSelector";
+			KeyDown += TAtariColorSelectorForm_KeyDown;
+			((System.ComponentModel.ISupportInitialize)ImagePalette).EndInit();
+			((System.ComponentModel.ISupportInitialize)ImageSelected).EndInit();
+			ResumeLayout(false);
+			PerformLayout();
 		}
 
 		#endregion

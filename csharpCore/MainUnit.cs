@@ -1,14 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
+﻿using System.Diagnostics;
 using System.Reflection;
-using System.Resources;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms.VisualStyles;
 
 namespace FontMaker
 {
@@ -56,6 +48,24 @@ namespace FontMaker
 		{
 			try
 			{
+				Assembly thisAssem = typeof(MainUnit).Assembly;
+				AssemblyName thisAssemName = thisAssem.GetName();
+
+				Version ver = thisAssemName.Version;
+				V1 = ver.Major;
+				V2 = ver.Minor;
+				V3 = ver.Build;
+				V4 = ver.Revision;
+
+				return;
+			}
+			catch (Exception ex)
+			{
+				// MessageBox.Show(ex.Message);
+			}
+			/*
+			try
+			{
 				var assembly = Assembly.GetExecutingAssembly();
 				var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
 				var version = fvi.FileVersion.Split('.');
@@ -64,7 +74,11 @@ namespace FontMaker
 				V3 = Int32.Parse(version[2]);
 				V4 = Int32.Parse(version[3]);
 			}
-			catch { }
+			catch (Exception ex)
+			{
+				MessageBox.Show(ex.Message);
+			}
+			*/
 		}
 
 		public static string GetBuildInfoAsString()
@@ -264,7 +278,7 @@ namespace FontMaker
 
 			if (re == DialogResult.Yes)
 			{
-				Environment.Exit(Environment.ExitCode);
+				MainForm.Exit();
 			}
 		}
 
