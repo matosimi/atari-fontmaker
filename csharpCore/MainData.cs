@@ -5,7 +5,15 @@
 	public class AtrViewInfoJSON
 	{
 		public string Version { get; set; }
+		/// <summary>
+		/// Mode 4 indicator
+		/// 1 = mode 4
+		/// </summary>
 		public string ColoredGfx { get; set; }
+
+		/// <summary>
+		/// Characters in the view
+		/// </summary>
 		public string Chars { get; set; }
 
 		public string Lines { get; set; }
@@ -13,13 +21,15 @@
 		public string Colors { get; set; }
 
 		public string Fontname1 { get; set; }
-
 		public string Fontname2 { get; set; }
+		public string Fontname3 { get; set; }
+		public string Fontname4 { get; set; }
 
 		public string Data { get; set; }
 
 		public string FortyBytes { get; set; }
 
+		public List<SavedPageData> Pages { get; set; }
 	}
 
 	public class ClipboardJSON
@@ -32,20 +42,22 @@
 
 	public partial class TMainForm
 	{
-		public static readonly int VIEW_WIDTH = 40;
-		public static readonly int VIEW_HEIGHT = 26;
-		internal byte[] chsline = new byte[VIEW_HEIGHT - 1 + 1];
+		internal byte[] chsline = new byte[Constants.VIEW_HEIGHT];
 		internal string pathf = string.Empty;
+
 		internal string fname1 = string.Empty;
 		internal string fname2 = string.Empty;
+		internal string fname3 = string.Empty;
+		internal string fname4 = string.Empty;
+
 		internal bool gfx = false;
-		internal int ac;
+		internal int activeColorNr;
 		internal byte[] cpal = new byte[6];
 		internal SolidBrush[] cpalBrushes = new SolidBrush[6];
 
 		internal int selectedCharacterIndex = 0;			// The current character 0 - 511
 		internal int duplicateCharacterIndex = 0;
-		internal byte[,] vw = new byte[VIEW_WIDTH - 1 + 1, VIEW_HEIGHT - 1 + 1];
+		internal byte[,] vw = new byte[Constants.VIEW_WIDTH, Constants.VIEW_HEIGHT];
 		internal int clx = 0;
 		internal int cly = 0;
 		internal int clxv = 0;
@@ -65,15 +77,23 @@
 		public static readonly byte[] colorIndex2bits = new byte[] { 0, 0, 1, 2, 3, 3 };
 		public static readonly byte[] bits2colorIndex = new byte[] { 1, 2, 3, 4 };
 		public static readonly int UNDOBUFFERSIZE = 250;
-		public byte[] ft = new byte[2048];
-		public byte[,] undoBuffer = new byte[UNDOBUFFERSIZE + 1, 2048];
+
+		public byte[] ft = new byte[Constants.NUM_FONT_BYTES];
+
+		public byte[,] undoBuffer = new byte[UNDOBUFFERSIZE + 1, Constants.NUM_FONT_BYTES];
+
 		public int[] undoBufferFlags = new int[UNDOBUFFERSIZE + 1];
 		public int undoBufferIndex = 0;
 
+		/// <summary>
+		/// This is the bitmap that contains all 4 fonts draw in 2x2 pixel size
+		/// </summary>
+		public Bitmap bmpFontBanks = new Bitmap(512, 512);
 
-		public Font myFont = new System.Drawing.Font("Microsoft Sans Serif", 8, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 
-
+		/// <summary>
+		/// Load the default "laoo.act" color palette
+		/// </summary>
 		public void LoadPalette()
 		{
 			var buffer = File.ReadAllBytes("laoo.act");
@@ -85,10 +105,14 @@
 			{
 				palette[i] = Color.FromArgb(buffer[i * 3], buffer[i * 3 + 1], buffer[i * 3 + 2]);
 			}
+
 			AtariColorSelectorUnit.AtariColorSelectorForm.SetPalette(palette);
 		}
 
-		public void default_pal()
+		/// <summary>
+		/// Init some default colors into the app's color selection boxes
+		/// </summary>
+		public void SetupDefaultPalColors()
 		{
 			cpal[0] = 14;
 			cpal[1] = 0;
@@ -133,8 +157,7 @@
 			if (src.Image != null)
 				return src.Image;
 
-			var matrix = new Bitmap(w, h);
-			src.Image = matrix;
+			src.Image = new Bitmap(w, h);
 
 			return src.Image;
 		}
