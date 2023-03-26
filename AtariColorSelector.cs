@@ -76,22 +76,16 @@
 			this.Close();
 		}
 
-
-
 		public void FormShow(object Sender, EventArgs e)
 		{
 			DrawPalette();
 			DrawActualColor();
 		}
 
-
-
 		public void SetSelectedColorIndex(byte paletteIndex)
 		{
 			selectedColorIndex = paletteIndex;
 		}
-
-
 
 		public void FormClose(object Sender, FormClosedEventArgs Action)
 		{
@@ -105,30 +99,21 @@
 			}
 		}
 
-
-
 		public void SetPalette(Color[] pal)
 		{
 			palette = pal;
 		}
 
-
-
 		public Color GetColor(byte paletteIndex)
 		{
-			Color getColor_result = Color.Empty;
-			getColor_result = palette[paletteIndex];
-			return getColor_result;
+			return palette[paletteIndex];
 		}
-
-
 
 		public Color[] GetMyPalette()
 		{
-			Color[] getMyPalette_result = new Color[256];
-			getMyPalette_result = palette;
-			return getMyPalette_result;
+			return palette;
 		}
+
 		internal Color[] palette = new Color[256];
 		public byte selectedColorIndex;
 		public byte actualColorIndex;
@@ -140,7 +125,6 @@
 			{
 				Close();
 			}
-
 		}
 	}
 }

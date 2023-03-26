@@ -63,22 +63,6 @@ namespace FontMaker
 			{
 				// MessageBox.Show(ex.Message);
 			}
-			/*
-			try
-			{
-				var assembly = Assembly.GetExecutingAssembly();
-				var fvi = FileVersionInfo.GetVersionInfo(assembly.Location);
-				var version = fvi.FileVersion.Split('.');
-				V1 = Int32.Parse(version[0]);
-				V2 = Int32.Parse(version[1]);
-				V3 = Int32.Parse(version[2]);
-				V4 = Int32.Parse(version[3]);
-			}
-			catch (Exception ex)
-			{
-				MessageBox.Show(ex.Message);
-			}
-			*/
 		}
 
 		public static string GetBuildInfoAsString()
@@ -91,7 +75,7 @@ namespace FontMaker
 			return $"{v1}.{v2}.{v3}.{v4}";
 		}
 
-		public static int GetCharacterPointer(int character)
+		public static int GetCharacterPointer(int character, bool onBank2)
 		{
 			var ry = character / 32;
 			var rx = character % 32;
@@ -106,7 +90,7 @@ namespace FontMaker
 				ry -= 8;
 			}
 
-			return ry * 32 * 8 + rx * 8;
+			return ry * 32 * 8 + rx * 8 + (onBank2 ? 2048 : 0);
 		}
 
 		public static byte[] DecodeBW(byte ln)
@@ -169,10 +153,10 @@ namespace FontMaker
 			return o;
 		}
 
-		public static byte[,] Get5ColorCharacter(int character)
+		public static byte[,] Get5ColorCharacter(int character, bool onBank2)
 		{
-			var get5ColorCharacter_result = new byte[8, 8];
-			var charPtr = GetCharacterPointer(character);
+			var res = new byte[8, 8];
+			var charPtr = GetCharacterPointer(character, onBank2);
 
 			for (var i = 0; i < 8; i++)
 			{
@@ -180,19 +164,19 @@ namespace FontMaker
 
 				for (var j = 0; j < 4; j++)
 				{
-					get5ColorCharacter_result[j, i] = clData[j];
+					res[j, i] = clData[j];
 				}
 
 				charPtr++;
 			}
 
-			return get5ColorCharacter_result;
+			return res;
 		}
 
-		public static byte[,] Get2ColorCharacter(int character)
+		public static byte[,] Get2ColorCharacter(int character, bool onBank2)
 		{
-			var get2ColorCharacter_result = new byte[8, 8];
-			var charPtr = GetCharacterPointer(character);
+			var res = new byte[8, 8];
+			var charPtr = GetCharacterPointer(character, onBank2);
 
 			for (var i = 0; i < 8; i++)
 			{
@@ -200,33 +184,33 @@ namespace FontMaker
 
 				for (var j = 0; j < 8; j++)
 				{
-					get2ColorCharacter_result[j, i] = clData[j];
+					res[j, i] = clData[j];
 				}
 			}
 
-			return get2ColorCharacter_result;
+			return res;
 		}
 
-		public static void Set2ColorCharacter(byte[,] character2color, int character)
+		public static void Set2ColorCharacter(byte[,] pixels, int character, bool onBank2)
 		{
 			var charline2 = new byte[8];
-			var fontByteIndex = GetCharacterPointer(character);
+			var fontByteIndex = GetCharacterPointer(character, onBank2);
 
 			for (var a = 0; a < 8; a++)
 			{
 				for (var b = 0; b < 8; b++)
 				{
-					charline2[b] = character2color[b, a];
+					charline2[b] = pixels[b, a];
 				}
 
 				MainForm.ft[fontByteIndex + a] = EncodeBW(charline2);
 			}
 		}
 
-		public static void Set5ColorCharacter(byte[,] character5color, int character)
+		public static void Set5ColorCharacter(byte[,] character5color, int character, bool onBank2)
 		{
 			var charline5 = new byte[4];
-			var fontByteIndex = GetCharacterPointer(character);
+			var fontByteIndex = GetCharacterPointer(character, onBank2);
 
 			for (var a = 0; a < 8; a++)
 			{
@@ -272,7 +256,7 @@ namespace FontMaker
 			}
 		}
 
-		public static void exitowiec()
+		public static void ExitApplication()
 		{
 			var re = MessageBox.Show("Are you sure you want to quit?", "Atari FontMaker", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
@@ -282,23 +266,26 @@ namespace FontMaker
 			}
 		}
 
-		//TColor > palette index approximator
+		/// <summary>
+		/// Find the palette entry that best approximates the request RGB color
+		/// </summary>
+		/// <param name="rr">Red color component</param>
+		/// <param name="gg">Green color component</param>
+		/// <param name="bb">Blue color component</param>
+		/// <param name="pal">Reference palette where the best fit is searched in</param>
+		/// <returns>Index in the palette that best matches the input RGB</returns>
 		public static byte FindClosest(byte rr, byte gg, byte bb, Color[] pal)
 		{
-			int distR;
-			int distG;
-			int distB;
 			byte best = 0;
-			int newDistance = 0;
 			var bestDistance = 9999999;
 
 			for (var j = 0; j < 128; j++)
 			{
 				var i = j * 2; //only compare with EVEN palette indexes
-				distR = rr - pal[i].R;
-				distG = gg - pal[i].G;
-				distB = bb - pal[i].B;
-				newDistance = distR * distR + distG * distG + distB * distB;
+				var distR = rr - pal[i].R;
+				var distG = gg - pal[i].G;
+				var distB = bb - pal[i].B;
+				var newDistance = distR * distR + distG * distG + distB * distB;
 
 				if (bestDistance > newDistance)
 				{

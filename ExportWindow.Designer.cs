@@ -125,7 +125,7 @@
 			// 
 			ComboBoxFontNumber.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxFontNumber.FormattingEnabled = true;
-			ComboBoxFontNumber.Items.AddRange(new object[] { "1", "2" });
+			ComboBoxFontNumber.Items.AddRange(new object[] { "1", "2", "3", "4" });
 			ComboBoxFontNumber.Location = new Point(104, 8);
 			ComboBoxFontNumber.Name = "ComboBoxFontNumber";
 			ComboBoxFontNumber.Size = new Size(145, 21);
@@ -151,6 +151,7 @@
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
+			CancelButton = Button_Cancel;
 			ClientSize = new Size(360, 443);
 			Controls.Add(Label1);
 			Controls.Add(Label2);

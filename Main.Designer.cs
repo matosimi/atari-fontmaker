@@ -58,6 +58,8 @@
 			b_cpy = new Button();
 			b_pst = new Button();
 			p_hh = new Panel();
+			btnClearFont2 = new Button();
+			btnClearFont1 = new Button();
 			b_load1 = new Button();
 			b_save1as = new Button();
 			b_new = new Button();
@@ -78,6 +80,8 @@
 			b_clrview = new Button();
 			b_sview = new Button();
 			p_status = new Panel();
+			cbFontBank = new CheckBox();
+			imageListFont1234 = new ImageList(components);
 			i_actcol = new PictureBox();
 			l_char = new Label();
 			l_col = new Label();
@@ -104,6 +108,11 @@
 			Shape2 = new PictureBox();
 			Shape2v = new PictureBox();
 			toolTips = new ToolTip(components);
+			cbPages = new ComboBox();
+			btnAddPage = new Button();
+			btnDeletePage = new Button();
+			btnEditPage = new Button();
+			lblCurrentPageIndex = new Label();
 			((System.ComponentModel.ISupportInitialize)i_view).BeginInit();
 			((System.ComponentModel.ISupportInitialize)I_fn).BeginInit();
 			I_fn.SuspendLayout();
@@ -171,6 +180,7 @@
 			// i_abo
 			// 
 			i_abo.Image = (Image)resources.GetObject("i_abo.Image");
+			i_abo.InitialImage = null;
 			i_abo.Location = new Point(536, 136);
 			i_abo.Name = "i_abo";
 			i_abo.Size = new Size(512, 128);
@@ -207,8 +217,8 @@
 			ImageMegaCopyV.TabIndex = 5;
 			ImageMegaCopyV.TabStop = false;
 			ImageMegaCopyV.Visible = false;
-			ImageMegaCopyV.MouseDown += ImageMegaCopyVMouseDown;
-			ImageMegaCopyV.MouseMove += ImageMegaCopyVMouseMove;
+			ImageMegaCopyV.MouseDown += ImageMegaCopyViewMouseDown;
+			ImageMegaCopyV.MouseMove += ImageMegaCopyViewMouseMove;
 			// 
 			// Label_char_view
 			// 
@@ -295,7 +305,7 @@
 			b_shu.Text = "SHU";
 			toolTips.SetToolTip(b_shu, "Shift Up");
 			b_shu.UseVisualStyleBackColor = true;
-			b_shu.Click += b_shuClick;
+			b_shu.Click += ButtonShiftUpClicked;
 			// 
 			// b_vmir
 			// 
@@ -308,7 +318,7 @@
 			b_vmir.Text = "V MIR";
 			toolTips.SetToolTip(b_vmir, "Vertical Mirror (Shift+M)");
 			b_vmir.UseVisualStyleBackColor = true;
-			b_vmir.Click += Mirror_verticalExecute;
+			b_vmir.Click += ButtonMirrorVerticalClicked;
 			// 
 			// b_shr
 			// 
@@ -321,7 +331,7 @@
 			b_shr.Text = "SHR";
 			toolTips.SetToolTip(b_shr, "Shift Right");
 			b_shr.UseVisualStyleBackColor = true;
-			b_shr.Click += b_shrClick;
+			b_shr.Click += ButtonShiftRightClicked;
 			// 
 			// b_shl
 			// 
@@ -334,7 +344,7 @@
 			b_shl.Text = "SHL";
 			toolTips.SetToolTip(b_shl, "Shift Left");
 			b_shl.UseVisualStyleBackColor = true;
-			b_shl.Click += Shift_leftExecute;
+			b_shl.Click += ButtonShiftLeftClicked;
 			// 
 			// b_shd
 			// 
@@ -347,7 +357,7 @@
 			b_shd.Text = "SHD";
 			toolTips.SetToolTip(b_shd, "Shift Down");
 			b_shd.UseVisualStyleBackColor = true;
-			b_shd.Click += b_shdClick;
+			b_shd.Click += ButtonShiftDownClicked;
 			// 
 			// b_ror
 			// 
@@ -360,7 +370,7 @@
 			b_ror.Text = "ROR";
 			toolTips.SetToolTip(b_ror, "Rotate Right (Shift+R)");
 			b_ror.UseVisualStyleBackColor = true;
-			b_ror.Click += Rotate_rightExecute;
+			b_ror.Click += ButtonRotateRightClicked;
 			// 
 			// b_rol
 			// 
@@ -375,7 +385,7 @@
 			toolTips.SetToolTip(b_rol, "Rotate Left (R)");
 			b_rol.UseMnemonic = false;
 			b_rol.UseVisualStyleBackColor = true;
-			b_rol.Click += Rotate_leftExecute;
+			b_rol.Click += ButtonRotateLeftClicked;
 			// 
 			// b_ress
 			// 
@@ -387,7 +397,7 @@
 			b_ress.Text = "RES S";
 			toolTips.SetToolTip(b_ress, "Restore Last Saved");
 			b_ress.UseVisualStyleBackColor = true;
-			b_ress.Click += b_ressClick;
+			b_ress.Click += ButtonRestoreFromLastSavedClicked;
 			// 
 			// b_resd
 			// 
@@ -399,7 +409,7 @@
 			b_resd.Text = "RES D";
 			toolTips.SetToolTip(b_resd, "Restore Default");
 			b_resd.UseVisualStyleBackColor = true;
-			b_resd.Click += b_resdClick;
+			b_resd.Click += ButtonRestoreFromDefaultFontClicked;
 			// 
 			// b_inv
 			// 
@@ -412,7 +422,7 @@
 			b_inv.Text = "INV";
 			toolTips.SetToolTip(b_inv, "Invert (i)");
 			b_inv.UseVisualStyleBackColor = true;
-			b_inv.Click += b_invClick;
+			b_inv.Click += ButtonInverseClicked;
 			// 
 			// b_hmir
 			// 
@@ -425,7 +435,7 @@
 			b_hmir.Text = "H MIR";
 			toolTips.SetToolTip(b_hmir, "Horizontal Mirror (M)");
 			b_hmir.UseVisualStyleBackColor = true;
-			b_hmir.Click += Mirror_horizontalExecute;
+			b_hmir.Click += ButtonMirrorHorizontalClicked;
 			// 
 			// b_clr
 			// 
@@ -438,7 +448,7 @@
 			b_clr.Text = "CLR";
 			toolTips.SetToolTip(b_clr, "Clear");
 			b_clr.UseVisualStyleBackColor = true;
-			b_clr.Click += b_clrClick;
+			b_clr.Click += ButtonClearClicked;
 			// 
 			// b_cpy
 			// 
@@ -449,7 +459,7 @@
 			b_cpy.Text = "CPY";
 			toolTips.SetToolTip(b_cpy, "Copy To Clipboard");
 			b_cpy.UseVisualStyleBackColor = true;
-			b_cpy.Click += Clipboard_copyExecute;
+			b_cpy.Click += ButtonCopyToClipboardClicked;
 			// 
 			// b_pst
 			// 
@@ -461,11 +471,13 @@
 			b_pst.Text = "PST";
 			toolTips.SetToolTip(b_pst, "Paste From Clipboard");
 			b_pst.UseVisualStyleBackColor = true;
-			b_pst.Click += b_pstClick;
+			b_pst.Click += ButtonPasteClicked;
 			// 
 			// p_hh
 			// 
 			p_hh.BorderStyle = BorderStyle.FixedSingle;
+			p_hh.Controls.Add(btnClearFont2);
+			p_hh.Controls.Add(btnClearFont1);
 			p_hh.Controls.Add(b_load1);
 			p_hh.Controls.Add(b_save1as);
 			p_hh.Controls.Add(b_new);
@@ -480,20 +492,45 @@
 			p_hh.Size = new Size(105, 177);
 			p_hh.TabIndex = 0;
 			// 
+			// btnClearFont2
+			// 
+			btnClearFont2.Location = new Point(52, 106);
+			btnClearFont2.Margin = new Padding(0);
+			btnClearFont2.Name = "btnClearFont2";
+			btnClearFont2.Size = new Size(50, 20);
+			btnClearFont2.TabIndex = 10;
+			btnClearFont2.Text = "Clear 2";
+			toolTips.SetToolTip(btnClearFont2, "Blank out font");
+			btnClearFont2.UseVisualStyleBackColor = true;
+			btnClearFont2.Click += btnClearFont2_Click;
+			// 
+			// btnClearFont1
+			// 
+			btnClearFont1.Location = new Point(3, 106);
+			btnClearFont1.Margin = new Padding(0);
+			btnClearFont1.Name = "btnClearFont1";
+			btnClearFont1.Size = new Size(50, 20);
+			btnClearFont1.TabIndex = 9;
+			btnClearFont1.Text = "Clear 1";
+			toolTips.SetToolTip(btnClearFont1, "Blank out font");
+			btnClearFont1.UseVisualStyleBackColor = true;
+			btnClearFont1.Click += btnClearFont1_Click;
+			// 
 			// b_load1
 			// 
-			b_load1.Location = new Point(3, 46);
+			b_load1.Location = new Point(3, 35);
 			b_load1.Margin = new Padding(0);
 			b_load1.Name = "b_load1";
 			b_load1.Size = new Size(50, 20);
 			b_load1.TabIndex = 1;
 			b_load1.Text = "Load 1";
+			toolTips.SetToolTip(b_load1, "Load font");
 			b_load1.UseVisualStyleBackColor = true;
 			b_load1.Click += b_load1Click;
 			// 
 			// b_save1as
 			// 
-			b_save1as.Location = new Point(3, 91);
+			b_save1as.Location = new Point(3, 80);
 			b_save1as.Margin = new Padding(0);
 			b_save1as.Name = "b_save1as";
 			b_save1as.Size = new Size(50, 20);
@@ -514,7 +551,7 @@
 			// 
 			// b_about
 			// 
-			b_about.Location = new Point(8, 128);
+			b_about.Location = new Point(8, 130);
 			b_about.Name = "b_about";
 			b_about.Size = new Size(89, 20);
 			b_about.TabIndex = 5;
@@ -524,7 +561,7 @@
 			// 
 			// b_quit
 			// 
-			b_quit.Location = new Point(8, 152);
+			b_quit.Location = new Point(8, 154);
 			b_quit.Name = "b_quit";
 			b_quit.Size = new Size(89, 20);
 			b_quit.TabIndex = 6;
@@ -534,7 +571,7 @@
 			// 
 			// b_save1
 			// 
-			b_save1.Location = new Point(3, 72);
+			b_save1.Location = new Point(3, 61);
 			b_save1.Margin = new Padding(0);
 			b_save1.Name = "b_save1";
 			b_save1.Size = new Size(50, 20);
@@ -545,7 +582,7 @@
 			// 
 			// b_save2
 			// 
-			b_save2.Location = new Point(52, 72);
+			b_save2.Location = new Point(52, 61);
 			b_save2.Margin = new Padding(0);
 			b_save2.Name = "b_save2";
 			b_save2.Size = new Size(50, 20);
@@ -556,18 +593,19 @@
 			// 
 			// b_load2
 			// 
-			b_load2.Location = new Point(52, 46);
+			b_load2.Location = new Point(52, 35);
 			b_load2.Margin = new Padding(0);
 			b_load2.Name = "b_load2";
 			b_load2.Size = new Size(50, 20);
 			b_load2.TabIndex = 7;
 			b_load2.Text = "Load 2";
+			toolTips.SetToolTip(b_load2, "Load font");
 			b_load2.UseVisualStyleBackColor = true;
 			b_load2.Click += b_load2Click;
 			// 
 			// b_save2as
 			// 
-			b_save2as.Location = new Point(52, 91);
+			b_save2as.Location = new Point(52, 80);
 			b_save2as.Margin = new Padding(0);
 			b_save2as.Name = "b_save2as";
 			b_save2as.Size = new Size(50, 20);
@@ -683,6 +721,7 @@
 			// 
 			// p_status
 			// 
+			p_status.Controls.Add(cbFontBank);
 			p_status.Controls.Add(i_actcol);
 			p_status.Controls.Add(l_char);
 			p_status.Controls.Add(l_col);
@@ -696,9 +735,37 @@
 			p_status.Size = new Size(515, 25);
 			p_status.TabIndex = 6;
 			// 
+			// cbFontBank
+			// 
+			cbFontBank.Appearance = Appearance.Button;
+			cbFontBank.AutoSize = true;
+			cbFontBank.FlatAppearance.CheckedBackColor = SystemColors.Control;
+			cbFontBank.FlatAppearance.MouseDownBackColor = SystemColors.Control;
+			cbFontBank.FlatAppearance.MouseOverBackColor = SystemColors.Control;
+			cbFontBank.FlatStyle = FlatStyle.Flat;
+			cbFontBank.ImageIndex = 0;
+			cbFontBank.ImageList = imageListFont1234;
+			cbFontBank.Location = new Point(469, 3);
+			cbFontBank.Name = "cbFontBank";
+			cbFontBank.Size = new Size(46, 22);
+			cbFontBank.TabIndex = 12;
+			cbFontBank.TextImageRelation = TextImageRelation.ImageBeforeText;
+			cbFontBank.UseMnemonic = false;
+			cbFontBank.UseVisualStyleBackColor = true;
+			cbFontBank.CheckedChanged += cbFontBank_CheckedChanged;
+			cbFontBank.Click += cbFontBank_Click;
+			// 
+			// imageListFont1234
+			// 
+			imageListFont1234.ColorDepth = ColorDepth.Depth8Bit;
+			imageListFont1234.ImageStream = (ImageListStreamer)resources.GetObject("imageListFont1234.ImageStream");
+			imageListFont1234.TransparentColor = Color.Transparent;
+			imageListFont1234.Images.SetKeyName(0, "12.bmp");
+			imageListFont1234.Images.SetKeyName(1, "34.bmp");
+			// 
 			// i_actcol
 			// 
-			i_actcol.Location = new Point(232, 6);
+			i_actcol.Location = new Point(228, 6);
 			i_actcol.Name = "i_actcol";
 			i_actcol.Size = new Size(49, 17);
 			i_actcol.TabIndex = 0;
@@ -718,7 +785,7 @@
 			// 
 			l_col.AutoSize = true;
 			l_col.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-			l_col.Location = new Point(199, 7);
+			l_col.Location = new Point(195, 7);
 			l_col.Name = "l_col";
 			l_col.Size = new Size(34, 13);
 			l_col.TabIndex = 2;
@@ -726,8 +793,7 @@
 			// 
 			// cb_dupes
 			// 
-			cb_dupes.AutoSize = true;
-			cb_dupes.Location = new Point(366, 5);
+			cb_dupes.Location = new Point(341, 7);
 			cb_dupes.Name = "cb_dupes";
 			cb_dupes.Size = new Size(49, 17);
 			cb_dupes.TabIndex = 11;
@@ -740,9 +806,9 @@
 			// 
 			SpeedButtonMegaCopy.Appearance = Appearance.Button;
 			SpeedButtonMegaCopy.CheckAlign = ContentAlignment.MiddleCenter;
-			SpeedButtonMegaCopy.Location = new Point(426, 3);
+			SpeedButtonMegaCopy.Location = new Point(394, 3);
 			SpeedButtonMegaCopy.Name = "SpeedButtonMegaCopy";
-			SpeedButtonMegaCopy.Size = new Size(89, 21);
+			SpeedButtonMegaCopy.Size = new Size(74, 21);
 			SpeedButtonMegaCopy.TabIndex = 3;
 			SpeedButtonMegaCopy.Text = "Mega Copy";
 			SpeedButtonMegaCopy.TextAlign = ContentAlignment.MiddleCenter;
@@ -752,7 +818,7 @@
 			// SpeedButtonUndo
 			// 
 			SpeedButtonUndo.Image = (Image)resources.GetObject("SpeedButtonUndo.Image");
-			SpeedButtonUndo.Location = new Point(298, 2);
+			SpeedButtonUndo.Location = new Point(284, 2);
 			SpeedButtonUndo.Name = "SpeedButtonUndo";
 			SpeedButtonUndo.Size = new Size(22, 22);
 			SpeedButtonUndo.TabIndex = 4;
@@ -762,7 +828,7 @@
 			// SpeedButtonRedo
 			// 
 			SpeedButtonRedo.Image = (Image)resources.GetObject("SpeedButtonRedo.Image");
-			SpeedButtonRedo.Location = new Point(326, 2);
+			SpeedButtonRedo.Location = new Point(312, 2);
 			SpeedButtonRedo.Name = "SpeedButtonRedo";
 			SpeedButtonRedo.Size = new Size(22, 22);
 			SpeedButtonRedo.TabIndex = 5;
@@ -774,7 +840,7 @@
 			ComboBoxWriteMode.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxWriteMode.FormattingEnabled = true;
 			ComboBoxWriteMode.Items.AddRange(new object[] { "Rewrite", "Insert" });
-			ComboBoxWriteMode.Location = new Point(122, 3);
+			ComboBoxWriteMode.Location = new Point(126, 3);
 			ComboBoxWriteMode.Name = "ComboBoxWriteMode";
 			ComboBoxWriteMode.Size = new Size(66, 21);
 			ComboBoxWriteMode.TabIndex = 0;
@@ -945,12 +1011,67 @@
 			Shape2v.MouseMove += Shape2vMouseMove;
 			Shape2v.MouseUp += Shape2vMouseUp;
 			// 
+			// cbPages
+			// 
+			cbPages.DropDownStyle = ComboBoxStyle.DropDownList;
+			cbPages.FormattingEnabled = true;
+			cbPages.Location = new Point(695, 443);
+			cbPages.Name = "cbPages";
+			cbPages.Size = new Size(121, 21);
+			cbPages.TabIndex = 16;
+			cbPages.SelectedIndexChanged += cbPages_SelectedIndexChanged;
+			// 
+			// btnAddPage
+			// 
+			btnAddPage.Location = new Point(817, 443);
+			btnAddPage.Name = "btnAddPage";
+			btnAddPage.Size = new Size(25, 21);
+			btnAddPage.TabIndex = 17;
+			btnAddPage.Text = "+";
+			btnAddPage.UseVisualStyleBackColor = true;
+			btnAddPage.Click += btnAddPage_Click;
+			// 
+			// btnDeletePage
+			// 
+			btnDeletePage.Location = new Point(845, 443);
+			btnDeletePage.Name = "btnDeletePage";
+			btnDeletePage.Size = new Size(25, 21);
+			btnDeletePage.TabIndex = 18;
+			btnDeletePage.Text = "-";
+			btnDeletePage.UseVisualStyleBackColor = true;
+			btnDeletePage.Click += btnDeletePage_Click;
+			// 
+			// btnEditPage
+			// 
+			btnEditPage.Location = new Point(872, 443);
+			btnEditPage.Name = "btnEditPage";
+			btnEditPage.Size = new Size(38, 21);
+			btnEditPage.TabIndex = 19;
+			btnEditPage.Text = "Edit";
+			btnEditPage.UseVisualStyleBackColor = true;
+			btnEditPage.Click += btnEditPage_Click;
+			// 
+			// lblCurrentPageIndex
+			// 
+			lblCurrentPageIndex.Location = new Point(663, 448);
+			lblCurrentPageIndex.Name = "lblCurrentPageIndex";
+			lblCurrentPageIndex.Size = new Size(30, 15);
+			lblCurrentPageIndex.TabIndex = 20;
+			lblCurrentPageIndex.Text = "#0";
+			lblCurrentPageIndex.TextAlign = ContentAlignment.TopRight;
+			lblCurrentPageIndex.UseMnemonic = false;
+			// 
 			// TMainForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1048, 465);
+			Controls.Add(lblCurrentPageIndex);
+			Controls.Add(btnEditPage);
+			Controls.Add(btnDeletePage);
+			Controls.Add(btnAddPage);
+			Controls.Add(cbPages);
 			Controls.Add(i_abo);
 			Controls.Add(p_color_switch);
 			Controls.Add(ImageMegacopy);
@@ -1151,9 +1272,14 @@
 				var ry = dupe / 32;
 				var fontNr = dupe / 256;
 
-				ShapeDupes.Left = /*I_fn.Left + */rx * 16 - 2;
-				ShapeDupes.Top = /*I_fn.Top + */ry * 16 - 2;
+				ShapeDupes.Left = rx * 16 - 2;
+				ShapeDupes.Top = ry * 16 - 2;
 				ShapeDupes.Visible = true;
+			}
+			else
+			{
+				// Rounded back to the start character
+				int a = 0;
 			}
 		}
 
@@ -1162,5 +1288,14 @@
 		private PictureBox Shape2;
 		private PictureBox Shape2v;
 		private ToolTip toolTips;
+		private ComboBox cbPages;
+		private Button btnAddPage;
+		private Button btnDeletePage;
+		private Button btnEditPage;
+		private Label lblCurrentPageIndex;
+		private CheckBox cbFontBank;
+		private ImageList imageListFont1234;
+		private Button btnClearFont1;
+		private Button btnClearFont2;
 	}
 }

@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Drawing.Imaging;
-using System.Linq;
-using System.Reflection;
+﻿using System.Drawing.Imaging;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace FontMaker
 {
-    public partial class ExportWindowUnit
+    public static class ExportWindowUnit
 	{
 		public enum FormatTypes
         {
@@ -21,18 +16,11 @@ namespace FontMaker
 			BasicListingFile,
 		};
 
-		public enum DataTypes
-		{
-
-		};
-
-
 		public static ExportWindow ExportWindowForm { get; set; } = new ExportWindow();
 
-		public static void saveFontBMP(int fi, string fn, Image bmp1)
+		public static void SaveFontBMP(int fi, string fn, Image bmp1)
 		{
-
-			int fntIndex = 128 * fi;
+			var fntIndex = 128 * fi;
 
 			var destRect = new Rectangle
 			{
@@ -45,7 +33,7 @@ namespace FontMaker
 			var srcRect = new Rectangle
 			{
 				X = 0,
-				Y = 128 * fi,
+				Y = 0,
 				Width = 1,
 				Height = 1,
 			};
@@ -73,7 +61,7 @@ namespace FontMaker
 			bmp2.Image.Save(fn, ImageFormat.Bmp);
 		}
 
-		public static void saveRemFont(int fi, string fn)
+		public static void SaveRemFont(int fi, string fn)
 		{
 			// Load the basic starting REM font from disc
 			try
@@ -96,7 +84,6 @@ namespace FontMaker
 
 				// Write the updated font to disc
 				File.WriteAllBytes(fn, buf);
-                return;
             }
 			catch(Exception ex)
 			{
@@ -107,7 +94,7 @@ namespace FontMaker
 		/* //////////////////////////////////////////////////////////////////////////////
 		          export data to assembler language, action! and atari basic
 		//////////////////////////////////////////////////////////////////////////////-*/
-		public static string generateFileAsText(int fontNumber, FormatTypes exportType, int dataType)
+		public static string GenerateFileAsText(int fontNumber, FormatTypes exportType, int dataType)
 		{
 			var sb = new StringBuilder();
 

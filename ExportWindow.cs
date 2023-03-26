@@ -128,7 +128,7 @@ namespace FontMaker
 
 			if ((ComboBoxExportType.SelectedIndex > 0) && (ComboBoxExportType.SelectedIndex < 6))
 			{
-				MemoExport.Text = ExportWindowUnit.generateFileAsText(
+				MemoExport.Text = ExportWindowUnit.GenerateFileAsText(
 					ComboBoxFontNumber.SelectedIndex,
 					(FormatTypes)ComboBoxExportType.SelectedIndex,
 					ComboBoxDataType.SelectedIndex);
@@ -154,7 +154,7 @@ namespace FontMaker
 
 				if (d_save.ShowDialog() == DialogResult.OK)
 				{
-					ExportWindowUnit.saveFontBMP(ComboBoxFontNumber.SelectedIndex, d_save.FileName, MainUnit.MainForm.I_fn.Image);
+					ExportWindowUnit.SaveFontBMP(ComboBoxFontNumber.SelectedIndex, d_save.FileName, MainUnit.MainForm.bmpFontBanks);
 				}
 
 				return;
@@ -175,7 +175,7 @@ namespace FontMaker
 
 				if (d_save.ShowDialog() == DialogResult.OK)
 				{
-					var text = ExportWindowUnit.generateFileAsText(ComboBoxFontNumber.SelectedIndex, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex);
+					var text = ExportWindowUnit.GenerateFileAsText(ComboBoxFontNumber.SelectedIndex, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex);
 
 					File.WriteAllText(d_save.FileName, text);
 				}
@@ -198,7 +198,7 @@ namespace FontMaker
 
 				if (d_save.ShowDialog() == DialogResult.OK)
 				{
-					ExportWindowUnit.saveRemFont(ComboBoxFontNumber.SelectedIndex, d_save.FileName);
+					ExportWindowUnit.SaveRemFont(ComboBoxFontNumber.SelectedIndex, d_save.FileName);
 				}
 			}
 		}
