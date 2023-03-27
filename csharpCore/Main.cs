@@ -896,7 +896,7 @@ namespace FontMaker
 									var brush = cpalBrushes[fb + 1];
 									gr.FillRectangle(brush, colOffset + x * 4, y * 2 + rowOffset, 4, 2);
 									// Invert
-									if (fb == 4)
+									if (fb == 3)
 									{
 										brush = cpalBrushes[5];
 									}
@@ -907,7 +907,7 @@ namespace FontMaker
 									brush = cpalBrushes[fb + 1];
 									gr.FillRectangle(brush, colOffset + x * 4, y * 2 + rowOffset + 128, 4, 2);
 									// Invert
-									if (fb == 4)
+									if (fb == 3)
 									{
 										brush = cpalBrushes[5];
 									}
@@ -918,7 +918,7 @@ namespace FontMaker
 									brush = cpalBrushes[fb + 1];
 									gr.FillRectangle(brush, colOffset + x * 4, y * 2 + rowOffset + 256, 4, 2);
 									// Invert
-									if (fb == 4)
+									if (fb == 3)
 									{
 										brush = cpalBrushes[5];
 									}
@@ -929,7 +929,7 @@ namespace FontMaker
 									brush = cpalBrushes[fb + 1];
 									gr.FillRectangle(brush, colOffset + x * 4, y * 2 + rowOffset + 384, 4, 2);
 									// Invert
-									if (fb == 4)
+									if (fb == 3)
 									{
 										brush = cpalBrushes[5];
 									}
