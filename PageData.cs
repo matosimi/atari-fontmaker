@@ -152,6 +152,7 @@
 		{
 			lblCurrentPageIndex.Text = $"#{cbPages.SelectedIndex}";
 			RedrawView();
+			RedrawLineTypes();
 
 			btnDeletePage.Enabled = Pages.Count > 1;
 		}

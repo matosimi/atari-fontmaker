@@ -155,9 +155,8 @@
 			// 
 			// I_fn
 			// 
-			I_fn.BorderStyle = BorderStyle.FixedSingle;
 			I_fn.Controls.Add(ShapeDupes);
-			I_fn.Location = new Point(2, 208);
+			I_fn.Location = new Point(2, 207);
 			I_fn.Name = "I_fn";
 			I_fn.Size = new Size(512, 256);
 			I_fn.TabIndex = 1;
@@ -1066,7 +1065,7 @@
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
-			ClientSize = new Size(1048, 465);
+			ClientSize = new Size(1048, 466);
 			Controls.Add(lblCurrentPageIndex);
 			Controls.Add(btnEditPage);
 			Controls.Add(btnDeletePage);
