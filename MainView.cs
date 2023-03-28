@@ -363,9 +363,6 @@ namespace FontMaker
 				var rx = selectedCharacterIndex % 32;		// Character x,y
 				var ry = selectedCharacterIndex / 32;
 
-				var fontYOffset = Constants.FontYOffset[cbFontBank.Checked ? 2 : 0];
-				var bankSelector = cbFontBank.Checked ? 3 : 1;
-
 				var srcRect = new Rectangle
 				{
 					X = rx * 16,
@@ -376,12 +373,11 @@ namespace FontMaker
 
 				for (var y = 0; y < Constants.VIEW_HEIGHT; y++)
 				{
-					if (chsline[y] != bankSelector && chsline[y] != (bankSelector + 1))
-						continue;
+					var fontYOffset = Constants.FontPageOffset[chsline[y]-1];
 
 					ry = (ry | 8);
 
-					if (chsline[y] == bankSelector)
+					if (chsline[y] == 1 || chsline[y] == 3)
 					{
 						ry = (ry ^ 8);
 					}

@@ -11,5 +11,7 @@
 		public static Rectangle RectFontBank34 = new Rectangle(0, 256, 512, 512);
 
 		public static int[] FontYOffset = new int[4] { 0, 128, 256, 384 };
+
+		public static int[] FontPageOffset = new int[4] { 0, 0, 256, 256 };
 	}
 }
