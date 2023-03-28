@@ -15,6 +15,8 @@ namespace FontMaker
 		private static SolidBrush whiteBrush = new(Color.White);
 		private static SolidBrush cyanBrush = new(Color.Cyan);
 		private static SolidBrush redBrush = new(Color.Red);
+		private static SolidBrush yellowBrush = new(Color.Yellow);
+		private static SolidBrush greenBrush = new(Color.Green);
 
 		private List<System.Windows.Forms.Button> ActionListNormalModeOnly = new();
 
@@ -384,7 +386,7 @@ namespace FontMaker
 		{
 			d_open.FileName = string.Empty;
 			d_open.InitialDirectory = pathf;
-			d_open.Filter = "Atari font 1 or Dual font (*.fnt,*.fn2)|*.fnt;*.fn2";
+			d_open.Filter = $"Atari font {(cbFontBank.Checked ? 3 : 1)} or Dual font (*.fnt,*.fn2)|*.fnt;*.fn2";
 			var ok = d_open.ShowDialog();
 
 			if (ok == DialogResult.OK)
@@ -430,7 +432,7 @@ namespace FontMaker
 		{
 			d_open.FileName = string.Empty;
 			d_open.InitialDirectory = pathf;
-			d_open.Filter = "Atari font 2 (*.fnt)|*.fnt";
+			d_open.Filter = $"Atari font {(cbFontBank.Checked ? 4 : 2)} (*.fnt)|*.fnt";
 			var ok = d_open.ShowDialog();
 
 			if (ok == DialogResult.OK)
@@ -479,7 +481,7 @@ namespace FontMaker
 		{
 			d_save.FileName = string.Empty;
 			d_save.InitialDirectory = pathf;
-			d_save.Filter = "Atari font 1(*.fnt)|*.fnt";
+			d_save.Filter = $"Atari font {(cbFontBank.Checked ? 3 : 1)} (*.fnt)|*.fnt";
 			d_save.DefaultExt = "fnt";
 			var ok = d_save.ShowDialog();
 
@@ -501,7 +503,7 @@ namespace FontMaker
 		{
 			d_save.FileName = string.Empty;
 			d_save.InitialDirectory = pathf;
-			d_save.Filter = "Atari font 2(*.fnt)|*.fnt";
+			d_save.Filter = $"Atari font {(cbFontBank.Checked ? 4 : 2)} (*.fnt)|*.fnt";
 			d_save.DefaultExt = "fnt";
 			var ok = d_save.ShowDialog();
 
@@ -1737,6 +1739,7 @@ namespace FontMaker
 				Shape1v.Visible = false;
 				Shape2v.Width = 20;
 				Shape2v.Height = 20;
+				Shape2v_Resize();
 				var bx = selectedCharacterIndex % 32;
 				var by = selectedCharacterIndex / 32;
 				I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 0, bx * 16 + 4, by * 16 + 4, 0));
@@ -1853,7 +1856,9 @@ namespace FontMaker
 				ImageMegaCopyV.Image = ImageMegacopy.Image;
 
 				Shape2.Size = new Size(4 + w, 4 + h);
-				Shape2v.Size = new Size(w, h);
+				Shape2_Resize();
+				Shape2v.Size = new Size(4 + w, 4 + h);
+				Shape2v_Resize();
 			}
 		}
 
@@ -2143,6 +2148,46 @@ namespace FontMaker
 			I_fnMouseDown(null, new MouseEventArgs(MouseButtons.Left, 0, (selectedCharacterIndex % 32) * 16, (selectedCharacterIndex / 32) * 16, 0));
 			RedrawView();
 			CheckDuplicate();
+		}
+
+		private void Shape2_Resize()
+		{
+			var img = NewImage(Shape2);
+			using (var gr = Graphics.FromImage(img))
+			{
+				gr.FillRectangle(greenBrush, new Rectangle(0, 0, img.Width, img.Height));
+				Shape2.Region?.Dispose();
+				Shape2.Size = new Size(img.Width, img.Height);
+
+			}
+			var graphicsPath = new GraphicsPath();
+			graphicsPath.AddRectangle(new Rectangle(0, 0, Shape2.Width, 2));
+			graphicsPath.AddRectangle(new Rectangle(Shape2.Width - 2, 0, 2, Shape2.Height));
+			graphicsPath.AddRectangle(new Rectangle(0, Shape2.Height - 2, Shape2.Width, 2));
+			graphicsPath.AddRectangle(new Rectangle(0, 0, 2, Shape2.Height));
+			Shape2.Region = new Region(graphicsPath);
+
+			Shape2.Refresh();
+		}
+
+		private void Shape2v_Resize()
+		{
+			var img = NewImage(Shape2v);
+			using (var gr = Graphics.FromImage(img))
+			{
+				gr.FillRectangle(yellowBrush, new Rectangle(0, 0, img.Width, img.Height));
+				Shape2v.Region?.Dispose();
+				Shape2v.Size = new Size(img.Width, img.Height);
+
+			}
+			var graphicsPath = new GraphicsPath();
+			graphicsPath.AddRectangle(new Rectangle(0, 0, Shape2v.Width, 2));
+			graphicsPath.AddRectangle(new Rectangle(Shape2v.Width - 2, 0, 2, Shape2v.Height));
+			graphicsPath.AddRectangle(new Rectangle(0, Shape2v.Height - 2, Shape2v.Width, 2));
+			graphicsPath.AddRectangle(new Rectangle(0, 0, 2, Shape2v.Height));
+			Shape2v.Region = new Region(graphicsPath);
+
+			Shape2v.Refresh();
 		}
 
 	}
