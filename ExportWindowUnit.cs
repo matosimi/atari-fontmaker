@@ -61,29 +61,29 @@ namespace FontMaker
 			bmp2.Image.Save(fn, ImageFormat.Bmp);
 		}
 
-		public static void SaveRemFont(int fi, string fn)
+		public static void SaveRemFont(int fontIndex, string fileName)
 		{
 			// Load the basic starting REM font from disc
 			try
 			{
-                var buf = File.ReadAllBytes("basicremfont.lst");
+                byte[] buf = MainUnit.GetResource<byte[]>("basicremfont.lst");
 
                 // Write the font values into the "loaded" font file
                 for (var j = 0; j < 9; j++)
                 {
                     for (var i = 0; i < 0x68; i++)
                     {
-                        buf[6 + i + j * (0x68 + 7)] = MainUnit.MainForm.ft[1024 * fi + i + 0x68 * j];
+                        buf[6 + i + j * (0x68 + 7)] = MainUnit.MainForm.ft[1024 * fontIndex + i + 0x68 * j];
                     }
                 }
 
                 for (var i = 0; i < 0x58; i++)
                 {
-                    buf[6 + i + 9 * (0x68 + 7)] = MainUnit.MainForm.ft[1024 * fi + i + 0x68 * 9];
+                    buf[6 + i + 9 * (0x68 + 7)] = MainUnit.MainForm.ft[1024 * fontIndex + i + 0x68 * 9];
                 }
 
-				// Write the updated font to disc
-				File.WriteAllBytes(fn, buf);
+				// Write the updated font to disk
+				File.WriteAllBytes(fileName, buf);
             }
 			catch(Exception ex)
 			{
@@ -148,7 +148,7 @@ namespace FontMaker
 
 					if (exportType == FormatTypes.FastBasic)
 					{
-						sb.Append(",");
+						sb.Append(',');
 					}
 
 					sb.AppendLine(String.Empty);
@@ -179,7 +179,7 @@ namespace FontMaker
 				{
 					if (exportType == FormatTypes.Action)
 					{
-						sb.Append(" ");
+						sb.Append(' ');
 					}
 
 					if ((exportType == FormatTypes.Assembler) 
@@ -187,7 +187,7 @@ namespace FontMaker
 						|| (exportType == FormatTypes.FastBasic) 
 						|| (exportType == FormatTypes.MADSdta))
 					{
-						sb.Append(",");
+						sb.Append(',');
 					}
 				}
 			}

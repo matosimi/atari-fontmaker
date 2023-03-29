@@ -1,4 +1,6 @@
-﻿namespace FontMaker
+﻿using System.Reflection;
+
+namespace FontMaker
 {
 	public class MainData { }
 
@@ -92,20 +94,17 @@
 
 
 		/// <summary>
-		/// Load the default "laoo.act" color palette
+		/// Load the color palette
 		/// </summary>
 		public void LoadPalette()
 		{
-			var buffer = File.ReadAllBytes("laoo.act");
-			if (buffer.Length < 768)
-				MessageBox.Show("Palette load error");
-
+			// Get the embedded resource palette as byte[] 
+			byte[] buffer = MainUnit.GetResource<byte[]>("altirraPAL.pal");
 			// Make Color values out of the bytes
 			for (var i = 0; i < 256; ++i)
 			{
 				palette[i] = Color.FromArgb(buffer[i * 3], buffer[i * 3 + 1], buffer[i * 3 + 2]);
 			}
-
 			AtariColorSelectorUnit.AtariColorSelectorForm.SetPalette(palette);
 		}
 
@@ -120,7 +119,6 @@
 			cpal[3] = 202;
 			cpal[4] = 148;
 			cpal[5] = 70;
-
 			BuildBrushCache();
 		}
 

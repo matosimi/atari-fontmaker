@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using System.Drawing.Drawing2D;
 using System.Text;
+using System.Text.Json;
 using TinyJson;
 
 namespace FontMaker
@@ -360,7 +361,7 @@ namespace FontMaker
 					Height = 16,
 				};
 
-				var rx = selectedCharacterIndex % 32;		// Character x,y
+				var rx = selectedCharacterIndex % 32;       // Character x,y
 				var ry = selectedCharacterIndex / 32;
 
 				var srcRect = new Rectangle
@@ -373,7 +374,7 @@ namespace FontMaker
 
 				for (var y = 0; y < Constants.VIEW_HEIGHT; y++)
 				{
-					var fontYOffset = Constants.FontPageOffset[chsline[y]-1];
+					var fontYOffset = Constants.FontPageOffset[chsline[y] - 1];
 
 					ry = (ry | 8);
 
@@ -508,8 +509,7 @@ namespace FontMaker
 
 			try
 			{
-				var jtext = File.ReadAllText(filename, Encoding.UTF8);
-
+				string jtext = filename is null ? MainUnit.GetResource<string>("default.atrview") : File.ReadAllText(filename, Encoding.UTF8);
 				var jsonObj = jtext.FromJson<AtrViewInfoJSON>();
 
 				int.TryParse(jsonObj.Version, out var version);
@@ -525,8 +525,8 @@ namespace FontMaker
 
 					filenames[0] = jsonObj.Fontname1;
 					filenames[1] = jsonObj.Fontname2;
-					filenames[2] = jsonObj.Fontname3 == null ? "default.fnt" : jsonObj.Fontname3;
-					filenames[3] = jsonObj.Fontname4 == null ? "default.fnt" : jsonObj.Fontname4;
+					filenames[2] = jsonObj.Fontname3 == null ? "Default.fnt" : jsonObj.Fontname3;
+					filenames[3] = jsonObj.Fontname4 == null ? "Default.fnt" : jsonObj.Fontname4;
 
 					if (version < 2007)
 					{
@@ -625,10 +625,10 @@ namespace FontMaker
 
 				// Set some defaults!
 				SetupDefaultPalColors();
-				fname1 = "default.fnt";
-				fname2 = "default.fnt";
-				fname3 = "default.fnt";
-				fname4 = "default.fnt";
+				fname1 = "Default.fnt";
+				fname2 = "Default.fnt";
+				fname3 = "Default.fnt";
+				fname4 = "Default.fnt";
 			}
 
 			// Make sure the cpal values have valid brushes for painting!
@@ -722,7 +722,7 @@ namespace FontMaker
 				// Reset to 1
 				chsline[ry] = 1;
 			}
-			else if (Control.ModifierKeys == Keys.Shift)
+			else if (Control.ModifierKeys == Keys.Shift || e.Button == MouseButtons.Right)
 			{
 				// Cycle backwards
 				--chsline[ry];
