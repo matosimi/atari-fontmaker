@@ -1,6 +1,6 @@
 ﻿namespace FontMaker
 {
-	partial class TAtariColorSelectorForm
+	partial class AtariColorSelectorForm
 	{
 		/// <summary>
 		/// Required designer variable.

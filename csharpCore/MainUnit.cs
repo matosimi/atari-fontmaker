@@ -1,4 +1,5 @@
-﻿using System.Diagnostics;
+﻿using System.CodeDom;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -223,40 +224,35 @@ namespace FontMaker
 			}
 		}
 
-		public static readonly string CutFromResourceNameToGetFilename = "FontMaker.Resources.";
-		public static readonly string[] Filenames = new string[] { "Default.fnt", "basicremfont.lst", "default.atrview", "laoo.act" };
-		/// <summary>
-		/// Make sure that the basic files we need to boot are there.
-		/// </summary>
-		public static void CheckResources()
+		public static T GetResource<T>(string shortResourceName)
 		{
 			var assembly = Assembly.GetExecutingAssembly();
-			var names = assembly.GetManifestResourceNames();
-
-			var loc = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-
-			foreach (var name in names)
+			var resourceName = $"FontMaker.Resources.{shortResourceName}";
+			if (typeof(T) == typeof(string))
 			{
-				var myName = name.Replace(CutFromResourceNameToGetFilename, "");
-				if (Filenames.Contains(myName))
+				using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+				using (StreamReader reader = new StreamReader(stream))
 				{
-					if (!File.Exists(myName))
-					{
-						var res = assembly.GetManifestResourceStream(name);
-						if (res != null)
-						{
-							var bytes = new byte[res.Length];
-							res.Read(bytes, 0, (int)res.Length);
 
-							// Now write the file to the disc
-							File.WriteAllBytes(myName, bytes);
-						}
-					}
+                    return (T)(object)reader.ReadToEnd();
 				}
 			}
+			else if (typeof(T) == typeof(byte[]))
+			{
+				using (Stream stream = assembly.GetManifestResourceStream(resourceName))
+				using (BinaryReader reader = new(stream))
+				{
+
+					return (T)(object)reader.ReadBytes((int)stream.Length);
+				}
+
+			}
+			else
+				throw new Exception("Unsupported resource object type");
 		}
 
-		public static void ExitApplication()
+
+        public static void ExitApplication()
 		{
 			var re = MessageBox.Show("Are you sure you want to quit?", "Atari FontMaker", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 

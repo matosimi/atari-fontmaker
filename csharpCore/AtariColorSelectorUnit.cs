@@ -2,10 +2,10 @@
 {
 	public static class AtariColorSelectorUnit
 	{
-		public static TAtariColorSelectorForm AtariColorSelectorForm
+		public static AtariColorSelectorForm AtariColorSelectorForm
 		{
 			get;
 			set;
-		} = new TAtariColorSelectorForm();
+		} = new AtariColorSelectorForm();
 	}
 }

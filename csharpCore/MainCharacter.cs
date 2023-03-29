@@ -260,7 +260,7 @@ namespace FontMaker
 				var whichCharacter = selectedCharacterIndex & 127;
 
 				// Load the font bytes
-				var data = File.ReadAllBytes(Path.Join(AppContext.BaseDirectory, "Default.fnt"));
+				byte[] data = MainUnit.GetResource<byte[]>("Default.fnt");
 
 				var fontNumber = selectedCharacterIndex > 255 ? 1 : 0;
 				fontNumber += cbFontBank.Checked ? 2 : 0;

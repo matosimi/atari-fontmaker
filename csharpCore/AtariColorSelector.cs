@@ -1,8 +1,8 @@
 ﻿namespace FontMaker
 {
-	public partial class TAtariColorSelectorForm : Form
+	public partial class AtariColorSelectorForm : Form
 	{
-		public TAtariColorSelectorForm()
+		public AtariColorSelectorForm()
 		{
 			InitializeComponent();
 

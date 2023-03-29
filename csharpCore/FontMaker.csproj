@@ -15,7 +15,7 @@
 	<FileVersion>1.6.2.3</FileVersion>
 	<AssemblyVersion>1.6.2.3</AssemblyVersion>
 	<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	<Version>1.6.2.3</Version>
+	<Version>1.6.2.4</Version>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -27,10 +27,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Resources\altirraPAL.pal" />
     <None Remove="Resources\basicremfont.lst" />
     <None Remove="Resources\default.atrview" />
     <None Remove="Resources\Default.fnt" />
-    <None Remove="Resources\laoo.act" />
   </ItemGroup>
 
   <ItemGroup>
@@ -38,10 +38,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="Resources\altirraPAL.pal" />
     <EmbeddedResource Include="Resources\basicremfont.lst" />
     <EmbeddedResource Include="Resources\default.atrview" />
     <EmbeddedResource Include="Resources\Default.fnt" />
-    <EmbeddedResource Include="Resources\laoo.act" />
   </ItemGroup>
 
   <ItemGroup>
@@ -54,7 +54,7 @@
 
   <ItemGroup>
     <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
+      <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>

@@ -49,7 +49,7 @@ namespace FontMaker
 
 			activeColorNr = 2;
 
-			MainUnit.CheckResources();          // Make sure that the default files we need are unpacked in the exe folder
+
 			LoadPalette();
 
 			// UndoBuffer initialization
@@ -124,7 +124,7 @@ namespace FontMaker
 				Timer1.Enabled = true;
 				i_abo.Visible = true;
 
-				LoadViewFile("default.atrview", true);
+				LoadViewFile(null, true);
 				UpdateFormCaption();
 				RedrawSet();
 				RedrawLineTypes();
@@ -133,7 +133,7 @@ namespace FontMaker
 				RedrawViewChar();
 				RedrawChar();
 				ext = ".atrview";
-				b_save1Click(null, EventArgs.Empty);
+				//b_save1Click(null, EventArgs.Empty);
 			}
 
 			if (ext != ".atrview")
@@ -1076,7 +1076,7 @@ namespace FontMaker
 			finally
 			{
 				fs.Close();
-				fs = null;
+				fs.Dispose();
 			}
 
 			if (loadSize != expSize)
@@ -1099,12 +1099,11 @@ namespace FontMaker
 			try
 			{
 				fs.Write(ft, fontNr * 1024, 1024);
-
 			}
 			finally
 			{
 				fs.Close();
-				fs = null;
+				fs.Dispose();
 			}
 		}
 
@@ -1628,8 +1627,7 @@ namespace FontMaker
 			if (re == DialogResult.Yes)
 			{
 				pathf = AppContext.BaseDirectory;
-				MainUnit.CheckResources();
-				LoadViewFile("default.atrview", true);
+				LoadViewFile(null, true);
 				cbFontBank.Checked = false;
 				UpdateFormCaption();
 				RedrawSet();
@@ -1638,7 +1636,7 @@ namespace FontMaker
 				RedrawPal();
 				RedrawViewChar();
 				RedrawChar();
-				b_save1Click(null, EventArgs.Empty);
+				// b_save1Click(null, EventArgs.Empty);
 			}
 		}
 
