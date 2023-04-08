@@ -76,7 +76,7 @@
 			LabelOldColor.Text = "$00 - 0";
 			LabelOldColor.TextAlign = ContentAlignment.MiddleCenter;
 			// 
-			// TAtariColorSelectorForm
+			// AtariColorSelectorForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
@@ -87,9 +87,9 @@
 			Controls.Add(LabelActualColor);
 			Controls.Add(LabelOldColor);
 			FormBorderStyle = FormBorderStyle.FixedDialog;
-			Name = "TAtariColorSelectorForm";
+			Name = "AtariColorSelectorForm";
 			Text = "AtariColorSelector";
-			KeyDown += TAtariColorSelectorForm_KeyDown;
+			KeyDown += AtariColorSelectorForm_KeyDown;
 			((System.ComponentModel.ISupportInitialize)ImagePalette).EndInit();
 			((System.ComponentModel.ISupportInitialize)ImageSelected).EndInit();
 			ResumeLayout(false);

@@ -6,14 +6,13 @@
 		{
 			InitializeComponent();
 
-			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(FormClose!);
-			this.Load += new System.EventHandler(FormCreate!);
+			this.FormClosed += FormClose!;
+			this.Load += FormCreate!;
 		}
 
-		public void FormCreate(object Sender, EventArgs e)
+		public void FormCreate(object sender, EventArgs e)
 		{
 			DoubleBuffered = true;
-			//  LoadPalette();
 			DrawPalette();
 			DrawActualColor();
 		}
@@ -57,12 +56,11 @@
 			gr.Dispose();
 			ImageSelected.Image?.Dispose();
 			ImageSelected.Image = clr;
-
 		}
 
-		public void ImagePaletteMouseMove(object Sender, MouseEventArgs e)
+		public void ImagePaletteMouseMove(object sender, MouseEventArgs e)
 		{
-			if ((e.X < 16 * 8) && (e.Y < 16 * 16))
+			if (e.X < 16 * 8 && e.Y < 16 * 16)
 			{
 				actualColorIndex = (byte)((e.Y / 16) * 16 + (e.X / 16) * 2);
 				actualColor = palette[actualColorIndex];
@@ -70,16 +68,10 @@
 			}
 		}
 
-		public void ImagePaletteMouseDown(object Sender, MouseEventArgs e)
+		public void ImagePaletteMouseDown(object sender, MouseEventArgs e)
 		{
 			selectedColorIndex = actualColorIndex;
-			this.Close();
-		}
-
-		public void FormShow(object Sender, EventArgs e)
-		{
-			DrawPalette();
-			DrawActualColor();
+			Close();
 		}
 
 		public void SetSelectedColorIndex(byte paletteIndex)
@@ -87,9 +79,9 @@
 			selectedColorIndex = paletteIndex;
 		}
 
-		public void FormClose(object Sender, FormClosedEventArgs Action)
+		public void FormClose(object sender, FormClosedEventArgs action)
 		{
-			if (this.DialogResult == DialogResult.OK)
+			if (DialogResult == DialogResult.OK)
 			{
 				selectedColorIndex = actualColorIndex;
 			}
@@ -104,22 +96,12 @@
 			palette = pal;
 		}
 
-		public Color GetColor(byte paletteIndex)
-		{
-			return palette[paletteIndex];
-		}
-
-		public Color[] GetMyPalette()
-		{
-			return palette;
-		}
-
-		internal Color[] palette = new Color[256];
+		internal Color[] palette;// = new Color[256];
 		public byte selectedColorIndex;
 		public byte actualColorIndex;
 		public Color actualColor = Color.Empty;
 
-		private void TAtariColorSelectorForm_KeyDown(object sender, KeyEventArgs e)
+		private void AtariColorSelectorForm_KeyDown(object sender, KeyEventArgs e)
 		{
 			if (e.KeyCode == Keys.Escape)
 			{
