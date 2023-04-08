@@ -33,12 +33,12 @@
 			Label3 = new Label();
 			ComboBoxExportType = new ComboBox();
 			ComboBoxDataType = new ComboBox();
-			Button_Export = new Button();
+			Button_SaveAs = new Button();
 			Button_Cancel = new Button();
 			MemoExport = new RichTextBox();
 			ComboBoxFontNumber = new ComboBox();
 			ButtonCopyClipboard = new Button();
-			d_save = new SaveFileDialog();
+			saveDialog = new SaveFileDialog();
 			SuspendLayout();
 			// 
 			// Label1
@@ -75,7 +75,7 @@
 			// 
 			ComboBoxExportType.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxExportType.FormattingEnabled = true;
-			ComboBoxExportType.Items.AddRange(new object[] { "Image BMP", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "Basic listing file" });
+			ComboBoxExportType.Items.AddRange(new object[] { "Image BMP Mono", "Image BMP Color", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "Basic listing file" });
 			ComboBoxExportType.Location = new Point(104, 43);
 			ComboBoxExportType.Name = "ComboBoxExportType";
 			ComboBoxExportType.Size = new Size(145, 21);
@@ -92,15 +92,15 @@
 			ComboBoxDataType.TabIndex = 1;
 			ComboBoxDataType.SelectedIndexChanged += ComboBoxDataTypeChange;
 			// 
-			// Button_Export
+			// Button_SaveAs
 			// 
-			Button_Export.Location = new Point(269, 8);
-			Button_Export.Name = "Button_Export";
-			Button_Export.Size = new Size(81, 25);
-			Button_Export.TabIndex = 2;
-			Button_Export.Text = "Save as...";
-			Button_Export.UseVisualStyleBackColor = true;
-			Button_Export.Click += Button_ExportClick;
+			Button_SaveAs.Location = new Point(269, 8);
+			Button_SaveAs.Name = "Button_SaveAs";
+			Button_SaveAs.Size = new Size(81, 25);
+			Button_SaveAs.TabIndex = 2;
+			Button_SaveAs.Text = "Save as...";
+			Button_SaveAs.UseVisualStyleBackColor = true;
+			Button_SaveAs.Click += ButtonSaveAsClick;
 			// 
 			// Button_Cancel
 			// 
@@ -142,9 +142,9 @@
 			ButtonCopyClipboard.UseVisualStyleBackColor = true;
 			ButtonCopyClipboard.Click += ButtonCopyClipboardClick;
 			// 
-			// d_save
+			// saveDialog
 			// 
-			d_save.FileName = "d_save";
+			saveDialog.FileName = "saveDialog";
 			// 
 			// ExportWindow
 			// 
@@ -158,7 +158,7 @@
 			Controls.Add(Label3);
 			Controls.Add(ComboBoxExportType);
 			Controls.Add(ComboBoxDataType);
-			Controls.Add(Button_Export);
+			Controls.Add(Button_SaveAs);
 			Controls.Add(Button_Cancel);
 			Controls.Add(MemoExport);
 			Controls.Add(ComboBoxFontNumber);
@@ -167,7 +167,6 @@
 			Name = "ExportWindow";
 			Padding = new Padding(505, 354, 0, 0);
 			Text = "Export to ...";
-			FormClosed += FormClose;
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -179,11 +178,11 @@
 		private System.Windows.Forms.Label Label3;
 		private System.Windows.Forms.ComboBox ComboBoxExportType;
 		private System.Windows.Forms.ComboBox ComboBoxDataType;
-		private System.Windows.Forms.Button Button_Export;
+		private System.Windows.Forms.Button Button_SaveAs;
 		private System.Windows.Forms.Button Button_Cancel;
 		private System.Windows.Forms.RichTextBox MemoExport;
 		private System.Windows.Forms.ComboBox ComboBoxFontNumber;
 		private System.Windows.Forms.Button ButtonCopyClipboard;
-		private System.Windows.Forms.SaveFileDialog d_save;
+		private System.Windows.Forms.SaveFileDialog saveDialog;
 	}
 }

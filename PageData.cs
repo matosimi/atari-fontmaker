@@ -55,7 +55,7 @@
 		public string SelectedFont { get; set; }
 	}
 
-	public partial class TMainForm
+	public partial class FontMakerForm
 	{
 		// Everything to do with pages goes here
 		public List<PageData> Pages = new List<PageData>();
@@ -84,54 +84,41 @@
 			// If the page list is empty then create ONE default page
 			if (Pages.Count == 0)
 			{
-				var pageOne = new PageData(vw, chsline);
+				var pageOne = new PageData(AtariView.ViewBytes, AtariView.UseFontOnLine);
 				Pages.Add(pageOne);
 
 				CurrentPageIndex = 0;
 			}
 
 			InPagesSetup = true;
-			cbPages.Items.Clear();
-			cbPages.ResetText();
+			comboBoxPages.Items.Clear();
+			comboBoxPages.ResetText();
 
 			foreach (var page in Pages)
 			{
-				var idx = cbPages.Items.Add(page.Name);
+				var idx = comboBoxPages.Items.Add(page.Name);
 				page.Index = idx;
 			}
 
-			cbPages.SelectedIndex = 0;
-			CurrentPageIndex = cbPages.SelectedIndex;
+			comboBoxPages.SelectedIndex = 0;
+			CurrentPageIndex = comboBoxPages.SelectedIndex;
 
 			InPagesSetup = false;
 
 			UpdatePageDisplay();
 		}
-
-		/// <summary>
-		/// Select a page
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void cbPages_SelectedIndexChanged(object sender, EventArgs e)
-		{
-			if (InPagesSetup) return;
-
-			SwopPage(saveCurrent:true);
-
-			UpdatePageDisplay();
-		}
+	
 
 		private void SwopPage(bool saveCurrent)
 		{
-			var nextPageIndex = cbPages.SelectedIndex;
+			var nextPageIndex = comboBoxPages.SelectedIndex;
 			if (nextPageIndex == -1) return;
 
 			if (saveCurrent)
 			{
 				// Save the current page data
 				var currentPage = Pages[CurrentPageIndex];
-				currentPage.Save(vw, chsline);
+				currentPage.Save(AtariView.ViewBytes, AtariView.UseFontOnLine);
 			}
 
 			SwopPageAction(nextPageIndex);
@@ -142,126 +129,23 @@
 		{
 			// Select the next page and copy the data
 			var page = Pages[nextPageIndex];
-			vw = page.View.Clone() as byte[,];
-			chsline = page.SelectedFont.Clone() as byte[];
+			AtariView.ViewBytes = page.View.Clone() as byte[,];
+			AtariView.UseFontOnLine = page.SelectedFont.Clone() as byte[];
 
 			CurrentPageIndex = nextPageIndex;
 		}
 
 		private void UpdatePageDisplay()
 		{
-			lblCurrentPageIndex.Text = $"#{cbPages.SelectedIndex}";
+			labelCurrentPageIndex.Text = $"#{comboBoxPages.SelectedIndex}";
 			RedrawView();
 			RedrawLineTypes();
 
-			btnDeletePage.Enabled = Pages.Count > 1;
+			buttonDeletePage.Enabled = Pages.Count > 1;
 		}
 
-		/// <summary>
-		/// Add a new page, by duplicating the current page data
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		private void btnAddPage_Click(object sender, EventArgs e)
-		{
-			// Save the current page data
-			var currentPage = Pages[CurrentPageIndex];
-			currentPage.Save(vw, chsline);
-
-			// Create a new page
-			var nextNr = Pages.Max(page => page.Nr) + 1;
-			var pageOne = new PageData(nextNr, $"Page {nextNr}", vw, chsline, -1);
-			Pages.Add(pageOne);
-
-			InPagesSetup = true;
-			cbPages.Items.Clear();
-			cbPages.ResetText();
-
-			foreach (var page in Pages)
-			{
-				var idx = cbPages.Items.Add(page.Name);
-				page.Index = idx;
-			}
-
-			cbPages.SelectedIndex = cbPages.Items.Count - 1;
-			CurrentPageIndex = cbPages.SelectedIndex;
-
-			InPagesSetup = false;
-			UpdatePageDisplay();
-		}
-
-		private void btnDeletePage_Click(object sender, EventArgs e)
-		{
-			if (Pages.Count <= 1) return;
-			var answer = MessageBox.Show("Are you sure you want to delete the page?", "Delete page", MessageBoxButtons.YesNo);
-			if (answer == DialogResult.No) return;
-
-			// Delete the page at the current index
-			InPagesSetup = true;
-			Pages.RemoveAt(CurrentPageIndex);
-
-			// Rebuild the combo list
-			cbPages.Items.Clear();
-			cbPages.ResetText();
-
-			foreach (var page in Pages)
-			{
-				var idx = cbPages.Items.Add(page.Name);
-				page.Index = idx;
-			}
-
-			if (CurrentPageIndex >= cbPages.Items.Count - 1)
-			{
-				CurrentPageIndex = cbPages.Items.Count - 1;
-			}
-
-			cbPages.SelectedIndex = CurrentPageIndex;
-
-			InPagesSetup = false;
-
-			SwopPage(saveCurrent: false);
-
-			UpdatePageDisplay();
-		}
-
-		private void btnEditPage_Click(object sender, EventArgs e)
-		{
-			// Save the current page data
-			var currentPage = Pages[CurrentPageIndex];
-			currentPage.Save(vw, chsline);
-
-			// Show the editor
-			var pe = new PageEditor(Pages, CurrentPageIndex);
-			var action = pe.ShowDialog();
-			if (action == DialogResult.OK)
-			{
-				// Save the data back and
-				Pages = pe.GetPages();
-
-				// Rebuild the combo list
-				InPagesSetup = true;
-				cbPages.Items.Clear();
-				cbPages.ResetText();
-
-				var toSelect = 0;
-
-				foreach (var page in Pages)
-				{
-					var idx = cbPages.Items.Add(page.Name);
-					page.Index = idx;
-					if (currentPage.Nr == page.Nr)
-						toSelect = idx;
-				}
-
-				cbPages.SelectedIndex = toSelect;
-				SwopPage(false);
-
-				InPagesSetup = false;
-
-				UpdatePageDisplay();
-			}
 
 
-		}
+
 	}
 }

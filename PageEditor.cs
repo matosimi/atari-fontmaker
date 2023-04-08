@@ -38,9 +38,9 @@ namespace FontMaker
 		/// <summary>
 		/// List of data to be displayed in the ListBox (Index, Name)
 		/// </summary>
-		private List<dynamic> _dynList = null;
+		private List<dynamic> _dynList;
 
-		private bool _inSetup = false;
+		private bool _inSetup;
 
 		/// <summary>
 		/// Create the PageEditor dialog.
