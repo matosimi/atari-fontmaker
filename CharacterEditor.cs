@@ -730,26 +730,26 @@ namespace FontMaker
 					break;
 
 				case MegaCopyStatusFlags.Selecting:
-				{
-					megaCopyStatus = MegaCopyStatusFlags.None;
-					// Font selector window
-					pictureBoxFontSelectorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
-					// View editor window
-					pictureBoxViewEditorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
-					break;
-				}
+					{
+						megaCopyStatus = MegaCopyStatusFlags.None;
+						// Font selector window
+						pictureBoxFontSelectorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
+						// View editor window
+						pictureBoxViewEditorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
+						break;
+					}
 
 				case MegaCopyStatusFlags.Selected:
 					break;
 
 				case MegaCopyStatusFlags.Pasting:
-				{
-					megaCopyStatus = MegaCopyStatusFlags.Selected;
-					pictureBoxFontSelectorPasteCursor.Visible = false;
-					pictureBoxFontSelectorMegaCopyImage.Visible = false;
-					pictureBoxViewEditorPasteCursor.Visible = false;
-					pictureBoxViewEditorMegaCopyImage.Visible = false;
-				}
+					{
+						megaCopyStatus = MegaCopyStatusFlags.Selected;
+						pictureBoxFontSelectorPasteCursor.Visible = false;
+						pictureBoxFontSelectorMegaCopyImage.Visible = false;
+						pictureBoxViewEditorPasteCursor.Visible = false;
+						pictureBoxViewEditorMegaCopyImage.Visible = false;
+					}
 					break;
 			}
 		}

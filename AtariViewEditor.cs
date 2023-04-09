@@ -23,8 +23,14 @@ namespace FontMaker
 		/// </summary>
 		public string Chars { get; set; }
 
+		/// <summary>
+		/// Use which font on which of the 26 lines of the view "1234"
+		/// </summary>
 		public string Lines { get; set; }
 
+		/// <summary>
+		/// Hex encoded array of the 6 selected colors
+		/// </summary>
 		public string Colors { get; set; }
 
 		public string Fontname1 { get; set; }
@@ -32,6 +38,9 @@ namespace FontMaker
 		public string? Fontname3 { get; set; }
 		public string? Fontname4 { get; set; }
 
+		/// <summary>
+		/// Hex encoded 1024 bytes per font
+		/// </summary>
 		public string Data { get; set; }
 
 		public string FortyBytes { get; set; }
@@ -43,14 +52,15 @@ namespace FontMaker
 	// All functions that interact with the view can be found here
 	public partial class FontMakerForm
 	{
+		/// <summary>
+		/// View editor width indicator 32/40 characters wide
+		/// </summary>
 		internal string FortyBytes { get; set; } = string.Empty;
 
 		internal int LastViewCharacterX { get; set; }
 		internal int LastViewCharacterY { get; set; }
 
-
 		internal bool ContinueViewDrawInMove { get; set; } = false;
-
 
 		public void ActionAtariViewDoubleClick(MouseEventArgs e)
 		{
@@ -137,15 +147,25 @@ namespace FontMaker
 					RedrawViewChar();
 				}
 
+				// Pick a character from the view
+				// This also picks the correct font
 				if (e.Button == MouseButtons.Right)
 				{
 					var readChar = AtariView.ViewBytes[rx, ry];
 					var bx = readChar % 32;
 					var by = readChar / 32;
 
-					if (AtariView.UseFontOnLine[ry] == 2)
+					// If its the 2nd font on the bank then add 8 to the y offset
+					if (AtariView.UseFontOnLine[ry] == 2 || AtariView.UseFontOnLine[ry] == 4)
 					{
 						by = by | 8;
+					}
+					// Check if the font bank needs to be switched
+					if ((checkBoxFontBank.Checked == false && (AtariView.UseFontOnLine[ry] == 3 || AtariView.UseFontOnLine[ry] == 4)) ||
+					    (checkBoxFontBank.Checked == true && (AtariView.UseFontOnLine[ry] == 1 || AtariView.UseFontOnLine[ry] == 2)))
+					{
+						checkBoxFontBank.Checked = !checkBoxFontBank.Checked;
+						SwitchFontBank();
 					}
 
 					// Select the character in the font

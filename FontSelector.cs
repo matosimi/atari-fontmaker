@@ -17,7 +17,11 @@ namespace FontMaker
 		public void RedrawFonts()
 		{
 			AtariFontRenderer.RenderAllFonts();
+			ShowCorrectFontBank();
+		}
 
+		public void ShowCorrectFontBank()
+		{
 			var src = Constants.WhereAreTheFontBanksComingFrom[(checkBoxFontBank.Checked ? 1 : 0) + (InColorMode ? 2 : 0)];
 
 			var img = Helpers.GetImage(pictureBoxFontSelector);
@@ -28,7 +32,6 @@ namespace FontMaker
 			}
 			pictureBoxFontSelector.Refresh();
 		}
-
 
 		/// <summary>
 		/// Repaint actual character into the font area

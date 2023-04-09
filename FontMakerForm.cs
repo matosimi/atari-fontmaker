@@ -760,6 +760,15 @@ namespace FontMaker
 			ActionAtariViewEditorMouseMove(new MouseEventArgs(MouseButtons.None, 0, e.X + pictureBoxViewEditorMegaCopyImage.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorMegaCopyImage.Top - pictureBoxAtariView.Top, 0));
 		}
 
+		private void ViewEditor_MegaCopyImage_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			// Setup selection by right DoubleClick
+			if (e.Button == MouseButtons.Right)
+			{
+				ResetMegaCopyStatus();
+			}
+		}
+
 		public void ViewEditor_RubberBand_MouseDown(object sender, MouseEventArgs e)
 		{
 			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorRubberBand.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorRubberBand.Top - pictureBoxAtariView.Top, 0));
@@ -815,8 +824,6 @@ namespace FontMaker
 		{
 			ActionAtariViewMouseUp(new MouseEventArgs(e.Button, 0, pictureBoxViewEditorPasteCursor.Left + e.X - pictureBoxAtariView.Left, pictureBoxViewEditorPasteCursor.Top + e.Y - pictureBoxAtariView.Top, 0));
 		}
-
-
 
 		#endregion
 
@@ -909,11 +916,7 @@ namespace FontMaker
 
 		public void FontBank_Click(object sender, EventArgs e)
 		{
-			FontBank_CheckedChanged(0, EventArgs.Empty);
-			RedrawFonts();
-			ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
-			ActionFontSelectorMouseUp(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
-			CheckDuplicate();
+			SwitchFontBank();
 		}
 
 		public void FontBank_CheckedChanged(object sender, EventArgs e)
@@ -1065,5 +1068,7 @@ namespace FontMaker
 		}
 
 		#endregion
+
+
 	}
 }
