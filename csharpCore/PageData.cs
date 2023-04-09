@@ -143,9 +143,5 @@
 
 			buttonDeletePage.Enabled = Pages.Count > 1;
 		}
-
-
-
-
 	}
 }

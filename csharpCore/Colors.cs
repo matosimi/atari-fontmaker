@@ -28,7 +28,7 @@
 		private void SwitchGfxMode()
 		{
 			InColorMode = !InColorMode;
-			RedrawFonts();
+			ShowCorrectFontBank();
 			RedrawView();
 			ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
 
@@ -41,6 +41,15 @@
 			{
 				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
 			}
+		}
+
+		private void SwitchFontBank()
+		{
+			FontBank_CheckedChanged(0, EventArgs.Empty);
+			ShowCorrectFontBank();
+			ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
+			ActionFontSelectorMouseUp(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
+			CheckDuplicate();
 		}
 
 

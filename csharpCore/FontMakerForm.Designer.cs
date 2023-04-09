@@ -214,6 +214,7 @@
 			pictureBoxViewEditorMegaCopyImage.TabIndex = 5;
 			pictureBoxViewEditorMegaCopyImage.TabStop = false;
 			pictureBoxViewEditorMegaCopyImage.Visible = false;
+			pictureBoxViewEditorMegaCopyImage.MouseDoubleClick += ViewEditor_MegaCopyImage_MouseDoubleClick;
 			pictureBoxViewEditorMegaCopyImage.MouseDown += ViewEditor_MegaCopyImage_MouseDown;
 			pictureBoxViewEditorMegaCopyImage.MouseMove += ViewEditor_MegaCopyImage_MouseMove;
 			// 
