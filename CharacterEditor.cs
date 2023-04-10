@@ -494,8 +494,6 @@ namespace FontMaker
 			var characterBytes = string.Empty;
 			var fontBytes = string.Empty;
 
-			var fontInBankOffset = checkBoxFontBank.Checked ? 2048 : 0;
-
 			if ((buttonMegaCopy.Checked && (megaCopyStatus == MegaCopyStatusFlags.Selected)) || (!buttonMegaCopy.Checked))
 			{
 				if (pictureBoxFontSelectorRubberBand.Visible)
@@ -539,7 +537,7 @@ namespace FontMaker
 
 						for (var k = 0; k < 8; k++)
 						{
-							fontBytes = fontBytes + String.Format("{0:X2}", AtariFont.FontBytes[charInFont + k + fontInBankOffset]);
+							fontBytes = fontBytes + String.Format("{0:X2}", AtariFont.FontBytes[charInFont + k]);
 						}
 					}
 				}
