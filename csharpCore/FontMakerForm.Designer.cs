@@ -74,7 +74,7 @@
 			pictureBoxPalette = new PictureBox();
 			buttonShowColorSwitchSetup = new Button();
 			buttonSwitchGraphicsMode = new Button();
-			buttonExport = new Button();
+			buttonExportFont = new Button();
 			buttonRecolor = new Button();
 			buttonLoadView = new Button();
 			buttonClearView = new Button();
@@ -111,6 +111,7 @@
 			buttonDeletePage = new Button();
 			buttonEditPage = new Button();
 			labelCurrentPageIndex = new Label();
+			buttonExportView = new Button();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -203,6 +204,7 @@
 			pictureBoxFontSelectorMegaCopyImage.TabIndex = 4;
 			pictureBoxFontSelectorMegaCopyImage.TabStop = false;
 			pictureBoxFontSelectorMegaCopyImage.Visible = false;
+			pictureBoxFontSelectorMegaCopyImage.MouseDoubleClick += FontSelector_MegaCopyImage_MouseDoubleClick;
 			pictureBoxFontSelectorMegaCopyImage.MouseDown += FontSelector_MegaCopyImage_MouseDown;
 			pictureBoxFontSelectorMegaCopyImage.MouseMove += FontSelector_MegaCopyImage_MouseMove;
 			// 
@@ -619,7 +621,7 @@
 			p_zz.Controls.Add(Bevel4);
 			p_zz.Controls.Add(buttonShowColorSwitchSetup);
 			p_zz.Controls.Add(buttonSwitchGraphicsMode);
-			p_zz.Controls.Add(buttonExport);
+			p_zz.Controls.Add(buttonExportFont);
 			p_zz.Controls.Add(buttonRecolor);
 			p_zz.Location = new Point(409, 0);
 			p_zz.Name = "p_zz";
@@ -669,15 +671,15 @@
 			buttonSwitchGraphicsMode.UseVisualStyleBackColor = true;
 			buttonSwitchGraphicsMode.Click += SwitchGraphicsMode_Click;
 			// 
-			// buttonExport
+			// buttonExportFont
 			// 
-			buttonExport.Location = new Point(8, 144);
-			buttonExport.Name = "buttonExport";
-			buttonExport.Size = new Size(89, 25);
-			buttonExport.TabIndex = 1;
-			buttonExport.Text = "Export font";
-			buttonExport.UseVisualStyleBackColor = true;
-			buttonExport.Click += Export_Click;
+			buttonExportFont.Location = new Point(8, 144);
+			buttonExportFont.Name = "buttonExportFont";
+			buttonExportFont.Size = new Size(89, 25);
+			buttonExportFont.TabIndex = 1;
+			buttonExportFont.Text = "Export font";
+			buttonExportFont.UseVisualStyleBackColor = true;
+			buttonExportFont.Click += ExportFont_Click;
 			// 
 			// buttonRecolor
 			// 
@@ -901,7 +903,7 @@
 			buttonEnterText.Enabled = false;
 			buttonEnterText.Location = new Point(520, 416);
 			buttonEnterText.Name = "buttonEnterText";
-			buttonEnterText.Size = new Size(89, 25);
+			buttonEnterText.Size = new Size(69, 25);
 			buttonEnterText.TabIndex = 9;
 			buttonEnterText.Text = "Enter text";
 			toolTips.SetToolTip(buttonEnterText, "Text to clipboard, hold SHIFT while clicking to inverse");
@@ -1049,12 +1051,23 @@
 			labelCurrentPageIndex.TextAlign = ContentAlignment.TopRight;
 			labelCurrentPageIndex.UseMnemonic = false;
 			// 
+			// buttonExportView
+			// 
+			buttonExportView.Location = new Point(595, 416);
+			buttonExportView.Name = "buttonExportView";
+			buttonExportView.Size = new Size(70, 25);
+			buttonExportView.TabIndex = 21;
+			buttonExportView.Text = "Export view";
+			buttonExportView.UseVisualStyleBackColor = true;
+			buttonExportView.Click += ViewEditor_ExportView_Click;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1048, 466);
+			Controls.Add(buttonExportView);
 			Controls.Add(labelCurrentPageIndex);
 			Controls.Add(buttonEditPage);
 			Controls.Add(buttonDeletePage);
@@ -1165,7 +1178,7 @@
 		private System.Windows.Forms.PictureBox pictureBoxPalette;
 		private System.Windows.Forms.Button buttonShowColorSwitchSetup;
 		private System.Windows.Forms.Button buttonSwitchGraphicsMode;
-		private System.Windows.Forms.Button buttonExport;
+		private System.Windows.Forms.Button buttonExportFont;
 		private System.Windows.Forms.Button buttonRecolor;
 		private System.Windows.Forms.Button buttonLoadView;
 		private System.Windows.Forms.Button buttonClearView;
@@ -1209,5 +1222,6 @@
 		private ImageList imageListFont1234;
 		private Button buttonClearFont1;
 		private Button buttonClearFont2;
+		private Button buttonExportView;
 	}
 }

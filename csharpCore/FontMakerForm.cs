@@ -55,7 +55,8 @@ namespace FontMaker
 
 		#region All data used by Atari Font Maker
 		public AtariColorSelectorForm AtariColorSelector { get; set; } = new AtariColorSelectorForm();
-		public ExportWindow ExportWindowForm { get; set; } = new ExportWindow();
+		public ExportFontWindow ExportFontWindowForm { get; set; } = new ExportFontWindow();
+		public ExportViewWindow ExportViewWindowForm { get; set; } = new ExportViewWindow();
 
 		/// <summary>
 		/// The Atari color palette. Loaded from "altirraPAL.pal"
@@ -647,9 +648,9 @@ namespace FontMaker
 			panelColorSwitcher.Visible = !panelColorSwitcher.Visible;
 		}
 
-		public void Export_Click(object _, EventArgs __)
+		public void ExportFont_Click(object _, EventArgs __)
 		{
-			ExportWindowForm.ShowDialog();
+			ExportFontWindowForm.ShowDialog();
 		}
 
 		public void RecolorSource_Click(object _, EventArgs __)
@@ -682,6 +683,11 @@ namespace FontMaker
 		private void ViewEditor_EnterText_Click(object sender, EventArgs e)
 		{
 			ActionEnterText();
+		}
+
+		private void ViewEditor_ExportView_Click(object sender, EventArgs e)
+		{
+			ExportViewWindowForm.ShowDialog();
 		}
 
 		public void ViewEditor_CheckBox40Bytes_Click(object sender, EventArgs e)
@@ -977,6 +983,15 @@ namespace FontMaker
 			ActionFontSelectorMouseMove(new MouseEventArgs(MouseButtons.None, 0, e.X + pictureBoxFontSelectorMegaCopyImage.Left - pictureBoxFontSelector.Left, e.Y + pictureBoxFontSelectorMegaCopyImage.Top - pictureBoxFontSelector.Top, 0));
 		}
 
+		private void FontSelector_MegaCopyImage_MouseDoubleClick(object sender, MouseEventArgs e)
+		{
+			// Setup selection by right DoubleClick
+			if (e.Button == MouseButtons.Right)
+			{
+				ResetMegaCopyStatus();
+			}
+		}
+
 		public void FontSelector_RubberBand_MouseDown(object _, MouseEventArgs e)
 		{
 			ActionFontSelectorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxFontSelectorRubberBand.Left - pictureBoxFontSelector.Left, e.Y + pictureBoxFontSelectorRubberBand.Top - pictureBoxFontSelector.Top, 0));
@@ -1068,6 +1083,7 @@ namespace FontMaker
 		}
 
 		#endregion
+
 
 
 	}

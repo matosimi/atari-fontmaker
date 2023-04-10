@@ -1,6 +1,6 @@
 ﻿namespace FontMaker
 {
-	partial class ExportWindow
+	partial class ExportFontWindow
 	{
 		/// <summary>
 		/// Required designer variable.
@@ -146,7 +146,7 @@
 			// 
 			saveDialog.FileName = "saveDialog";
 			// 
-			// ExportWindow
+			// ExportFontWindow
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
@@ -164,9 +164,11 @@
 			Controls.Add(ComboBoxFontNumber);
 			Controls.Add(ButtonCopyClipboard);
 			FormBorderStyle = FormBorderStyle.FixedDialog;
-			Name = "ExportWindow";
+			MaximizeBox = false;
+			MinimizeBox = false;
+			Name = "ExportFontWindow";
 			Padding = new Padding(505, 354, 0, 0);
-			Text = "Export to ...";
+			Text = "Export font to ...";
 			ResumeLayout(false);
 			PerformLayout();
 		}

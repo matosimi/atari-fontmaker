@@ -3,7 +3,7 @@ using System.Text;
 
 namespace FontMaker
 {
-	public partial class ExportWindow : Form
+	public partial class ExportFontWindow : Form
 	{
 		public enum FormatTypes
 		{
@@ -17,7 +17,7 @@ namespace FontMaker
 			BasicListingFile, // 7
 		};
 
-		public ExportWindow()
+		public ExportFontWindow()
 		{
 			InitializeComponent();
 			Load += FormCreate!;
@@ -31,7 +31,7 @@ namespace FontMaker
 			ComboBoxExportType.SelectedIndex = -1;
 			ComboBoxDataType.SelectedIndex = -1;
 
-			ComboBoxExportType.SelectedIndex = 0;	// This will fire the export type handler and setup the rest of the GUI
+			ComboBoxExportType.SelectedIndex = 0;   // This will fire the export type handler and setup the rest of the GUI
 		}
 
 		public void ComboBoxExportTypeChange(object _, EventArgs __)
@@ -159,7 +159,7 @@ namespace FontMaker
 		public void ButtonSaveAsClick(object sender, EventArgs e)
 		{
 			if ((FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.ImageBmpMono ||
-			    (FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.ImageBmpColor)
+				(FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.ImageBmpColor)
 			{
 				saveDialog.Filter = $@"Font{(ComboBoxFontNumber.SelectedIndex + 1)} (*.bmp)|*.bmp";
 				saveDialog.DefaultExt = "bmp";
