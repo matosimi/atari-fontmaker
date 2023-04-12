@@ -1005,7 +1005,7 @@
 			// 
 			comboBoxPages.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxPages.FormattingEnabled = true;
-			comboBoxPages.Location = new Point(695, 443);
+			comboBoxPages.Location = new Point(719, 443);
 			comboBoxPages.Name = "comboBoxPages";
 			comboBoxPages.Size = new Size(121, 21);
 			comboBoxPages.TabIndex = 16;
@@ -1013,7 +1013,7 @@
 			// 
 			// buttonAddPage
 			// 
-			buttonAddPage.Location = new Point(817, 443);
+			buttonAddPage.Location = new Point(841, 443);
 			buttonAddPage.Name = "buttonAddPage";
 			buttonAddPage.Size = new Size(25, 21);
 			buttonAddPage.TabIndex = 17;
@@ -1023,7 +1023,7 @@
 			// 
 			// buttonDeletePage
 			// 
-			buttonDeletePage.Location = new Point(845, 443);
+			buttonDeletePage.Location = new Point(869, 443);
 			buttonDeletePage.Name = "buttonDeletePage";
 			buttonDeletePage.Size = new Size(25, 21);
 			buttonDeletePage.TabIndex = 18;
@@ -1033,7 +1033,7 @@
 			// 
 			// buttonEditPage
 			// 
-			buttonEditPage.Location = new Point(872, 443);
+			buttonEditPage.Location = new Point(896, 443);
 			buttonEditPage.Name = "buttonEditPage";
 			buttonEditPage.Size = new Size(38, 21);
 			buttonEditPage.TabIndex = 19;
@@ -1043,7 +1043,7 @@
 			// 
 			// labelCurrentPageIndex
 			// 
-			labelCurrentPageIndex.Location = new Point(663, 448);
+			labelCurrentPageIndex.Location = new Point(687, 447);
 			labelCurrentPageIndex.Name = "labelCurrentPageIndex";
 			labelCurrentPageIndex.Size = new Size(30, 15);
 			labelCurrentPageIndex.TabIndex = 20;

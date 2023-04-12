@@ -303,7 +303,7 @@ namespace FontMaker
 			rx = e.X / 16;
 			ry = e.Y / 16;
 			var fontchar = AtariView.ViewBytes[rx, ry];
-			labelViewCharInfo.Text = $@"Char: Font {AtariView.UseFontOnLine[ry]} ${fontchar:X2} #{fontchar}";
+			labelViewCharInfo.Text = $@"Char: Font {AtariView.UseFontOnLine[ry]} ${fontchar:X2} #{fontchar} @ {rx},{ry}";
 		}
 
 		public bool MouseValidView(int x, int y)
