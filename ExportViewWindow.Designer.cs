@@ -52,6 +52,7 @@
 			buttonResetSelection = new Button();
 			label7 = new Label();
 			saveDialog = new SaveFileDialog();
+			checkBoxRememberState = new CheckBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariViewSmall).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericFromX).BeginInit();
@@ -96,9 +97,9 @@
 			Label1.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
 			Label1.Location = new Point(8, 11);
 			Label1.Name = "Label1";
-			Label1.Size = new Size(76, 13);
+			Label1.Size = new Size(82, 13);
 			Label1.TabIndex = 14;
-			Label1.Text = "Export font to :";
+			Label1.Text = "Export view as :";
 			// 
 			// Label2
 			// 
@@ -276,12 +277,25 @@
 			// 
 			saveDialog.FileName = "saveDialog";
 			// 
+			// checkBoxRememberState
+			// 
+			checkBoxRememberState.AutoSize = true;
+			checkBoxRememberState.Checked = true;
+			checkBoxRememberState.CheckState = CheckState.Checked;
+			checkBoxRememberState.Location = new Point(365, 46);
+			checkBoxRememberState.Name = "checkBoxRememberState";
+			checkBoxRememberState.Size = new Size(164, 17);
+			checkBoxRememberState.TabIndex = 33;
+			checkBoxRememberState.Text = "Remember current selection?";
+			checkBoxRememberState.UseVisualStyleBackColor = true;
+			// 
 			// ExportViewWindow
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			CancelButton = Button_Cancel;
-			ClientSize = new Size(697, 419);
+			ClientSize = new Size(690, 412);
+			Controls.Add(checkBoxRememberState);
 			Controls.Add(label7);
 			Controls.Add(buttonResetSelection);
 			Controls.Add(labelDimensions);
@@ -309,6 +323,7 @@
 			Name = "ExportViewWindow";
 			StartPosition = FormStartPosition.CenterParent;
 			Text = "Export view to ...";
+			FormClosing += ExportViewWindow_FormClosing;
 			Load += ExportViewWindow_Load;
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariViewSmall).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).EndInit();
@@ -344,5 +359,6 @@
 		private Button buttonResetSelection;
 		private Label label7;
 		private SaveFileDialog saveDialog;
+		private CheckBox checkBoxRememberState;
 	}
 }

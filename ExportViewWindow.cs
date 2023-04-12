@@ -1,11 +1,16 @@
 ﻿using System.Drawing.Drawing2D;
 using System.Text;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace FontMaker
 {
 	public partial class ExportViewWindow : Form
 	{
+		private int PreviousExportType { get; set; } = -1;
+		private int PreviousDataType { get; set; } = -1;
+
+		private Rectangle PreviousRegion = new Rectangle(0, 0, 40, 26);
+
+		private bool RememberSelection { get; set; }
 		public enum FormatTypes
 		{
 			BinaryData,
@@ -23,13 +28,14 @@ namespace FontMaker
 
 		private static readonly SolidBrush cyanBrush = new(Color.Cyan);
 
-		private Rectangle _exportRegion;
+		private Rectangle _exportRegion = new Rectangle(0, 0, 40, 26);
 
 		private SelectionStatusFlags _selectionStatus;
 
 		public ExportViewWindow()
 		{
 			InitializeComponent();
+			RememberSelection = true;
 		}
 
 		private void ExportViewWindow_Load(object sender, EventArgs e)
@@ -40,14 +46,38 @@ namespace FontMaker
 			ComboBoxExportType.SelectedIndex = -1;
 			ComboBoxDataType.SelectedIndex = -1;
 
-			ComboBoxExportType.SelectedIndex = 0;   // This will fire the export type handler and setup the rest of the GUI
+			if (RememberSelection)
+			{
+				ComboBoxExportType.SelectedIndex = PreviousExportType != -1 ? PreviousExportType : 0; // This will fire the export type handler and setup the rest of the GUI
+				ComboBoxDataType.SelectedIndex = PreviousDataType != -1 ? PreviousDataType : 0;
+			}
+			else
+			{
 
-			_exportRegion = new Rectangle(0, 0, 40, 26);
+				ComboBoxExportType.SelectedIndex = 0; // This will fire the export type handler and setup the rest of the GUI
+
+				_exportRegion = new Rectangle(0, 0, 40, 26);
+			}
 
 			UpdateRegionEdits();
 
-			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left - 2, pictureBoxAtariViewSmall.Top - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
+			//pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left - 2, pictureBoxAtariViewSmall.Top - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
+			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
 			pictureBoxViewEditorRubberBand.Visible = true;
+		}
+
+		private void ExportViewWindow_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (checkBoxRememberState.Checked)
+			{
+				PreviousExportType = ComboBoxExportType.SelectedIndex;
+				PreviousDataType = ComboBoxDataType.SelectedIndex;
+				RememberSelection = true;
+			}
+			else
+			{
+				RememberSelection = false;
+			}
 		}
 
 		private void UpdateRegionEdits()
@@ -630,5 +660,7 @@ namespace FontMaker
 				MessageBox.Show($"Unable to export binary data. Have error: {ex.Message}");
 			}
 		}
+
+
 	}
 }
