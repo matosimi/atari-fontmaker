@@ -11,6 +11,9 @@ namespace FontMaker
 		private Rectangle PreviousRegion = new Rectangle(0, 0, 40, 26);
 
 		private bool RememberSelection { get; set; }
+
+		public bool InColorMode { get; set; }
+
 		public enum FormatTypes
 		{
 			BinaryData,
@@ -97,7 +100,7 @@ namespace FontMaker
 
 		public void RedrawSmallView()
 		{
-			var colorOffset = false ? 512 : 0;
+			var colorOffset = InColorMode ? 512 : 0;
 			var img = Helpers.GetImage(pictureBoxAtariViewSmall);
 			using (var gr = Graphics.FromImage(img))
 			{

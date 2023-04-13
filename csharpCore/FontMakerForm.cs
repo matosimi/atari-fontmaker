@@ -687,6 +687,7 @@ namespace FontMaker
 
 		private void ViewEditor_ExportView_Click(object sender, EventArgs e)
 		{
+			ExportViewWindowForm.InColorMode = InColorMode;
 			ExportViewWindowForm.ShowDialog();
 		}
 
