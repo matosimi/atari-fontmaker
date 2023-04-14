@@ -4,8 +4,8 @@
 ![1](https://user-images.githubusercontent.com/2360950/231547441-307ec9f6-3c92-47cf-99f0-5dd4a1a1919a.JPG)
 
 ## What is it? ##
-Atari FontMaker is MS Windows tool used for creating and editing Atari XL/XE fonts and font-based graphics. The tool was originally written in Delphi but has been ported to C# and its source code repository can be found here: https://github.com/CycoPH/AtariFontMaker.
-The original Delphi sources and full history of the project are available here: http://matosimi.websupport.sk/atari/atari-fontmaker/.
+Atari FontMaker is MS Windows tool used for creating and editing Atari XL/XE fonts and font-based graphics. The tool was originally written in Delphi but has been ported to C# and its source code repository can be found here: https://github.com/matosimi/atari-fontmaker.
+The original Delphi sources are available here: https://sourceforge.net/projects/atari-fontmaker/ and full history of the project is available here: http://matosimi.websupport.sk/atari/atari-fontmaker/.
 
 First version dates back to 2003, since then lot of functionalities were added and lot of refactoring applied, especially in version 1.6 when the code was converted from Delphi to C#.
 
