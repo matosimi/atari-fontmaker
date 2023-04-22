@@ -535,11 +535,9 @@ namespace FontMaker
 							} //second font
 						}
 
-						var fontInBankOffset = checkBoxFontBank.Checked ? 2048 : 0;
-
 						for (var k = 0; k < 8; k++)
 						{
-							fontBytes = fontBytes + String.Format("{0:X2}", AtariFont.FontBytes[charInFont + k + fontInBankOffset]);
+							fontBytes = fontBytes + String.Format("{0:X2}", AtariFont.FontBytes[charInFont + k]);
 						}
 					}
 				}
