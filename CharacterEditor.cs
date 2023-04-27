@@ -12,7 +12,16 @@ namespace FontMaker
 		public string Width { get; set; }
 		public string Height { get; set; }
 		public string Chars { get; set; }
+		/// <summary>
+		/// The bytes that make up the font characters. 8 bytes/char
+		/// </summary>
 		public string Data { get; set; }
+
+		/// <summary>
+		/// When set then some operation was performed on the pixels in the "Data" container
+		/// and the values can't be pasted into the view window
+		/// </summary>
+		public bool Modified { get; set; }
 	}
 
 	public partial class FontMakerForm
@@ -21,6 +30,9 @@ namespace FontMaker
 		/// Internal copy of the JSON used for copy + paste
 		/// </summary>
 		private string _localCopyOfClipboardData = string.Empty;
+
+		private byte[] _tempPixelBuffer = new byte[40 * 8];		// Init to the max value that it can be and reuse it everywhere
+		private byte[,] _pixelBuffer = new byte[8,8];
 
 		/// <summary>
 		/// Character pixel being edited: X-coordinate
@@ -533,6 +545,8 @@ namespace FontMaker
 							{
 								charInFont = ((i % 4 + 4) * 32 + j) * 8;
 							} //second font
+
+							charInFont += checkBoxFontBank.Checked ? 2048 : 0;		// 3rd or 4th font?
 						}
 
 						for (var k = 0; k < 8; k++)
@@ -552,6 +566,12 @@ namespace FontMaker
 				var json = jo.ToJson();
 				Clipboard.SetText(json);
 				_localCopyOfClipboardData = json;
+
+				// The font and characters have been copied to the clipboard
+				// Enabled specific clipboard modification/action buttons
+				ConfigureClipboardActionButtons();
+
+				UpdateClipboardInformation(CopyPasteRange.Width + 1, CopyPasteRange.Height + 1);
 			}
 		}
 
@@ -596,6 +616,8 @@ namespace FontMaker
 			var json = jo.ToJson();
 			Clipboard.SetText(json);
 			_localCopyOfClipboardData = json;
+
+			UpdateClipboardInformation(text.Length, 1);
 		}
 
 		public void ExecutePasteFromClipboard()
@@ -635,6 +657,13 @@ namespace FontMaker
 
 				characterBytes = jsonObj.Chars;
 				fontBytes = jsonObj.Data;
+
+				if (fontBytes == null || fontBytes == string.Empty || fontBytes.Length == 0
+				    || characterBytes == null || characterBytes == string.Empty || characterBytes.Length == 0)
+				{
+					MessageBox.Show(@"Clipboard data parsing error");
+					return;
+				}
 			}
 			catch (Exception)
 			{
@@ -893,6 +922,523 @@ namespace FontMaker
 				}
 			}
 		}
+
+
+		#region Manipulate contents of MegaCopy area
+
+		public bool CheckAllUnique(byte[] toCheck)
+		{
+			var found = new bool[256];
+			for (var i = 0; i < toCheck.Length; ++i)
+			{
+				var it = toCheck[i];
+				if (found[it])
+					return false;
+				found[it] = true;
+			}
+
+			return true;
+		}
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public void ConfigureClipboardActionButtons()
+		{
+			var on = buttonMegaCopy.Checked;
+			var allUnique = false;
+			var isSquare = false;
+			if (on)
+			{
+				// If we are on then determine if the special in place paste can be used.
+				// All characters in the selected area need to be unique
+				try
+				{
+					var jsonText = Clipboard.GetText();
+					var jsonObj = jsonText.FromJson<ClipboardJSON>();
+					if (jsonObj == null)
+						throw new Exception();
+					int.TryParse(jsonObj.Width, out var width);
+					int.TryParse(jsonObj.Height, out var height);
+
+					var bytes = Convert.FromHexString(jsonObj.Chars);
+					allUnique = CheckAllUnique(bytes);
+					isSquare = width > 0 && width == height;
+				}
+				catch (Exception)
+				{
+					on = false;
+				}
+			}
+
+			buttonCopyAreaShiftLeft.Enabled = on;
+			buttonCopyAreaShiftRight.Enabled = on;
+			buttonCopyAreaShiftUp.Enabled = on;
+			buttonCopyAreaShiftDown.Enabled = on;
+			buttonCopyAreaHMirror.Enabled = on;
+			buttonCopyAreaVMirror.Enabled = on;
+			buttonCopyAreaInvert.Enabled = on && (InColorMode == false);
+			buttonCopyAreaRotateLeft.Enabled = on && (InColorMode == false) && isSquare;
+			buttonCopyAreaRotateRight.Enabled = on && (InColorMode == false) && isSquare;
+			buttonPasteInPlace.Enabled = on && allUnique;
+			comboBoxPasteIntoFontNr.Enabled = on && allUnique;
+
+			labelCopyAreaInfo.Visible = on;
+		}
+
+		public void UpdateClipboardInformation(int w = 0, int h = 0)
+		{
+			var msg = string.Empty;
+			if (w != 0 && h != 0)
+			{
+				msg = $"Copy Area: {w}x{h}";
+			}
+			else
+			{
+				try
+				{
+					var jsonText = Clipboard.GetText();
+					var jsonObj = jsonText.FromJson<ClipboardJSON>();
+					if (jsonObj == null)
+						throw new Exception();
+					int.TryParse(jsonObj.Width, out var width);
+					int.TryParse(jsonObj.Height, out var height);
+
+					msg = $"Copy Area: {width}x{height}";
+				}
+				catch
+				{
+				}
+			}
+
+			labelCopyAreaInfo.Text = msg;
+		}
+
+
+		/// <summary>
+		/// Convert the fontBytes from the clipboard into a X.Y pixel buffer.
+		/// Each pixel in each character is represented by one byte.
+		/// </summary>
+		/// <returns>Tuple with pixel buffer, used width and used height</returns>
+		private (byte[,]?, int, int) GetFontPixelsFromClipboard()
+		{
+			if (!buttonMegaCopy.Checked)
+				return (null, 0, 0);
+
+			var jsonText = Clipboard.GetText();
+			if (string.IsNullOrEmpty(jsonText))
+				return (null, 0, 0);
+
+			int width;
+			int height;
+			string fontBytes;
+
+			try
+			{
+				var jsonObj = jsonText.FromJson<ClipboardJSON>();
+				int.TryParse(jsonObj.Width, out width);
+				int.TryParse(jsonObj.Height, out height);
+
+				fontBytes = jsonObj.Data;
+			}
+			catch (Exception)
+			{
+				return (null, 0, 0);
+			}
+
+			// If the cached buffer is big enough use it, otherwise make a bigger one
+			if (_pixelBuffer.GetLength(0) < width * 8 || _pixelBuffer.GetLength(1) < height * 8)
+				_pixelBuffer = new byte[width * 8, height * 8];
+
+			var src = Convert.FromHexString(fontBytes);
+			var srcIndex = 0;
+			for (var y = 0; y < height; y++)
+			{
+				var targetY = y * 8;
+				for (var x = 0; x < width; ++x)
+				{
+					var targetX = x * 8;
+					for (var z = 0; z < 8; ++z)
+					{
+						var line = src[srcIndex++];
+						var mask = 128;
+						for (var i = 0; i < 8; ++i)
+						{
+							_pixelBuffer[targetX + i, targetY + z] = (byte)((line & mask) == 0 ? 0 : 1);
+							mask >>= 1;
+						}
+					}
+				}
+			}
+
+			return (_pixelBuffer, width * 8, height * 8);
+		}
+
+		/// <summary>
+		/// Convert the pixels back into font bytes in hex and stuff the result into the clipboard JSON
+		/// </summary>
+		/// <param name="pixels">X.Y expanded pixel bitmap</param>
+		/// <returns></returns>
+		private bool StuffPixelsIntoClipboard(byte[,] pixels)
+		{
+			var jsonText = Clipboard.GetText();
+			if (string.IsNullOrEmpty(jsonText))
+				return false;
+
+			int width;
+			int height;
+			string characterBytes;
+			string fontBytes = string.Empty;
+
+			try
+			{
+				var jsonObj = jsonText.FromJson<ClipboardJSON>();
+				int.TryParse(jsonObj.Width, out width);
+				int.TryParse(jsonObj.Height, out height);
+
+				characterBytes = jsonObj.Chars;
+			}
+			catch (Exception)
+			{
+				return false;
+			}
+			// Convert the pixel bitmap into characters (8x8 pixels)
+			for (var y = 0; y < height; ++y)
+			{
+				var srcY = y * 8;
+				for (var x = 0; x < width; ++x)
+				{
+					var srcX = x * 8;
+
+					for (var inY = 0; inY < 8; ++inY)
+					{
+						var accu = 0;
+
+						var mask = 128;
+						for (var pixelX = 0; pixelX < 8; ++pixelX)
+						{
+							accu |= (pixels[srcX + pixelX, srcY + inY] > 0) ? mask : 0;
+							mask >>= 1;
+						}
+						fontBytes += $"{accu:X2}";
+					}
+				}
+			}
+
+			var jo = new ClipboardJSON()
+			{
+				Width = width.ToString(),
+				Height = height.ToString(),
+				Chars = characterBytes,
+				Data = fontBytes,
+				Modified = true,
+			};
+			var json = jo.ToJson();
+			Clipboard.SetText(json);
+			_localCopyOfClipboardData = json;
+
+			return true;
+		}
+
+		public void ExecuteCopyAreaShiftLeft()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			for (var repeat = 0; repeat < (InColorMode ? 2 : 1); ++repeat)
+			{
+				// Copy out the left hand column
+				for (var y = 0; y < pixelHeight; ++y)
+				{
+					_tempPixelBuffer[y] = pixelBuffer[0, y];
+				}
+
+				// Shift everything left
+				for (var x = 0; x < pixelWidth - 1; ++x)
+				{
+					for (var y = 0; y < pixelHeight; ++y)
+					{
+						pixelBuffer[x, y] = pixelBuffer[x + 1, y];
+					}
+				}
+
+				// Restore the left column to the right
+				for (var y = 0; y < pixelHeight; ++y)
+				{
+					pixelBuffer[pixelWidth - 1, y] = _tempPixelBuffer[y];
+				}
+			}
+
+			StuffPixelsIntoClipboard(pixelBuffer);
+			ExecutePasteFromClipboard();
+		}
+		public void ExecuteCopyAreaShiftRight()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			for (var repeat = 0; repeat < (InColorMode ? 2 : 1); ++repeat)
+			{
+				// Copy out the right hand column
+				for (var y = 0; y < pixelHeight; ++y)
+				{
+					_tempPixelBuffer[y] = pixelBuffer[pixelWidth - 1, y];
+				}
+
+				// Shift everything right
+				for (var x = pixelWidth - 1; x > 0; --x)
+				{
+					for (var y = 0; y < pixelHeight; ++y)
+					{
+						pixelBuffer[x, y] = pixelBuffer[x - 1, y];
+					}
+				}
+
+				// Restore the right column to the left
+				for (var y = 0; y < pixelHeight; ++y)
+				{
+					pixelBuffer[0, y] = _tempPixelBuffer[y];
+				}
+			}
+
+			StuffPixelsIntoClipboard(pixelBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		public void ExecuteCopyAreaShiftUp()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			// Copy out the top row
+			for (var x = 0; x < pixelWidth; ++x)
+			{
+				_tempPixelBuffer[x] = pixelBuffer[x, 0];
+			}
+
+			// Shift everything up
+			for (var y = 0; y < pixelHeight-1; ++y)
+			{
+				for (var x = 0; x < pixelWidth; ++x)
+				{
+					pixelBuffer[x, y] = pixelBuffer[x, y + 1];
+				}
+			}
+
+			// Restore the top to the bottom
+			for (var x = 0; x < pixelWidth; ++x)
+			{
+				pixelBuffer[x, pixelHeight - 1] = _tempPixelBuffer[x];
+			}
+
+			StuffPixelsIntoClipboard(pixelBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		public void ExecuteCopyAreaShiftDown()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			// Copy out the bottom row
+			for (var x = 0; x < pixelWidth; ++x)
+			{
+				_tempPixelBuffer[x] = pixelBuffer[x, pixelHeight-1];
+			}
+
+			// Shift everything down
+			for (var y = pixelHeight - 1; y > 0; --y)
+			{
+				for (var x = 0; x < pixelWidth; ++x)
+				{
+					pixelBuffer[x, y] = pixelBuffer[x, y - 1];
+				}
+			}
+
+			// Restore the bottom to the top
+			for (var x = 0; x < pixelWidth; ++x)
+			{
+				pixelBuffer[x, 0] = _tempPixelBuffer[x];
+			}
+
+			StuffPixelsIntoClipboard(pixelBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		/// <summary>
+		/// Take the JSON (data/font bytes) and apply them to the characters in the currently selected font.
+		/// </summary>
+		public void ExecuteClipboardInPlace()
+		{
+			var jsonText = Clipboard.GetText();
+
+			if (string.IsNullOrEmpty(jsonText))
+				return;
+
+			int width;
+			int height;
+			string characterBytes;
+			string fontBytes;
+
+			try
+			{
+				var jsonObj = jsonText.FromJson<ClipboardJSON>();
+				int.TryParse(jsonObj.Width, out width);
+				int.TryParse(jsonObj.Height, out height);
+
+				characterBytes = jsonObj.Chars;
+				fontBytes = jsonObj.Data;
+			}
+			catch (Exception)
+			{
+				return;
+			}
+
+			// var fontOffset = (AtariFont.GetCharacterOffset(SelectedCharacterIndex, checkBoxFontBank.Checked) / 1024) * 1024;
+			var fontOffset = (comboBoxPasteIntoFontNr.SelectedIndex) * 1024;
+
+			var bytes = Convert.FromHexString(fontBytes);
+			var chars = Convert.FromHexString(characterBytes);
+
+			var charIdx = 0;
+			var srcFontDataIdx = 0;
+			for (var y = 0; y < height; ++y)
+			{
+				for (var x = 0; x < width; ++x)
+				{
+					var theCharNr = chars[charIdx++];
+					var charOffset = theCharNr * 8 + fontOffset;
+					for (var i = 0; i < 8; ++i)
+						AtariFont.FontBytes[charOffset++] = bytes[srcFontDataIdx++];
+				}
+			}
+
+			RedrawChar();
+			RedrawFonts();
+			CheckDuplicate();
+			RedrawView();
+			UndoBuffer.Add2UndoFullDifferenceScan();
+			UpdateUndoButtons(false);
+		}
+
+		public void ExecuteCopyAreaHorizontalMirror()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			var targetBuffer = (byte[,])pixelBuffer.Clone();
+			if (InColorMode)
+			{
+				// Two bits per pixel
+				for (var y = 0; y < pixelHeight; ++y)
+				{
+					for (var x = 0; x < pixelWidth; x += 2)
+					{
+						targetBuffer[x, y] = pixelBuffer[pixelWidth - 2 - x, y];
+						targetBuffer[x+1, y] = pixelBuffer[pixelWidth - 1 - x, y];
+					}
+				}
+			}
+			else
+			{
+				// One bit per pixel
+				for (var y = 0; y < pixelHeight; ++y)
+				{
+					for (var x = 0; x < pixelWidth; ++x)
+					{
+						targetBuffer[x, y] = pixelBuffer[pixelWidth - 1 - x, y];
+					}
+				}
+			}
+
+			StuffPixelsIntoClipboard(targetBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		public void ExecuteCopyAreaVerticalMirror()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			var targetBuffer = (byte[,])pixelBuffer.Clone();
+
+			for (var y = 0; y < pixelHeight; ++y)
+			{
+				for (var x = 0; x < pixelWidth; ++x)
+				{
+					targetBuffer[x, y] = pixelBuffer[x, pixelHeight - 1 - y];
+				}
+			}
+
+			StuffPixelsIntoClipboard(targetBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		public void ExecuteCopyAreaInvert()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			for (var y = 0; y < pixelHeight; ++y)
+			{
+				for (var x = 0; x < pixelWidth; ++x)
+				{
+					pixelBuffer[x, y] = (byte)(pixelBuffer[x, y] == 0 ? 1 : 0);
+				}
+			}
+
+			StuffPixelsIntoClipboard(pixelBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		public void ExecuteCopyAreaRotateLeft()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			var targetBuffer = (byte[,])pixelBuffer.Clone();
+		
+			for (var y = 0; y < pixelHeight; ++y)
+			{
+				for (var x = 0; x < pixelWidth; ++x)
+				{
+					targetBuffer[y, pixelWidth - 1 - x] = pixelBuffer[x, y];
+				}
+			}
+
+			StuffPixelsIntoClipboard(targetBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		public void ExecuteCopyAreaRotateRight()
+		{
+			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
+			if (pixelBuffer == null)
+				return;
+
+			var targetBuffer = (byte[,])pixelBuffer.Clone();
+
+			for (var y = 0; y < pixelHeight; ++y)
+			{
+				for (var x = 0; x < pixelWidth; ++x)
+				{
+					targetBuffer[pixelHeight - 1 - y, x] = pixelBuffer[x, y];
+				}
+			}
+
+			StuffPixelsIntoClipboard(targetBuffer);
+			ExecutePasteFromClipboard();
+		}
+
+		#endregion
 
 	}
 }

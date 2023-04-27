@@ -174,6 +174,8 @@ namespace FontMaker
 
 			fontnr += checkBoxFontBank.Checked ? 2 : 0;
 
+			comboBoxPasteIntoFontNr.SelectedIndex = fontnr - 1;
+
 			if (buttonMegaCopy.Checked)
 			{
 				switch (megaCopyStatus)
@@ -343,7 +345,6 @@ namespace FontMaker
 			}
 		}
 
-
 		private void ResizeFontSelectorPasteCursor()
 		{
 			var img = Helpers.NewImage(pictureBoxFontSelectorPasteCursor);
@@ -363,11 +364,5 @@ namespace FontMaker
 
 			pictureBoxFontSelectorPasteCursor.Refresh();
 		}
-
-
-
-
-
-
 	}
 }

@@ -1,4 +1,6 @@
-﻿namespace FontMaker
+﻿using System.Security.Policy;
+
+namespace FontMaker
 {
 	public static class AtariFont
 	{
@@ -369,11 +371,11 @@
 		public static byte[,] Get5ColorCharacter(int character, bool onBank2)
 		{
 			var res = new byte[8, 8];
-			var charPtr = AtariFont.GetCharacterOffset(character, onBank2);
+			var charPtr = GetCharacterOffset(character, onBank2);
 
 			for (var i = 0; i < 8; i++)
 			{
-				var clData = DecodeColor(AtariFont.FontBytes[charPtr]);
+				var clData = DecodeColor(FontBytes[charPtr]);
 
 				for (var j = 0; j < 4; j++)
 				{
@@ -389,11 +391,11 @@
 		public static byte[,] Get2ColorCharacter(int character, bool onBank2)
 		{
 			var res = new byte[8, 8];
-			var charPtr = AtariFont.GetCharacterOffset(character, onBank2);
+			var charPtr = GetCharacterOffset(character, onBank2);
 
 			for (var i = 0; i < 8; i++)
 			{
-				var clData = DecodeMono(AtariFont.FontBytes[charPtr + i]);
+				var clData = DecodeMono(FontBytes[charPtr + i]);
 
 				for (var j = 0; j < 8; j++)
 				{
@@ -407,7 +409,7 @@
 		public static void Set2ColorCharacter(byte[,] pixels, int character, bool onBank2)
 		{
 			var charline2 = new byte[8];
-			var fontByteIndex = AtariFont.GetCharacterOffset(character, onBank2);
+			var fontByteIndex = GetCharacterOffset(character, onBank2);
 
 			for (var a = 0; a < 8; a++)
 			{
@@ -416,14 +418,14 @@
 					charline2[b] = pixels[b, a];
 				}
 
-				AtariFont.FontBytes[fontByteIndex + a] = EncodeMono(charline2);
+				FontBytes[fontByteIndex + a] = EncodeMono(charline2);
 			}
 		}
 
 		public static void Set5ColorCharacter(byte[,] character5Color, int character, bool onBank2)
 		{
 			var fourPixels = new byte[4];
-			var fontByteIndex = AtariFont.GetCharacterOffset(character, onBank2);
+			var fontByteIndex = GetCharacterOffset(character, onBank2);
 
 			for (var y = 0; y < 8; y++)
 			{
@@ -432,10 +434,69 @@
 					fourPixels[x] = character5Color[x, y];
 				}
 
-				AtariFont.FontBytes[fontByteIndex + y] = EncodeColor(fourPixels);
+				FontBytes[fontByteIndex + y] = EncodeColor(fourPixels);
 			}
 		}
 
+		public static void ShiftFontLeft(int characterIndex, bool onBank2, bool makeHole)
+		{
+			// Find out which font nr we are dealing with
+			var hp = GetCharacterOffset(characterIndex, onBank2);
+			var fontNr = hp / 1024; // 0,1,2,3
+			var startOfFontData = fontNr * 1024;
+
+			if (makeHole == false)
+			{
+				// No hole so save the first char's data
+				Buffer.BlockCopy(FontBytes, startOfFontData, OneCharacterBuffer, 0, 8);
+				// Move the whole font to the left (8 bytes)
+				Buffer.BlockCopy(FontBytes, startOfFontData + 8, FontBytes, startOfFontData, 1024 - 8);
+				// Copy back the first char to the last char
+				Buffer.BlockCopy(OneCharacterBuffer, 0, FontBytes, startOfFontData + 1024 - 8, 8);
+			}
+			else
+			{
+				// Make a hole at the current location
+				var length = hp - startOfFontData;
+				if (length > 0)
+				{
+					Buffer.BlockCopy(FontBytes, startOfFontData+8, FontBytes, startOfFontData, length);
+				}
+				// Clear the char at the current location
+				Array.Clear(FontBytes, hp, 8);
+			}
+		}
+
+		public static void ShiftFontRight(int characterIndex, bool onBank2, bool makeHole)
+		{
+			// Find out which font nr we are dealing with
+			var hp = GetCharacterOffset(characterIndex, onBank2);
+			var fontNr = hp / 1024; // 0,1,2,3
+			var startOfFontData = fontNr * 1024;
+			var nextFontData = startOfFontData + 1024;
+
+			if (makeHole == false)
+			{
+				// No hole so save the last char's data
+				Buffer.BlockCopy(FontBytes, nextFontData-8, OneCharacterBuffer, 0, 8);
+				// Move the whole font to the right (8 bytes)
+				Buffer.BlockCopy(FontBytes, startOfFontData, FontBytes, startOfFontData+8, 1024 - 8);
+				// Copy back the last char to the first char
+				Buffer.BlockCopy(OneCharacterBuffer, 0, FontBytes, startOfFontData, 8);
+			}
+			else
+			{
+				// Make a hole at the current location
+				var length = nextFontData - hp;
+				if (length > 0)
+				{
+					Buffer.BlockCopy(FontBytes, hp, FontBytes, hp + 8, length-8);
+				}
+				// Clear the char at the current location
+				Array.Clear(FontBytes, hp, 8);
+			}
+
+		}
 
 		#endregion
 	}
