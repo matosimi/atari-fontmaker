@@ -240,7 +240,8 @@ namespace FontMaker
 
 			MakeSomeColoredBlocks();
 
-			ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
+			SimulateSafeLeftMouseButtonClick();
+
 			CheckDuplicate();
 		}
 
@@ -878,6 +879,7 @@ namespace FontMaker
 
 			// Hide character edit window
 			pictureBoxCharacterEditor.Visible = !on;
+			pictureBoxClipboardPreview.Visible = on;
 
 			// Hide recolor if in mega copy mode
 			if (on && panelColorSwitcher.Visible)
@@ -905,7 +907,11 @@ namespace FontMaker
 
 				pictureBoxViewEditorRubberBand.Left = pictureBoxAtariView.Left;
 				pictureBoxViewEditorRubberBand.Top = pictureBoxAtariView.Top;
+				pictureBoxViewEditorRubberBand.Size = new Size(20, 20);
 				pictureBoxViewEditorRubberBand.Visible = true;
+
+				pictureBoxViewEditorPasteCursor.Visible = false;
+				pictureBoxViewEditorMegaCopyImage.Visible = false;
 			}
 			else
 			{
@@ -918,9 +924,14 @@ namespace FontMaker
 				pictureBoxViewEditorPasteCursor.Width = 20;
 				pictureBoxViewEditorPasteCursor.Height = 20;
 				ResizeViewEditorPasteCursor();
-				var bx = SelectedCharacterIndex % 32;
-				var by = SelectedCharacterIndex / 32;
-				ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, bx * 16 + 4, by * 16 + 4, 0));
+				pictureBoxViewEditorPasteCursor.Visible = false;
+				pictureBoxViewEditorMegaCopyImage.Visible = false;
+
+				pictureBoxFontSelectorMegaCopyImage.Visible = false;
+				pictureBoxFontSelectorPasteCursor.Visible = false;
+
+				SimulateSafeLeftMouseButtonClick();
+
 				RevalidateCharButtons();
 				checkBoxShowDuplicates.Enabled = true;
 				CheckDuplicate();
@@ -1055,7 +1066,7 @@ namespace FontMaker
 
 		private void comboBoxPasteIntoFontNr_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			buttonPasteInPlace.Text = $"Paste {comboBoxPasteIntoFontNr.SelectedIndex + 1}";
+			buttonPasteInPlace.Text = $"Paste in location {comboBoxPasteIntoFontNr.SelectedIndex + 1}";
 		}
 
 		#endregion

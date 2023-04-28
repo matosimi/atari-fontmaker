@@ -22,6 +22,12 @@ namespace FontMaker
 		/// and the values can't be pasted into the view window
 		/// </summary>
 		public bool Modified { get; set; }
+		/// <summary>
+		/// Describes which font the individual rows come from.  If copied from the font area we know the font and bank,
+		/// if from the view area we can determine the font from the "Lines"
+		/// i.e 111222334
+		/// </summary>
+		public string FontNr { get; set; }
 	}
 
 	public partial class FontMakerForm
@@ -31,13 +37,14 @@ namespace FontMaker
 		/// </summary>
 		private string _localCopyOfClipboardData = string.Empty;
 
-		private byte[] _tempPixelBuffer = new byte[40 * 8];		// Init to the max value that it can be and reuse it everywhere
-		private byte[,] _pixelBuffer = new byte[8,8];
+		private byte[] _tempPixelBuffer = new byte[40 * 8]; // Init to the max value that it can be and reuse it everywhere
+		private byte[,] _pixelBuffer = new byte[8, 8];
 
 		/// <summary>
 		/// Character pixel being edited: X-coordinate
 		/// </summary>
 		internal int LastCharacterPixelX { get; set; }
+
 		/// <summary>
 		/// Character pixel being edited: Y-coordinate
 		/// </summary>
@@ -167,6 +174,7 @@ namespace FontMaker
 				UpdateUndoButtons(CharacterEdited());
 				CheckDuplicate();
 			}
+
 			pictureBoxCharacterEditor.Refresh();
 		}
 
@@ -243,6 +251,7 @@ namespace FontMaker
 					}
 				}
 			}
+
 			pictureBoxCharacterEditor.Refresh();
 		}
 
@@ -262,12 +271,14 @@ namespace FontMaker
 					}
 				}
 			}
+
 			pictureBoxCharacterEditor.Refresh();
 		}
 
 		#endregion
 
 		#region Character editor button actions
+
 		// All the character editor buttons have their click handlers defined here
 
 		private void ActionCharacterEditorColor1MouseDown()
@@ -308,7 +319,7 @@ namespace FontMaker
 			try
 			{
 				var whichCharacter = SelectedCharacterIndex & 127;
-				var fontNumber = SelectedCharacterIndex / 256;       // Font 0 or 1
+				var fontNumber = SelectedCharacterIndex / 256; // Font 0 or 1
 				fontNumber += checkBoxFontBank.Checked ? 2 : 0;
 
 				var filename = Font1Filename;
@@ -367,6 +378,7 @@ namespace FontMaker
 			{
 				AtariFont.MirrorHorizontalMono(SelectedCharacterIndex, checkBoxFontBank.Checked);
 			}
+
 			UpdateCharacterViews();
 		}
 
@@ -470,10 +482,10 @@ namespace FontMaker
 		{
 			if (CharacterEdited())
 			{
-				UndoBuffer.Add2Undo(true);  // Add 2 undo but don't change index
+				UndoBuffer.Add2Undo(true); // Add 2 undo but don't change index
 			}
 
-			UndoBuffer.Undo();              // Copy the old fonts back
+			UndoBuffer.Undo(); // Copy the old fonts back
 
 			UpdateUndoButtons(CharacterEdited());
 			RedrawChar();
@@ -505,6 +517,7 @@ namespace FontMaker
 		{
 			var characterBytes = string.Empty;
 			var fontBytes = string.Empty;
+			var fontNr = string.Empty; // 1234
 
 			if ((buttonMegaCopy.Checked && (megaCopyStatus == MegaCopyStatusFlags.Selected)) || (!buttonMegaCopy.Checked))
 			{
@@ -528,10 +541,12 @@ namespace FontMaker
 					for (var j = CopyPasteRange.X; j <= CopyPasteRange.Right; j++)
 					{
 						int charInFont;
+						int whichFontNr;
 						if (sourceIsView)
 						{
 							characterBytes = characterBytes + String.Format("{0:X2}", AtariView.ViewBytes[j, i]);
 							charInFont = (AtariView.ViewBytes[j, i] % 128) * 8 + (AtariView.UseFontOnLine[i] - 1) * 1024;
+							whichFontNr = AtariView.UseFontOnLine[i];
 						}
 						else
 						{
@@ -546,8 +561,12 @@ namespace FontMaker
 								charInFont = ((i % 4 + 4) * 32 + j) * 8;
 							} //second font
 
-							charInFont += checkBoxFontBank.Checked ? 2048 : 0;		// 3rd or 4th font?
+							charInFont += checkBoxFontBank.Checked ? 2048 : 0; // 3rd or 4th font?
+
+							whichFontNr = (charInFont / 1024) + 1; // What is the font # the character is in?
 						}
+
+						fontNr += whichFontNr;
 
 						for (var k = 0; k < 8; k++)
 						{
@@ -562,16 +581,17 @@ namespace FontMaker
 					Height = (CopyPasteRange.Height + 1).ToString(),
 					Chars = characterBytes,
 					Data = fontBytes,
+					FontNr = fontNr,
 				};
 				var json = jo.ToJson();
-				Clipboard.SetText(json);
-				_localCopyOfClipboardData = json;
+				SafeSetClipboard(json);
 
 				// The font and characters have been copied to the clipboard
 				// Enabled specific clipboard modification/action buttons
 				ConfigureClipboardActionButtons();
 
 				UpdateClipboardInformation(CopyPasteRange.Width + 1, CopyPasteRange.Height + 1);
+				RevalidateClipboard();
 			}
 		}
 
@@ -612,10 +632,10 @@ namespace FontMaker
 				Height = "1",
 				Chars = characterBytes,
 				Data = fontBytes,
+				FontNr = "1",
 			};
 			var json = jo.ToJson();
-			Clipboard.SetText(json);
-			_localCopyOfClipboardData = json;
+			SafeSetClipboard(json);
 
 			UpdateClipboardInformation(text.Length, 1);
 		}
@@ -624,7 +644,7 @@ namespace FontMaker
 		{
 			if (buttonMegaCopy.Checked)
 			{
-				if (Clipboard.GetText() != _localCopyOfClipboardData)
+				if (SafeGetClipboard() != _localCopyOfClipboardData)
 				{
 					pictureBoxFontSelectorRubberBand.Visible = false;
 					pictureBoxViewEditorRubberBand.Visible = false;
@@ -650,7 +670,7 @@ namespace FontMaker
 
 			try
 			{
-				var jsonText = Clipboard.GetText();
+				var jsonText = SafeGetClipboard();
 				var jsonObj = jsonText.FromJson<ClipboardJSON>();
 				int.TryParse(jsonObj.Width, out width);
 				int.TryParse(jsonObj.Height, out height);
@@ -757,33 +777,33 @@ namespace FontMaker
 					break;
 
 				case MegaCopyStatusFlags.Selecting:
-					{
-						megaCopyStatus = MegaCopyStatusFlags.None;
-						// Font selector window
-						pictureBoxFontSelectorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
-						// View editor window
-						pictureBoxViewEditorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
-						break;
-					}
+				{
+					megaCopyStatus = MegaCopyStatusFlags.None;
+					// Font selector window
+					pictureBoxFontSelectorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
+					// View editor window
+					pictureBoxViewEditorRubberBand.Bounds = new Rectangle(-30, 0, 20, 20);
+					break;
+				}
 
 				case MegaCopyStatusFlags.Selected:
 					break;
 
 				case MegaCopyStatusFlags.Pasting:
-					{
-						megaCopyStatus = MegaCopyStatusFlags.Selected;
-						pictureBoxFontSelectorPasteCursor.Visible = false;
-						pictureBoxFontSelectorMegaCopyImage.Visible = false;
-						pictureBoxViewEditorPasteCursor.Visible = false;
-						pictureBoxViewEditorMegaCopyImage.Visible = false;
-					}
+				{
+					megaCopyStatus = MegaCopyStatusFlags.Selected;
+					pictureBoxFontSelectorPasteCursor.Visible = false;
+					pictureBoxFontSelectorMegaCopyImage.Visible = false;
+					pictureBoxViewEditorPasteCursor.Visible = false;
+					pictureBoxViewEditorMegaCopyImage.Visible = false;
+				}
 					break;
 			}
 		}
 
 		public void RevalidateClipboard()
 		{
-			var jsonText = Clipboard.GetText();
+			var jsonText = SafeGetClipboard();
 
 			if (string.IsNullOrEmpty(jsonText))
 				return;
@@ -815,7 +835,6 @@ namespace FontMaker
 				pictureBoxFontSelectorMegaCopyImage.Size = new Size(w, h);
 				pictureBoxViewEditorMegaCopyImage.Size = new Size(w, h);
 
-
 				var img = Helpers.NewImage(pictureBoxFontSelectorMegaCopyImage);
 				using (var gr = Graphics.FromImage(img))
 				{
@@ -825,6 +844,25 @@ namespace FontMaker
 				DrawChars(pictureBoxFontSelectorMegaCopyImage, fontBytes, characterBytes, 0, 0, width, height, !InColorMode, 2);
 				pictureBoxViewEditorMegaCopyImage.Image?.Dispose();
 				pictureBoxViewEditorMegaCopyImage.Image = pictureBoxFontSelectorMegaCopyImage.Image;
+
+				// Copy the image into the clipboard preview bitmap
+				var imgPreview = Helpers.GetImage(pictureBoxClipboardPreview);
+				using (var gr = Graphics.FromImage(imgPreview))
+				{
+					gr.FillRectangle(blackBrush, new Rectangle(0, 0, imgPreview.Width, imgPreview.Height));
+
+					var theRect = new Rectangle
+					{
+						X = 0,
+						Y = 0,
+						Width = Math.Min(imgPreview.Width, pictureBoxViewEditorMegaCopyImage.Image.Width),
+						Height = Math.Min(imgPreview.Height, pictureBoxViewEditorMegaCopyImage.Image.Height),
+					};
+					gr.DrawImage(pictureBoxFontSelectorMegaCopyImage.Image, theRect, theRect, GraphicsUnit.Pixel);
+				}
+
+				pictureBoxClipboardPreview.Refresh();
+
 
 				pictureBoxFontSelectorPasteCursor.Size = new Size(4 + w, 4 + h);
 				ResizeFontSelectorPasteCursor();
@@ -846,6 +884,7 @@ namespace FontMaker
 					}
 				}
 			}
+
 			targetImage.Refresh();
 		}
 
@@ -926,7 +965,7 @@ namespace FontMaker
 
 		#region Manipulate contents of MegaCopy area
 
-		public bool CheckAllUnique(byte[] toCheck)
+		public bool CheckAllUnique(byte[] toCheck, string fontNr)
 		{
 			var found = new bool[256];
 			for (var i = 0; i < toCheck.Length; ++i)
@@ -935,6 +974,12 @@ namespace FontMaker
 				if (found[it])
 					return false;
 				found[it] = true;
+			}
+
+			// So far ok.  Make sure that all chars come from the same font
+			if (!string.IsNullOrEmpty(fontNr))
+			{
+				return fontNr.All(ch => ch == fontNr[0]);
 			}
 
 			return true;
@@ -951,10 +996,10 @@ namespace FontMaker
 			if (on)
 			{
 				// If we are on then determine if the special in place paste can be used.
-				// All characters in the selected area need to be unique
+				// All characters in the selected area need to be unique AND come from the same font
 				try
 				{
-					var jsonText = Clipboard.GetText();
+					var jsonText = SafeGetClipboard();
 					var jsonObj = jsonText.FromJson<ClipboardJSON>();
 					if (jsonObj == null)
 						throw new Exception();
@@ -962,7 +1007,8 @@ namespace FontMaker
 					int.TryParse(jsonObj.Height, out var height);
 
 					var bytes = Convert.FromHexString(jsonObj.Chars);
-					allUnique = CheckAllUnique(bytes);
+					var fontNr = jsonObj.FontNr;
+					allUnique = CheckAllUnique(bytes, fontNr);
 					isSquare = width > 0 && width == height;
 				}
 				catch (Exception)
@@ -997,7 +1043,7 @@ namespace FontMaker
 			{
 				try
 				{
-					var jsonText = Clipboard.GetText();
+					var jsonText = SafeGetClipboard();
 					var jsonObj = jsonText.FromJson<ClipboardJSON>();
 					if (jsonObj == null)
 						throw new Exception();
@@ -1025,7 +1071,7 @@ namespace FontMaker
 			if (!buttonMegaCopy.Checked)
 				return (null, 0, 0);
 
-			var jsonText = Clipboard.GetText();
+			var jsonText = SafeGetClipboard();
 			if (string.IsNullOrEmpty(jsonText))
 				return (null, 0, 0);
 
@@ -1081,14 +1127,15 @@ namespace FontMaker
 		/// <returns></returns>
 		private bool StuffPixelsIntoClipboard(byte[,] pixels)
 		{
-			var jsonText = Clipboard.GetText();
+			var jsonText = SafeGetClipboard();
 			if (string.IsNullOrEmpty(jsonText))
 				return false;
 
 			int width;
 			int height;
 			string characterBytes;
-			string fontBytes = string.Empty;
+			var fontBytes = string.Empty;
+			var fontNr = string.Empty;
 
 			try
 			{
@@ -1097,11 +1144,13 @@ namespace FontMaker
 				int.TryParse(jsonObj.Height, out height);
 
 				characterBytes = jsonObj.Chars;
+				fontNr = jsonObj.FontNr;
 			}
 			catch (Exception)
 			{
 				return false;
 			}
+
 			// Convert the pixel bitmap into characters (8x8 pixels)
 			for (var y = 0; y < height; ++y)
 			{
@@ -1120,6 +1169,7 @@ namespace FontMaker
 							accu |= (pixels[srcX + pixelX, srcY + inY] > 0) ? mask : 0;
 							mask >>= 1;
 						}
+
 						fontBytes += $"{accu:X2}";
 					}
 				}
@@ -1132,10 +1182,10 @@ namespace FontMaker
 				Chars = characterBytes,
 				Data = fontBytes,
 				Modified = true,
+				FontNr = fontNr, // Transfer the original values
 			};
 			var json = jo.ToJson();
-			Clipboard.SetText(json);
-			_localCopyOfClipboardData = json;
+			SafeSetClipboard(json);
 
 			return true;
 		}
@@ -1173,6 +1223,7 @@ namespace FontMaker
 			StuffPixelsIntoClipboard(pixelBuffer);
 			ExecutePasteFromClipboard();
 		}
+
 		public void ExecuteCopyAreaShiftRight()
 		{
 			var (pixelBuffer, pixelWidth, pixelHeight) = GetFontPixelsFromClipboard();
@@ -1220,7 +1271,7 @@ namespace FontMaker
 			}
 
 			// Shift everything up
-			for (var y = 0; y < pixelHeight-1; ++y)
+			for (var y = 0; y < pixelHeight - 1; ++y)
 			{
 				for (var x = 0; x < pixelWidth; ++x)
 				{
@@ -1247,7 +1298,7 @@ namespace FontMaker
 			// Copy out the bottom row
 			for (var x = 0; x < pixelWidth; ++x)
 			{
-				_tempPixelBuffer[x] = pixelBuffer[x, pixelHeight-1];
+				_tempPixelBuffer[x] = pixelBuffer[x, pixelHeight - 1];
 			}
 
 			// Shift everything down
@@ -1274,7 +1325,7 @@ namespace FontMaker
 		/// </summary>
 		public void ExecuteClipboardInPlace()
 		{
-			var jsonText = Clipboard.GetText();
+			var jsonText = SafeGetClipboard();
 
 			if (string.IsNullOrEmpty(jsonText))
 				return;
@@ -1311,6 +1362,13 @@ namespace FontMaker
 				for (var x = 0; x < width; ++x)
 				{
 					var theCharNr = chars[charIdx++];
+					if (theCharNr >= 128)
+					{
+						// This is the inverse of the character
+						// Switch back to the base character
+						theCharNr -= 128;
+					}
+
 					var charOffset = theCharNr * 8 + fontOffset;
 					for (var i = 0; i < 8; ++i)
 						AtariFont.FontBytes[charOffset++] = bytes[srcFontDataIdx++];
@@ -1340,7 +1398,7 @@ namespace FontMaker
 					for (var x = 0; x < pixelWidth; x += 2)
 					{
 						targetBuffer[x, y] = pixelBuffer[pixelWidth - 2 - x, y];
-						targetBuffer[x+1, y] = pixelBuffer[pixelWidth - 1 - x, y];
+						targetBuffer[x + 1, y] = pixelBuffer[pixelWidth - 1 - x, y];
 					}
 				}
 			}
@@ -1405,7 +1463,7 @@ namespace FontMaker
 				return;
 
 			var targetBuffer = (byte[,])pixelBuffer.Clone();
-		
+
 			for (var y = 0; y < pixelHeight; ++y)
 			{
 				for (var x = 0; x < pixelWidth; ++x)
@@ -1440,5 +1498,28 @@ namespace FontMaker
 
 		#endregion
 
+		public string SafeGetClipboard()
+		{
+			try
+			{
+				return Clipboard.GetText();
+			}
+			catch
+			{
+				return _localCopyOfClipboardData;
+			}
+		}
+
+		public void SafeSetClipboard(string json)
+		{
+			try
+			{
+				Clipboard.SetText(json);
+			}
+			catch
+			{
+			}
+			_localCopyOfClipboardData = json;
+		}
 	}
 }

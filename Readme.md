@@ -88,20 +88,55 @@ Tip: Drawing an animation over a couple of pages and quickly flipping through th
 **Mega Copy mode**
 Mega Copy mode has been added in version 1.5, it allows you to copy multiple characters from the font window to the view window and vice versa.
 
-You can enter Mega Copy mode by clicking on the [Mega Copy] button, the character edit window is blank and all character editing functions are disabled:
+You can enter Mega Copy mode by clicking on the [Mega Copy] button, the character edit window is switched out for a preview window, and all character editing functions are disabled:
 ![12](https://user-images.githubusercontent.com/2360950/231687996-20d9e28c-6063-411f-ad14-4ab2967db6a0.JPG)
 
-When in Mega Copy mode you can click and drag selection frame in font window or view window to select multiple characters at a time, watch following video to get idea how it works and what could be achieved:
+When in Mega Copy mode you can click and drag a selection frame in the font or view window to select multiple characters at a time; watch the following video to get idea how it works and what could be achieved:
 
 <iframe width="956" height="538" src="https://www.youtube.com/embed/bSo6yRGIE-Y" title="Atari FontMaker - Mega Copy mode" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
-As you can see it is possible to copy characters to view window, but it is also possible to copy character data to font window, so it requires some hands-on experience to fully understand the options available.
+As you can see it is possible to copy characters to the view window, but it is also possible to copy character data to the font window, so it requires some hands-on experience to fully understand the options available.
 
 Additional function shown in the video is available after clicking on [Enter text] button. You can type free text which will be copied to clipboard, so you can paste it to view (or font) window.
 
 Tip: Keep in mind that multi-character clipboard is working only in Mega Copy mode, you will not be able to paste bigger clipboard contents when you exit the Mega Copy mode.
 
 You can cancel clipboard paste by pressing ESC key or double-clicking the right mouse button.
+
+** Expanded Mega Copy mode **
+From version 1.6.7 of the Atari Font Maker there is a new  list of font manipulation commands located just above the font selection section.
+
+The first four buttons allow the font characters to be shifted in bulk. You can either rotate all 128 characters left or right, basically shifting the look of each character.  Two buttons allow shifting with hole insertion.  This can be used to create a free spot in a font.
+
+Sometimes you need to manipulate the pixels in a character in such a way that the contents from one spills over into the next character. i.e. You have a nice 2x2 tile but want to center it in a 3x2 tile.  Until now you would have to redraw the pixels into the 3x2 characters.
+
+The expanded Mega Copy mode makes this shifting simpler. By the way, preparing soft-sprites as characters now also becomes easy.
+
+Steps to follow:
+- Enter mega copy mode by clicking the [Mega Copy] button
+- Select an area in the font or the view window.
+  - As an example select the 4x1 area of the word "fox" and the space behind it: "fox ".
+  - Note that all characters are unique in this selection
+- Pressing CTRL+C or the [CPY] button now copies the characters into a working buffer.
+  - The buffer is shown in the location where the character editor window used to be.
+  - Above the buffer the buffer preview window you can see the selection size indicator.
+- Now the contents of that buffer can be manipulated by the buttons just above the font selection window. The available operations are:
+  - Shift left/right
+  - Shift up/down
+  - Horizontal and Vertical mirror
+  - Invert the pixels
+  - And if the selected area was square left and right rotation are available.
+- Clicking the second button [Shift Copy Area Right] four times should now center the pixels of the "fox " text in the 4 selected characters. It will look like this " fox ".
+- The manipulated buffer can now be pasted into any location in the font.
+  - Click CTRL+V or the [PST] button to create a paste action.
+  - Select the location in the font and press the left mouse button to commit the paste action
+  - Press ESC or double click the right mouse button to cancel the paste operation.
+  - Lets assume you pasted the shifted " fox " characters to the numbers "0123".
+  - Now every occurrence of the number "0123" will show the shifted " fox " text.
+
+One special feature is the ability to paste the copy area back into the selected font characters.
+	- If all the characters in the selected area are unique (and come from the same font)
+	- then pressing the [Paste in location X] button will paste the working buffer into the original font. i.e. the letters "fox " now become " fox " where the "f" has turned into a " f" and only a portion of the "f" is still in the "f" character, the rest can be found in the "o" character.
 
 **DUP** Just to the left of the Mega Copy button is the *DUP* checkbox. Turning it on will cycle through all characters in a font that are identical (duplicates off) to the currently selected character. Very useful to see if you have some duplicates in your character design.
 
@@ -181,6 +216,7 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 
 - **, .** – previous/next character
 - **Mousewheel** – previous/next character
+- CTRL+**Mousewheel** – previous/next character row
 - **1 2 3** – select color
 - **R Shift+R** – rotate character left and right
 - **M Shift+M** – mirror horizontal and vertical
@@ -190,6 +226,22 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.7.1
+- Fixed font bank switching when in MegaCopy mode. This used to paste the current copy area on each bank switch.
+- Fixed the in-place pasting of the copy area. It did not handle inverted characters correctly.
+- Added a preview window when in mega copy mode. This will show the shifted/rotated characters before they are pasted into a font.
+
+V1.6.7.0
+- Significant extension to the MegaCopy functionality:
+- When an area has been copied the font pixels can now be
+    - Shifted left/right/up/down
+    - Mirrored horizontally or vertically
+    - Inverted
+    - If the area is square the pixels can be rotated left or right
+    - If the area contains unique characters then the modified font area can be pasted directly into the source characters (into any of the 4 fonts)
+- Using the mouse wheel to select the next/prev character has been extended with the control key. When pressing CTRL and using the mouse wheel the character selector will move a row at a time (jump 32 characters).
+- This allows for quick left-right and up-down movement in the font selection area.
+- The characters in a font can also be shifted left-right with or without creating a hole at the current selected location
 
 V1.6.6.1
 - Allow the view exporter to remember its settings.

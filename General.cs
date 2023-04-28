@@ -11,6 +11,16 @@
 		// Methods to implement the button actions
 
 		#region Button and mouse event actions
+
+		public void SimulateSafeLeftMouseButtonClick()
+		{
+			var old_megaCopyStatus = megaCopyStatus;
+			megaCopyStatus = MegaCopyStatusFlags.None;
+			var mouseEvent = new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0);
+			ActionFontSelectorMouseDown(mouseEvent);
+			ActionFontSelectorMouseUp(mouseEvent);
+			megaCopyStatus = old_megaCopyStatus;
+		}
 		/// <summary>
 		/// New the font and view data
 		/// </summary>
@@ -78,7 +88,9 @@
 
 				UpdateFormCaption();
 				RedrawFonts();
-				ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
+
+				SimulateSafeLeftMouseButtonClick();
+
 				RedrawView();
 				UndoBuffer.Add2UndoFullDifferenceScan(); // Full font scan
 				UpdateUndoButtons(false);
@@ -113,7 +125,7 @@
 
 				UpdateFormCaption();
 				RedrawFonts();
-				ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
+				SimulateSafeLeftMouseButtonClick();
 				RedrawView();
 				UndoBuffer.Add2UndoFullDifferenceScan(); //full font scan
 				UpdateUndoButtons(false);
@@ -227,7 +239,7 @@
 			AtariFont.ClearFont(fontNr);
 
 			RedrawFonts();
-			ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
+			SimulateSafeLeftMouseButtonClick();
 			RedrawView();
 			CheckDuplicate();
 		}

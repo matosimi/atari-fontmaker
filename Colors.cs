@@ -30,8 +30,12 @@
 			InColorMode = !InColorMode;
 			ShowCorrectFontBank();
 			RedrawView();
-			ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
 
+			// Now simulate a mouse click in the font selector. The idea is to get the
+			// color character into the edit area.
+			// DANGER: When in MegaCopy mode this would paste the copy area into the font.
+			// Hence, turn off the MegaCopy mode, do the simulated click and then restore the MegaCopy mode
+			SimulateSafeLeftMouseButtonClick();
 			if (!buttonMegaCopy.Checked)
 			{
 				RevalidateCharButtons();
@@ -47,8 +51,13 @@
 		{
 			FontBank_CheckedChanged(0, EventArgs.Empty);
 			ShowCorrectFontBank();
-			ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
-			ActionFontSelectorMouseUp(new MouseEventArgs(MouseButtons.Left, 0, (SelectedCharacterIndex % 32) * 16, (SelectedCharacterIndex / 32) * 16, 0));
+
+			// Now simulate a mouse click in the font selector. The idea is to get the
+			// color character into the edit area.
+			// DANGER: When in MegaCopy mode this would paste the copy area into the font.
+			// Hence, turn off the MegaCopy mode, do the simulated click and then restore the MegaCopy mode
+			SimulateSafeLeftMouseButtonClick();
+
 			CheckDuplicate();
 		}
 

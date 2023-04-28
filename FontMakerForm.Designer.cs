@@ -41,6 +41,7 @@
 			p_xx = new Panel();
 			Bevel3 = new Panel();
 			pictureBoxCharacterEditor = new PictureBox();
+			labelCopyAreaInfo = new Label();
 			pictureBoxCharacterEditorColor1 = new PictureBox();
 			pictureBoxCharacterEditorColor2 = new PictureBox();
 			buttonShiftUp = new Button();
@@ -80,7 +81,6 @@
 			buttonClearView = new Button();
 			buttonSaveView = new Button();
 			p_status = new Panel();
-			labelCopyAreaInfo = new Label();
 			buttonCopyAreaRotateRight = new Button();
 			imageListFontShift = new ImageList(components);
 			buttonCopyAreaRotateLeft = new Button();
@@ -129,6 +129,7 @@
 			buttonEditPage = new Button();
 			labelCurrentPageIndex = new Label();
 			buttonExportView = new Button();
+			pictureBoxClipboardPreview = new PictureBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -155,6 +156,7 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelectorPasteCursor).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorPasteCursor).BeginInit();
+			((System.ComponentModel.ISupportInitialize)pictureBoxClipboardPreview).BeginInit();
 			SuspendLayout();
 			// 
 			// pictureBoxAtariView
@@ -276,6 +278,8 @@
 			// 
 			Bevel3.BorderStyle = BorderStyle.FixedSingle;
 			Bevel3.Controls.Add(pictureBoxCharacterEditor);
+			Bevel3.Controls.Add(pictureBoxClipboardPreview);
+			Bevel3.Controls.Add(labelCopyAreaInfo);
 			Bevel3.Location = new Point(63, 7);
 			Bevel3.Name = "Bevel3";
 			Bevel3.Size = new Size(162, 162);
@@ -291,6 +295,17 @@
 			pictureBoxCharacterEditor.MouseDown += CharacterEditor_MouseDown;
 			pictureBoxCharacterEditor.MouseMove += CharacterEditor_MouseMove;
 			pictureBoxCharacterEditor.MouseUp += CharacterEditor_MouseUp;
+			// 
+			// labelCopyAreaInfo
+			// 
+			labelCopyAreaInfo.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
+			labelCopyAreaInfo.Location = new Point(0, 0);
+			labelCopyAreaInfo.Name = "labelCopyAreaInfo";
+			labelCopyAreaInfo.Size = new Size(100, 13);
+			labelCopyAreaInfo.TabIndex = 29;
+			labelCopyAreaInfo.Text = "Copy Area:";
+			labelCopyAreaInfo.TextAlign = ContentAlignment.MiddleLeft;
+			labelCopyAreaInfo.Visible = false;
 			// 
 			// pictureBoxCharacterEditorColor1
 			// 
@@ -741,7 +756,6 @@
 			// 
 			// p_status
 			// 
-			p_status.Controls.Add(labelCopyAreaInfo);
 			p_status.Controls.Add(buttonCopyAreaRotateRight);
 			p_status.Controls.Add(buttonCopyAreaRotateLeft);
 			p_status.Controls.Add(buttonCopyAreaInvert);
@@ -770,17 +784,6 @@
 			p_status.Name = "p_status";
 			p_status.Size = new Size(515, 50);
 			p_status.TabIndex = 6;
-			// 
-			// labelCopyAreaInfo
-			// 
-			labelCopyAreaInfo.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
-			labelCopyAreaInfo.Location = new Point(413, 30);
-			labelCopyAreaInfo.Name = "labelCopyAreaInfo";
-			labelCopyAreaInfo.Size = new Size(100, 13);
-			labelCopyAreaInfo.TabIndex = 28;
-			labelCopyAreaInfo.Text = "Copy Area:";
-			labelCopyAreaInfo.TextAlign = ContentAlignment.MiddleRight;
-			labelCopyAreaInfo.Visible = false;
 			// 
 			// buttonCopyAreaRotateRight
 			// 
@@ -877,7 +880,7 @@
 			comboBoxPasteIntoFontNr.Enabled = false;
 			comboBoxPasteIntoFontNr.FormattingEnabled = true;
 			comboBoxPasteIntoFontNr.Items.AddRange(new object[] { "1", "2", "3", "4" });
-			comboBoxPasteIntoFontNr.Location = new Point(383, 26);
+			comboBoxPasteIntoFontNr.Location = new Point(430, 26);
 			comboBoxPasteIntoFontNr.Name = "comboBoxPasteIntoFontNr";
 			comboBoxPasteIntoFontNr.Size = new Size(30, 21);
 			comboBoxPasteIntoFontNr.TabIndex = 22;
@@ -891,10 +894,10 @@
 			buttonPasteInPlace.Margin = new Padding(0);
 			buttonPasteInPlace.Name = "buttonPasteInPlace";
 			buttonPasteInPlace.RightToLeft = RightToLeft.No;
-			buttonPasteInPlace.Size = new Size(57, 24);
+			buttonPasteInPlace.Size = new Size(104, 24);
 			buttonPasteInPlace.TabIndex = 21;
-			buttonPasteInPlace.Text = "Paste";
-			toolTips.SetToolTip(buttonPasteInPlace, "Paste Clipboard in Place");
+			buttonPasteInPlace.Text = "Paste in location";
+			toolTips.SetToolTip(buttonPasteInPlace, "Paste into original characters");
 			buttonPasteInPlace.UseVisualStyleBackColor = true;
 			buttonPasteInPlace.Click += buttonPasteInPlace_Click;
 			// 
@@ -1329,6 +1332,15 @@
 			buttonExportView.UseVisualStyleBackColor = true;
 			buttonExportView.Click += ViewEditor_ExportView_Click;
 			// 
+			// pictureBoxClipboardPreview
+			// 
+			pictureBoxClipboardPreview.Location = new Point(0, 15);
+			pictureBoxClipboardPreview.Name = "pictureBoxClipboardPreview";
+			pictureBoxClipboardPreview.Size = new Size(160, 145);
+			pictureBoxClipboardPreview.TabIndex = 30;
+			pictureBoxClipboardPreview.TabStop = false;
+			pictureBoxClipboardPreview.Visible = false;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
@@ -1397,6 +1409,7 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelectorPasteCursor).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorPasteCursor).EndInit();
+			((System.ComponentModel.ISupportInitialize)pictureBoxClipboardPreview).EndInit();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -1508,5 +1521,6 @@
 		private Button buttonCopyAreaRotateRight;
 		private Button buttonCopyAreaRotateLeft;
 		private Label labelCopyAreaInfo;
+		private PictureBox pictureBoxClipboardPreview;
 	}
 }
