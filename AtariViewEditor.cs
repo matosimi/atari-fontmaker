@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualBasic;
+﻿using System.Diagnostics;
+using Microsoft.VisualBasic;
 using System.Drawing.Drawing2D;
 using System.Text;
 using TinyJson;
@@ -62,6 +63,10 @@ namespace FontMaker
 
 		internal bool ContinueViewDrawInMove { get; set; } = false;
 
+		/// <summary>
+		/// Detect a right-double-click and reset/cancel the mega copy paste mode
+		/// </summary>
+		/// <param name="e"></param>
 		public void ActionAtariViewDoubleClick(MouseEventArgs e)
 		{
 			// Setup selection by right DoubleClick
@@ -131,7 +136,7 @@ namespace FontMaker
 				if (Control.ModifierKeys == Keys.Control)
 				{
 					ContinueViewDrawInMove = false;
-				} //ctrl+click nezapina toggle
+				} // Ctrl+click nezapina toggle
 
 				if (ry >= pictureBoxAtariView.Height / 16)
 				{
@@ -143,7 +148,13 @@ namespace FontMaker
 
 				if (e.Button == MouseButtons.Left)
 				{
-					AtariView.ViewBytes[rx, ry] = (byte)(SelectedCharacterIndex % 256);
+					var theChar = (byte)(SelectedCharacterIndex % 256);
+					if (Control.ModifierKeys == Keys.Shift)
+					{
+						theChar += 128;
+					}
+
+					AtariView.ViewBytes[rx, ry] = theChar;
 					RedrawViewChar();
 				}
 
@@ -310,8 +321,6 @@ namespace FontMaker
 		{
 			return (x < pictureBoxAtariView.Width - (CopyPasteRange.Width) * 16) && (y < pictureBoxAtariView.Height - (CopyPasteRange.Height) * 16);
 		}
-
-
 
 		/// <summary>
 		/// Redraw whole view area by copying characters from font area
@@ -713,24 +722,21 @@ namespace FontMaker
 		{
 			var text = Interaction.InputBox("Enter text", "Enter text to be added to clipboard:", string.Empty);
 
-			if (text.Length == 0)
+			switch (text.Length)
 			{
-				return;
+				case 0:
+					return;
+				case > 32:
+					text = text[^32..];
+					break;
 			}
 
-			if (text.Length > 32)
-			{
-				text = text.Substring(-1, 32);
-			}
-
-			Clipboard_copyText(text, Control.ModifierKeys == Keys.Shift);
+			RenderTextToClipboard(text, Control.ModifierKeys == Keys.Shift);
 		}
 
 		/// <summary>
 		/// Load data into the view area
 		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
 		public void ActionLoadView()
 		{
 			byte version = 0;
@@ -760,27 +766,24 @@ namespace FontMaker
 					return;
 				}
 
-				FileStream fs = null;
 				if (ext == ".dat")
 				{
-					fs = new FileStream(dialogOpenFile.FileName, FileMode.Open, FileAccess.Read, FileShare.None);
-					var loadSize = (int)Math.Min(fs.Length, AtariView.VIEW_HEIGHT * viewWidth);
+					using var fsDat = new FileStream(dialogOpenFile.FileName, FileMode.Open, FileAccess.Read, FileShare.None);
+					var loadSize = (int)Math.Min(fsDat.Length, AtariView.VIEW_HEIGHT * viewWidth);
 
 					try
 					{
-						fs.Read(buf, 0, loadSize);
+						var read = fsDat.Read(buf, 0, loadSize);
 					}
 					finally
 					{
-						fs.Close();
-						fs = null;
+						fsDat.Close();
 					}
 
-
 					// Copy the bytes into the screen
-					for (int a = 0; a < AtariView.VIEW_HEIGHT; a++)
+					for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
 					{
-						for (int b = 0; b < viewWidth; b++)
+						for (var b = 0; b < viewWidth; b++)
 						{
 							if (a * viewWidth + b < loadSize)
 							{
@@ -798,13 +801,12 @@ namespace FontMaker
 					RedrawChar();
 					return;
 				}
-
 				// Handle old binary versions of view file
 				// Bytes:
 				// version : 1 byte
 				// InColorMode : 1 byte
-				fs = new FileStream(dialogOpenFile.FileName, FileMode.Open, FileAccess.Read, FileShare.None);
-				int fsIndex = 0;
+				using var fs = new FileStream(dialogOpenFile.FileName, FileMode.Open, FileAccess.Read, FileShare.None);
+				var fsIndex = 0;
 
 				if (ext == ".vf2")
 				{
@@ -958,7 +960,6 @@ namespace FontMaker
 				}
 
 				fs.Close();
-				fs = null;
 				RedrawFonts();
 				RedrawView();
 				RedrawPal();

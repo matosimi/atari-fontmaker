@@ -467,6 +467,40 @@ namespace FontMaker
 			}
 		}
 
+		public static void DeleteAndShiftRight(int characterIndex, bool onBank2)
+		{
+			// Find out which font nr we are dealing with
+			var hp = GetCharacterOffset(characterIndex, onBank2);
+			var fontNr = hp / 1024; // 0,1,2,3
+			var startOfFontData = fontNr * 1024;
+
+			// Make a hole at the current location
+			var length = hp - startOfFontData;
+			if (length > 0)
+			{
+				Buffer.BlockCopy(FontBytes, startOfFontData, FontBytes, startOfFontData + 8, length);
+			}
+			// Clear the char at the current location
+			Array.Clear(FontBytes, startOfFontData, 8);
+		}
+
+		public static void DeleteAndShiftLeft(int characterIndex, bool onBank2)
+		{
+			// Find out which font nr we are dealing with
+			var hp = GetCharacterOffset(characterIndex, onBank2);
+			var fontNr = hp / 1024; // 0,1,2,3
+			var startOfFontData = fontNr * 1024;
+			var nextFontData = startOfFontData + 1024;
+		
+			var length = nextFontData - hp;
+			if (length > 0)
+			{
+				Buffer.BlockCopy(FontBytes, hp + 8, FontBytes, hp, length - 8);
+			}
+			// Clear the char at the current location
+			Array.Clear(FontBytes, nextFontData - 8, 8);
+		}
+
 		public static void ShiftFontRight(int characterIndex, bool onBank2, bool makeHole)
 		{
 			// Find out which font nr we are dealing with

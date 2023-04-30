@@ -145,6 +145,7 @@ namespace FontMaker
 			{
 				var loadPath = Path.GetDirectoryName(Environment.GetCommandLineArgs()[1]) + Path.DirectorySeparatorChar;
 				ext = Path.GetExtension(Environment.GetCommandLineArgs()[1]).ToLower();
+				CurrentDataFolder = loadPath;
 
 				switch (ext)
 				{
@@ -968,10 +969,8 @@ namespace FontMaker
 			}
 		}
 
-
-		private void buttonFontShiftLeftInsert_Click(object sender, EventArgs e)
+		private void UpdateGuiAfterFontAction()
 		{
-			AtariFont.ShiftFontLeft(SelectedCharacterIndex, checkBoxFontBank.Checked, true);
 			RedrawChar();
 			RedrawFonts();
 			UpdateCharacterViews();
@@ -980,37 +979,41 @@ namespace FontMaker
 			UpdateUndoButtons(false);
 		}
 
+		private void buttonFontShiftLeftInsert_Click(object sender, EventArgs e)
+		{
+			AtariFont.ShiftFontLeft(SelectedCharacterIndex, checkBoxFontBank.Checked, true);
+			UpdateGuiAfterFontAction();
+		}
+
 		private void buttonFontShiftLeftRotate_Click(object sender, EventArgs e)
 		{
 			AtariFont.ShiftFontLeft(SelectedCharacterIndex, checkBoxFontBank.Checked, false);
-			RedrawChar();
-			RedrawFonts();
-			CheckDuplicate();
-			RedrawView();
-			UndoBuffer.Add2UndoFullDifferenceScan();
-			UpdateUndoButtons(false);
+			UpdateGuiAfterFontAction();
+		}
+
+
+		private void buttonFontDeleteCharShiftRight_Click(object sender, EventArgs e)
+		{
+			AtariFont.DeleteAndShiftRight(SelectedCharacterIndex, checkBoxFontBank.Checked);
+			UpdateGuiAfterFontAction();
+		}
+
+		private void buttonFontDeleteCharShiftLeft_Click(object sender, EventArgs e)
+		{
+			AtariFont.DeleteAndShiftLeft(SelectedCharacterIndex, checkBoxFontBank.Checked);
+			UpdateGuiAfterFontAction();
 		}
 
 		private void buttonFontShiftRightRotate_Click(object sender, EventArgs e)
 		{
 			AtariFont.ShiftFontRight(SelectedCharacterIndex, checkBoxFontBank.Checked, false);
-			RedrawChar();
-			RedrawFonts();
-			CheckDuplicate();
-			RedrawView();
-			UndoBuffer.Add2UndoFullDifferenceScan();
-			UpdateUndoButtons(false);
+			UpdateGuiAfterFontAction();
 		}
 
 		private void buttonFontShiftRightInsert_Click(object sender, EventArgs e)
 		{
 			AtariFont.ShiftFontRight(SelectedCharacterIndex, checkBoxFontBank.Checked, true);
-			RedrawChar();
-			RedrawFonts();
-			CheckDuplicate();
-			RedrawView();
-			UndoBuffer.Add2UndoFullDifferenceScan();
-			UpdateUndoButtons(false);
+			UpdateGuiAfterFontAction();
 		}
 
 		private void buttonCopyAreaShiftRight_Click(object sender, EventArgs e)
@@ -1199,6 +1202,7 @@ namespace FontMaker
 		}
 
 		#endregion
+
 
 	}
 }

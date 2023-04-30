@@ -26,7 +26,7 @@
 		/// </summary>
 		public void ActionNewFontAndView()
 		{
-			var re = MessageBox.Show(@"Are you sure to load default character sets?", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+			var re = MessageBox.Show(@"Are you sure you want to reset to the default character set and view? Everything will be lost!", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error);
 
 			if (re == DialogResult.Yes)
 			{

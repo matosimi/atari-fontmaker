@@ -1,5 +1,6 @@
 ﻿using System.Media;
 using TinyJson;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace FontMaker
 {
@@ -538,10 +539,10 @@ namespace FontMaker
 
 				for (var i = CopyPasteRange.Y; i <= CopyPasteRange.Bottom; i++)
 				{
+					int whichFontNr = 1;
 					for (var j = CopyPasteRange.X; j <= CopyPasteRange.Right; j++)
 					{
 						int charInFont;
-						int whichFontNr;
 						if (sourceIsView)
 						{
 							characterBytes = characterBytes + String.Format("{0:X2}", AtariView.ViewBytes[j, i]);
@@ -566,13 +567,12 @@ namespace FontMaker
 							whichFontNr = (charInFont / 1024) + 1; // What is the font # the character is in?
 						}
 
-						fontNr += whichFontNr;
-
 						for (var k = 0; k < 8; k++)
 						{
 							fontBytes = fontBytes + String.Format("{0:X2}", AtariFont.FontBytes[charInFont + k]);
 						}
 					}
+					fontNr += whichFontNr;
 				}
 
 				var jo = new ClipboardJSON()
@@ -595,7 +595,7 @@ namespace FontMaker
 			}
 		}
 
-		public void Clipboard_copyText(string text, bool inverse)
+		public void RenderTextToClipboard(string text, bool inverse)
 		{
 			var characterBytes = string.Empty;
 			var fontBytes = string.Empty;
@@ -604,8 +604,8 @@ namespace FontMaker
 
 			CopyPasteRange.X = 0;
 			CopyPasteRange.Y = 0;
-			CopyPasteRange.Width = text.Length;
-			CopyPasteRange.Height = 1;
+			CopyPasteRange.Width = text.Length-1;
+			CopyPasteRange.Height = 0;			// 0 means that is 1 line high
 
 			var chars = text.ToCharArray();
 			for (var j = 0; j < text.Length; j++)
@@ -632,12 +632,13 @@ namespace FontMaker
 				Height = "1",
 				Chars = characterBytes,
 				Data = fontBytes,
-				FontNr = "1",
+				FontNr = checkBoxFontBank.Checked ? "3" : "1",
 			};
 			var json = jo.ToJson();
 			SafeSetClipboard(json);
 
 			UpdateClipboardInformation(text.Length, 1);
+			RevalidateClipboard();
 		}
 
 		public void ExecutePasteFromClipboard()
@@ -821,6 +822,20 @@ namespace FontMaker
 
 				characterBytes = jsonObj.Chars;
 				fontBytes = jsonObj.Data;
+
+				// Safety check
+				if (width < 1 || height < 1) 
+					return;
+				var cpWidth = width - 1;
+				var cpHeight = height - 1;
+
+				if (CopyPasteRange.Width != cpWidth || CopyPasteRange.Height != cpHeight)
+				{
+					CopyPasteRange.X = 0;
+					CopyPasteRange.Y = 0;
+					CopyPasteRange.Width = cpWidth;
+					CopyPasteRange.Height = cpHeight;
+				}
 			}
 			catch (Exception)
 			{

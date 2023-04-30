@@ -226,6 +226,11 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.7.2
+- Added delete buttons to the font manipulation area. This will delete the current character and shift all characters from the left or right one spot over.
+- Fixed a long standing MegaCopy bug: When not ever having copied something in MegaCopy mode and pasting, from another Atari FontMaker instance, you could paste data past the end of the screen buffer.
+- When drawing in the view area you can now hold down the SHIFT key to invert the character you are drawing.
+
 V1.6.7.1
 - Fixed font bank switching when in MegaCopy mode. This used to paste the current copy area on each bank switch.
 - Fixed the in-place pasting of the copy area. It did not handle inverted characters correctly.
