@@ -211,13 +211,14 @@
 
 		public void ActionShowAbout()
 		{
+			pictureBoxAbout.Left = pictureBoxAtariView.Left + (checkBox40Bytes.Checked ? (pictureBoxAtariView.Width - pictureBoxAbout.Width)/2 : 0);
 			pictureBoxAbout.Visible = !pictureBoxAbout.Visible;
 
 		}
 
-		public void ActionAboutUrl()
+		public void ActionAboutUrl(bool onLeftSide)
 		{
-			Helpers.OpenUrl("http://matosimi.atari.org");
+			Helpers.OpenUrl(onLeftSide ? "http://matosimi.atari.org" : "https://retro.cerebus.co.za");
 			pictureBoxAbout.Visible = false;
 		}
 
@@ -227,6 +228,7 @@
 
 			if (re == DialogResult.Yes)
 			{
+				SaveConfiguration();
 				Exit();
 			}
 		}

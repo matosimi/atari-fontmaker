@@ -13,6 +13,9 @@
     <Compile Update="ExportViewWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FontAnalysisWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="FontMakerForm.cs">
       <SubType>Form</SubType>
     </Compile>

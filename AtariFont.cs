@@ -1,6 +1,4 @@
-﻿using System.Security.Policy;
-
-namespace FontMaker
+﻿namespace FontMaker
 {
 	public static class AtariFont
 	{
@@ -29,19 +27,29 @@ namespace FontMaker
 		{
 			var expectedSize = dual ? 2048 : 1024;
 
-			try
+			if (string.IsNullOrEmpty(filename))
 			{
-				using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None);
-				var numReadBytes = fs.Read(FontBytes, fontNr * 1024, expectedSize);
+				// Get the default font
+				var fontData = Helpers.GetResource<byte[]>("Default.fnt");
 
-				if (numReadBytes != expectedSize)
-				{
-					MessageBox.Show($@"File size different, expected to load {expectedSize} bytes, but loaded {numReadBytes}");
-				}
+				AtariFont.CopyTo(fontData, 0, fontNr * 1024, expectedSize);
 			}
-			catch (Exception ex)
+			else
 			{
-				MessageBox.Show($@"Failed to load font {fontNr + 1} from '{filename}'. Reason:{ex.Message}");
+				try
+				{
+					using var fs = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.None);
+					var numReadBytes = fs.Read(FontBytes, fontNr * 1024, expectedSize);
+
+					if (numReadBytes != expectedSize)
+					{
+						MessageBox.Show($@"File size different, expected to load {expectedSize} bytes, but loaded {numReadBytes}");
+					}
+				}
+				catch (Exception ex)
+				{
+					MessageBox.Show($@"Failed to load font {fontNr + 1} from '{filename}'. Reason:{ex.Message}");
+				}
 			}
 		}
 

@@ -1,5 +1,4 @@
-﻿using System.Diagnostics;
-using Microsoft.VisualBasic;
+﻿using Microsoft.VisualBasic;
 using System.Drawing.Drawing2D;
 using System.Text;
 using TinyJson;
@@ -74,6 +73,42 @@ namespace FontMaker
 			{
 				ResetMegaCopyStatus();
 			}
+		}
+
+		/// <summary>
+		/// Select a character for editing
+		/// </summary>
+		/// <param name="charNr">0 - 1023</param>
+		public void PickCharacter(int charNr)
+		{
+			var bx = charNr % 32;
+			var by = charNr / 32;
+
+			var want2ndBank = by >= 16;
+			// Check if the font bank needs to be switched
+			if ((checkBoxFontBank.Checked == false && want2ndBank) ||
+			    (checkBoxFontBank.Checked == true && !want2ndBank) )
+			{
+				checkBoxFontBank.Checked = !checkBoxFontBank.Checked;
+				SwitchFontBank();
+			}
+
+			if (by > 16)
+				by -= 16;
+
+			var old_megaCopyStatus = megaCopyStatus;
+			megaCopyStatus = MegaCopyStatusFlags.None;
+			var mouseEvent = new MouseEventArgs(MouseButtons.Left, 0, bx * 16 + 4, by * 16 + 4, 0);
+			ActionFontSelectorMouseDown(mouseEvent);
+			ActionFontSelectorMouseUp(mouseEvent);
+			megaCopyStatus = old_megaCopyStatus;
+
+			//ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 1, bx * 16 + 4, by * 16 + 4, 0));
+		}
+
+		public void PickPage(int pageIndex)
+		{
+			comboBoxPages.SelectedIndex = pageIndex = pageIndex;
 		}
 
 		public void ActionAtariViewEditorMouseDown(MouseEventArgs e)
@@ -532,8 +567,11 @@ namespace FontMaker
 						}
 					}
 					// Load the AtariPalette selection
+					InColorSetSetup = true;
 					SetOfSelectedColors = Convert.FromHexString(colors);
+					SetPrimaryColorSetData();
 					BuildBrushCache();
+					InColorSetSetup = false;
 
 					// If the GFX (mode 0 or 4) does not match then hit the GFX button to switch the mode of the GUI
 					if (InColorMode != (coloredGfx == 1))
@@ -612,7 +650,7 @@ namespace FontMaker
 
 			// Make sure the SetOfSelectedColors values have valid brushes for painting!
 			BuildBrushCache();
-
+			BuildColorSetList();
 			BuildPageList();
 		}
 

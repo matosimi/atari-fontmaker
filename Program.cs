@@ -2,6 +2,8 @@ namespace FontMaker
 {
 	internal static class Program
 	{
+		public static FontMakerForm MainForm { get; set; }
+
 		/// <summary>
 		///  The main entry point for the application.
 		/// </summary>
@@ -13,7 +15,8 @@ namespace FontMaker
 			// To customize application configuration such as set high DPI settings or default font,
 			// see https://aka.ms/applicationconfiguration.
 			ApplicationConfiguration.Initialize();
-			Application.Run(new FontMakerForm());
+			MainForm = new FontMakerForm();
+			Application.Run(MainForm);
 		}
 	}
 }

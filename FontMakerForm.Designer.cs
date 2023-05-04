@@ -72,6 +72,7 @@
 			buttonLoadFont2 = new Button();
 			buttonSaveFont2As = new Button();
 			p_zz = new Panel();
+			comboBoxColorSets = new ComboBox();
 			Bevel4 = new Panel();
 			pictureBoxPalette = new PictureBox();
 			buttonShowColorSwitchSetup = new Button();
@@ -126,6 +127,7 @@
 			pictureBoxFontSelectorPasteCursor = new PictureBox();
 			pictureBoxViewEditorPasteCursor = new PictureBox();
 			toolTips = new ToolTip(components);
+			buttonFontAnalysis = new Button();
 			comboBoxPages = new ComboBox();
 			buttonAddPage = new Button();
 			buttonDeletePage = new Button();
@@ -661,6 +663,7 @@
 			// p_zz
 			// 
 			p_zz.BorderStyle = BorderStyle.FixedSingle;
+			p_zz.Controls.Add(comboBoxColorSets);
 			p_zz.Controls.Add(Bevel4);
 			p_zz.Controls.Add(buttonShowColorSwitchSetup);
 			p_zz.Controls.Add(buttonSwitchGraphicsMode);
@@ -670,6 +673,17 @@
 			p_zz.Name = "p_zz";
 			p_zz.Size = new Size(105, 177);
 			p_zz.TabIndex = 2;
+			// 
+			// comboBoxColorSets
+			// 
+			comboBoxColorSets.DropDownStyle = ComboBoxStyle.DropDownList;
+			comboBoxColorSets.FormattingEnabled = true;
+			comboBoxColorSets.Location = new Point(7, 92);
+			comboBoxColorSets.MaxDropDownItems = 6;
+			comboBoxColorSets.Name = "comboBoxColorSets";
+			comboBoxColorSets.Size = new Size(92, 21);
+			comboBoxColorSets.TabIndex = 23;
+			comboBoxColorSets.SelectedIndexChanged += comboBoxColorSets_SelectedIndexChanged;
 			// 
 			// Bevel4
 			// 
@@ -697,7 +711,7 @@
 			// 
 			buttonShowColorSwitchSetup.Enabled = false;
 			buttonShowColorSwitchSetup.Image = (Image)resources.GetObject("buttonShowColorSwitchSetup.Image");
-			buttonShowColorSwitchSetup.Location = new Point(72, 114);
+			buttonShowColorSwitchSetup.Location = new Point(72, 119);
 			buttonShowColorSwitchSetup.Name = "buttonShowColorSwitchSetup";
 			buttonShowColorSwitchSetup.Size = new Size(22, 22);
 			buttonShowColorSwitchSetup.TabIndex = 2;
@@ -727,7 +741,7 @@
 			// buttonRecolor
 			// 
 			buttonRecolor.Enabled = false;
-			buttonRecolor.Location = new Point(8, 112);
+			buttonRecolor.Location = new Point(8, 117);
 			buttonRecolor.Name = "buttonRecolor";
 			buttonRecolor.Size = new Size(64, 25);
 			buttonRecolor.TabIndex = 2;
@@ -1313,6 +1327,17 @@
 			pictureBoxViewEditorPasteCursor.MouseMove += ViewEditor_PasteCursor_MouseMove;
 			pictureBoxViewEditorPasteCursor.MouseUp += ViewEditor_PasteCursor_MouseUp;
 			// 
+			// buttonFontAnalysis
+			// 
+			buttonFontAnalysis.Location = new Point(520, 464);
+			buttonFontAnalysis.Name = "buttonFontAnalysis";
+			buttonFontAnalysis.Size = new Size(75, 23);
+			buttonFontAnalysis.TabIndex = 22;
+			buttonFontAnalysis.Text = "Analyse";
+			toolTips.SetToolTip(buttonFontAnalysis, "Find out which font elements are not used");
+			buttonFontAnalysis.UseVisualStyleBackColor = true;
+			buttonFontAnalysis.Click += ViewEditor_FontAnalysis_Click;
+			// 
 			// comboBoxPages
 			// 
 			comboBoxPages.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -1379,6 +1404,7 @@
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1048, 491);
+			Controls.Add(buttonFontAnalysis);
 			Controls.Add(buttonExportView);
 			Controls.Add(labelCurrentPageIndex);
 			Controls.Add(buttonEditPage);
@@ -1556,5 +1582,7 @@
 		private PictureBox pictureBoxClipboardPreview;
 		private Button buttonFontDeleteCharShiftLeft;
 		private Button buttonFontDeleteCharShiftRight;
+		private ComboBox comboBoxColorSets;
+		private Button buttonFontAnalysis;
 	}
 }

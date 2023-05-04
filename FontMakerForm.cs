@@ -57,6 +57,7 @@ namespace FontMaker
 		public AtariColorSelectorForm AtariColorSelector { get; set; } = new AtariColorSelectorForm();
 		public ExportFontWindow ExportFontWindowForm { get; set; } = new ExportFontWindow();
 		public ExportViewWindow ExportViewWindowForm { get; set; } = new ExportViewWindow();
+		public FontAnalysisWindow FontAnalysisWindowForm { get; set; } = new FontAnalysisWindow();
 
 		/// <summary>
 		/// The Atari color palette. Loaded from "altirraPAL.pal"
@@ -140,6 +141,8 @@ namespace FontMaker
 			AtariView.Setup();
 			LoadPalette();
 
+			LoadConfiguration();
+
 			string? ext;
 			if (Environment.GetCommandLineArgs().Length - 1 == 1)
 			{
@@ -176,7 +179,9 @@ namespace FontMaker
 							RedrawPal();
 							RedrawViewChar();
 							RedrawChar();
-							Font2Filename = Path.Join(loadPath, "Default.fnt");
+							if (string.IsNullOrWhiteSpace(Font2Filename)) Font2Filename = Path.Join(loadPath, "Default.fnt");
+							if (string.IsNullOrWhiteSpace(Font3Filename)) Font3Filename = Path.Join(loadPath, "Default.fnt");
+							if (string.IsNullOrWhiteSpace(Font4Filename)) Font4Filename = Path.Join(loadPath, "Default.fnt");
 						}
 						break;
 					default:
@@ -186,13 +191,11 @@ namespace FontMaker
 
 				timerAutoCloseAboutBox.Enabled = false;
 				pictureBoxAbout.Visible = false;
+
+
 			}
 			else
 			{
-				// If no input file set upon start, then show splash screen
-				timerAutoCloseAboutBox.Enabled = true;
-				pictureBoxAbout.Visible = true;
-
 				LoadViewFile(null, true);
 				UpdateFormCaption();
 				RedrawFonts();
@@ -202,12 +205,23 @@ namespace FontMaker
 				RedrawViewChar();
 				RedrawChar();
 				ext = ".atrview";
-				//SaveFont1_Click(null, EventArgs.Empty);
+
+				// If no input file set upon start, then show splash screen
+				timerAutoCloseAboutBox.Enabled = true;
+				pictureBoxAbout.Left = pictureBoxAtariView.Left + (checkBox40Bytes.Checked ? (pictureBoxAtariView.Width - pictureBoxAbout.Width) / 2 : 0);
+				pictureBoxAbout.Visible = true;
 			}
 
 			if (ext != ".atrview")
 			{
+				// Make sure the SetOfSelectedColors values have valid brushes for painting!
+				// Load the AtariPalette selection
 				SetupDefaultPalColors();
+				CurrentColorSetIndex = 0;
+				SaveColorSet();
+				BuildColorSetList();
+				BuildPageList();
+
 				RedrawPal();
 				RedrawGrid();
 
@@ -218,6 +232,11 @@ namespace FontMaker
 					AtariFont.LoadFont(Font2Filename, 1, false);
 					AtariFont.LoadFont(Font3Filename, 2, false);
 					AtariFont.LoadFont(Font4Filename, 3, false);
+
+					if (string.IsNullOrWhiteSpace(Font2Filename)) Font2Filename = Path.Join(CurrentDataFolder, "Default.fnt");
+					if (string.IsNullOrWhiteSpace(Font3Filename)) Font3Filename = Path.Join(CurrentDataFolder, "Default.fnt");
+					if (string.IsNullOrWhiteSpace(Font4Filename)) Font4Filename = Path.Join(CurrentDataFolder, "Default.fnt");
+
 
 					UpdateFormCaption();
 				}
@@ -512,9 +531,9 @@ namespace FontMaker
 		{
 			ActionShowAbout();
 		}
-		public void AboutPicture_MouseDown(object _, MouseEventArgs __)
+		public void AboutPicture_MouseDown(object _, MouseEventArgs e)
 		{
-			ActionAboutUrl();
+			ActionAboutUrl(e.X < pictureBoxAbout.Width / 2);
 		}
 		public void Quit_Click(object _, EventArgs __)
 		{
@@ -665,6 +684,13 @@ namespace FontMaker
 		public void RecolorTarget_Click(object _, EventArgs __)
 		{
 			RedrawRecolorTarget();
+		}
+
+		private void comboBoxColorSets_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			if (InColorSetSetup) return;
+
+			SwopColorSet(saveCurrent: true);
 		}
 
 		#endregion
@@ -834,6 +860,14 @@ namespace FontMaker
 		public void ViewEditor_PasteCursor_MouseUp(object sender, MouseEventArgs e)
 		{
 			ActionAtariViewMouseUp(new MouseEventArgs(e.Button, 0, pictureBoxViewEditorPasteCursor.Left + e.X - pictureBoxAtariView.Left, pictureBoxViewEditorPasteCursor.Top + e.Y - pictureBoxAtariView.Top, 0));
+		}
+
+		private void ViewEditor_FontAnalysis_Click(object sender, EventArgs e)
+		{
+			SaveCurrentPage();
+			FontAnalysisWindowForm.InColorMode = InColorMode;
+			FontAnalysisWindowForm.Pages = Pages;
+			FontAnalysisWindowForm.ShowDialog();
 		}
 
 		#endregion
@@ -1202,6 +1236,7 @@ namespace FontMaker
 		}
 
 		#endregion
+
 
 
 	}

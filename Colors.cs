@@ -7,6 +7,14 @@
 
 	public partial class FontMakerForm
 	{
+		public List<string> ColorSets;
+
+		/// <summary>
+		/// The index in the combo box that is currently selected
+		/// </summary>
+		public int CurrentColorSetIndex { get; set; } = -1;
+
+		public bool InColorSetSetup { get; set; }
 
 		/// <summary>
 		/// Load the color AtariPalette 
@@ -20,6 +28,7 @@
 			{
 				AtariPalette[i] = Color.FromArgb(buffer[i * 3], buffer[i * 3 + 1], buffer[i * 3 + 2]);
 			}
+
 			AtariColorSelector.SetPalette(AtariPalette);
 			AtariFontRenderer.SetPalette(AtariPalette);
 		}
@@ -71,6 +80,7 @@
 				gr.FillRectangle(brush, 0, 0, 49, 17);
 				DrawColorLabels(gr, 1, 1, listBoxRecolorSource.SelectedIndex + 2, AtariPalette[SetOfSelectedColors[listBoxRecolorSource.SelectedIndex + 1]]);
 			}
+
 			pictureBoxRecolorSourceColor.Refresh();
 		}
 
@@ -83,6 +93,7 @@
 				gr.FillRectangle(brush, 0, 0, 49, 17);
 				DrawColorLabels(gr, 1, 1, listBoxRecolorTarget.SelectedIndex + 2, AtariPalette[SetOfSelectedColors[listBoxRecolorTarget.SelectedIndex + 1]]);
 			}
+
 			pictureBoxRecolorTargetColor.Refresh();
 		}
 
@@ -110,6 +121,7 @@
 					}
 				}
 			}
+
 			pictureBoxPalette.Refresh();
 
 			img = Helpers.GetImage(pictureBoxCharacterEditorColor1);
@@ -121,6 +133,7 @@
 				DrawColorLabels(gr, 1, 1, tagVal, AtariPalette[SetOfSelectedColors[tagVal]]);
 
 			}
+
 			pictureBoxCharacterEditorColor1.Refresh();
 
 			img = Helpers.GetImage(pictureBoxCharacterEditorColor2);
@@ -131,6 +144,7 @@
 				gr.FillRectangle(brush, 0, 0, 49, 17);
 				DrawColorLabels(gr, 1, 1, tagVal, AtariPalette[SetOfSelectedColors[tagVal]]);
 			}
+
 			pictureBoxCharacterEditorColor2.Refresh();
 
 			img = Helpers.GetImage(pictureBoxActionColor);
@@ -140,6 +154,7 @@
 				gr.FillRectangle(brush, 0, 0, 49, 17);
 				DrawColorLabels(gr, 1, 1, ActiveColorNr, AtariPalette[SetOfSelectedColors[ActiveColorNr]]);
 			}
+
 			pictureBoxActionColor.Refresh();
 		}
 
@@ -175,8 +190,8 @@
 					{
 						SetOfSelectedColors[0] = (byte)(AtariColorSelector.selectedColorIndex % 16 + (SetOfSelectedColors[1] / 16) * 16);
 						UpdateBrushCache(0);
-					}
 						break;
+					}
 
 					case 1:
 					{
@@ -184,8 +199,8 @@
 						UpdateBrushCache(1);
 						SetOfSelectedColors[0] = (byte)((SetOfSelectedColors[1] / 16) * 16 + SetOfSelectedColors[0] % 16);
 						UpdateBrushCache(0);
-					}
 						break;
+					}
 
 					default:
 						SetOfSelectedColors[wh] = AtariColorSelector.selectedColorIndex;
@@ -201,6 +216,7 @@
 			RedrawChar();
 			RedrawView();
 			RedrawRecolorPanel();
+			SaveColorSet();
 		}
 
 
@@ -255,6 +271,7 @@
 			// Create the solid brushes to use for drawing the GUI and bitmaps
 			for (var i = 0; i < SetOfSelectedColors.Length; ++i)
 			{
+				BrushCache[i]?.Dispose();
 				BrushCache[i] = new SolidBrush(AtariPalette[SetOfSelectedColors[i]]);
 			}
 
@@ -267,6 +284,68 @@
 				throw new NotImplementedException("Oi something is wrong in UpdateBrushCache");
 
 			BrushCache[index] = new SolidBrush(AtariPalette[SetOfSelectedColors[index]]);
+		}
+
+		public void BuildColorSetList()
+		{
+			InColorSetSetup = true;
+
+			comboBoxColorSets.Items.Clear();
+			comboBoxColorSets.ResetText();
+
+			for (var idx = 0; idx < ColorSets.Count; ++idx)
+			{
+				comboBoxColorSets.Items.Add(idx == 0 ? "Project colors": $"Alt colors {idx}");
+			}
+
+			comboBoxColorSets.SelectedIndex = 0;
+			CurrentColorSetIndex = comboBoxColorSets.SelectedIndex;
+
+			InColorSetSetup = false;
+		}
+
+		public void SetPrimaryColorSetData()
+		{
+			ColorSets[0] = Convert.ToHexString(SetOfSelectedColors);
+		}
+
+		private void SwopColorSet(bool saveCurrent)
+		{
+			var nextColorSetIndex = comboBoxColorSets.SelectedIndex;
+			if (nextColorSetIndex == -1) return;
+
+			if (saveCurrent)
+			{
+				// Save the current color data
+				var currentColors = Convert.ToHexString(SetOfSelectedColors);
+				ColorSets[CurrentColorSetIndex] = currentColors;
+			}
+
+			SwopColorSetAction(nextColorSetIndex);
+		}
+
+		private void SwopColorSetAction(int nextColorSetIndex)
+		{
+			var colors = ColorSets[nextColorSetIndex];
+
+			// Load the AtariPalette selection
+			SetOfSelectedColors = Convert.FromHexString(colors);
+			BuildBrushCache();
+
+			CurrentColorSetIndex = nextColorSetIndex;
+
+			RedrawPal();
+			RedrawFonts();
+			RedrawChar();
+			RedrawView();
+			
+			RedrawRecolorPanel();
+		}
+
+		private void SaveColorSet()
+		{
+			// Save the current color data
+			ColorSets[CurrentColorSetIndex] = Convert.ToHexString(SetOfSelectedColors);
 		}
 	}
 }

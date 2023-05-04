@@ -149,6 +149,16 @@ At the top you can select the export format: Binary Data, Assembler, Action!, At
 
 The power of the exporter comes from selecting export region.  By default the whole view is selected, Top-left to bottom-right (40x26). By clicking and dragging with the left-mouse button held down you can select an export area. If the export format is text then it will be shown in the right hand side window, which you can copy and paste into your source code, or export to disc with the *[Export...]* button.
 
+**Analysis Window**
+Once you've designed your characters and combined them into tiles or used them in the view pages you might want to know if there are any unused characters left, or if you have not used one on a view page yet.
+This is where the analysis window comes in handy. Click the [Analyse] button to show an all up view of all 4 fonts.  Those characters that have **not** been used in a view page will be marked with a red overlay.
+You can chage the overlay color and opacity to make sure the highlight does not clash with your color usage.
+Moving the mouse over the characters will display some quick usage information. Basically how many of them have been used, both from the base and the inverse parts of the font.
+To find out where you have used the character left-click it and a box with more details will show up.  The first line gives information on the character. The subsequent lines list on which pages the character was used.
+Clicking the character will also select it in the character editor.
+You can click a text line in the details box to quickly jump to the page where the character was used.
+Having highlighted a character to get its detailed information you can use the mouse-wheel to move to the previous or next character or hold down the Control key to move by a row at a time.
+
 ## Clipboard ##
 Since version 1.5 windows clipboard is used by Atari FontMaker. That means you can copy character or set of characters (Mega Copy mode) between multiple instances of Atari FontMaker.
 
@@ -226,10 +236,19 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.7.4
+- Added multiple color sets (6 in total).
+    You can quickly switch between different color sets via the drop-down.
+    The color selections are persisted to disk so survive a reload.
+	The first color set uses the values of the currently loaded atrview file (or the defaults), the following 5 sets are free to be used.
+- Added a font analysis window. This checks which of the characters are used in the view window pages.
+    If you use the view window to test your character combinations then this allows you to quickly find characters that you have not used yet.
+    Clicking on a character will give usage details and allow you to quickly switch to the page where the character is used.
+
 V1.6.7.2
 - Added delete buttons to the font manipulation area. This will delete the current character and shift all characters from the left or right one spot over.
 - Fixed a long standing MegaCopy bug: When not ever having copied something in MegaCopy mode and pasting, from another Atari FontMaker instance, you could paste data past the end of the screen buffer.
-- When drawing in the view area you can now hold down the SHIFT key to invert the character you are drawing.
+- When drawing in the view area you can now hold down the SHIFT key to invert the character you are drawing with.
 
 V1.6.7.1
 - Fixed font bank switching when in MegaCopy mode. This used to paste the current copy area on each bank switch.

@@ -107,7 +107,13 @@
 
 			UpdatePageDisplay();
 		}
-	
+
+		private void SaveCurrentPage()
+		{
+			// Save the current page data
+			var currentPage = Pages[CurrentPageIndex];
+			currentPage.Save(AtariView.ViewBytes, AtariView.UseFontOnLine);
+		}
 
 		private void SwopPage(bool saveCurrent)
 		{
@@ -116,9 +122,7 @@
 
 			if (saveCurrent)
 			{
-				// Save the current page data
-				var currentPage = Pages[CurrentPageIndex];
-				currentPage.Save(AtariView.ViewBytes, AtariView.UseFontOnLine);
+				SaveCurrentPage();
 			}
 
 			SwopPageAction(nextPageIndex);
