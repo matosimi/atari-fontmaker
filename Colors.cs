@@ -44,16 +44,30 @@
 			// color character into the edit area.
 			// DANGER: When in MegaCopy mode this would paste the copy area into the font.
 			// Hence, turn off the MegaCopy mode, do the simulated click and then restore the MegaCopy mode
+			var fontRubberBandVisible = pictureBoxFontSelectorRubberBand.Visible;
+			var viewRubberBandVisible = pictureBoxViewEditorRubberBand.Visible;
+			var savedRange = CopyPasteRange;
 			SimulateSafeLeftMouseButtonClick();
+			pictureBoxViewEditorRubberBand.Visible = viewRubberBandVisible;
+			pictureBoxFontSelectorRubberBand.Visible = fontRubberBandVisible;
+			CopyPasteRange = savedRange;
+			
 			if (!buttonMegaCopy.Checked)
 			{
 				RevalidateCharButtons();
+			}
+			else
+			{
+				// Make sure the copy area is redrawn
+				RevalidateClipboard();
 			}
 
 			if (!InColorMode && panelColorSwitcher.Visible)
 			{
 				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
 			}
+
+			ConfigureClipboardActionButtons();
 		}
 
 		private void SwitchFontBank()

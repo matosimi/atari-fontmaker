@@ -943,7 +943,9 @@ namespace FontMaker
 				pictureBoxViewEditorRubberBand.Left = pictureBoxAtariView.Left;
 				pictureBoxViewEditorRubberBand.Top = pictureBoxAtariView.Top;
 				pictureBoxViewEditorRubberBand.Size = new Size(20, 20);
-				pictureBoxViewEditorRubberBand.Visible = true;
+				pictureBoxViewEditorRubberBand.Visible = false;
+
+				pictureBoxFontSelectorRubberBand.Visible = false;
 
 				pictureBoxViewEditorPasteCursor.Visible = false;
 				pictureBoxViewEditorMegaCopyImage.Visible = false;
@@ -952,6 +954,7 @@ namespace FontMaker
 			{
 				// MegaCopy mode off
 				// Turn the GUI back on
+				megaCopyStatus = MegaCopyStatusFlags.None;
 				pictureBoxFontSelectorRubberBand.Width = 20;
 				pictureBoxFontSelectorRubberBand.Height = 20;
 				pictureBoxFontSelectorRubberBand.Visible = true;

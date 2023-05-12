@@ -26,7 +26,7 @@
 		/// </summary>
 		public void ActionNewFontAndView()
 		{
-			var re = MessageBox.Show(@"Are you sure you want to reset to the default character set and view? Everything will be lost!", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+			var re = MessageBox.Show(@"Are you sure you want to reset to the default character set and view? Everything will be lost!", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
 			if (re == DialogResult.Yes)
 			{
@@ -201,7 +201,7 @@
 		{
 			var fontBankOffset = checkBoxFontBank.Checked ? 2 : 0;
 
-			var re = MessageBox.Show($@"Are you sure to clear font {fontOffset + 1 + fontBankOffset}?", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+			var re = MessageBox.Show($@"Are you sure to clear font {fontOffset + 1 + fontBankOffset}?", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
 			if (re == DialogResult.Yes)
 			{

@@ -651,8 +651,8 @@ namespace FontMaker
 					pictureBoxViewEditorRubberBand.Visible = false;
 				}
 
-				RevalidateClipboard();
-				megaCopyStatus = MegaCopyStatusFlags.Pasting;
+				if (RevalidateClipboard())
+					megaCopyStatus = MegaCopyStatusFlags.Pasting;
 			}
 			else
 			{
@@ -673,6 +673,8 @@ namespace FontMaker
 			{
 				var jsonText = SafeGetClipboard();
 				var jsonObj = jsonText.FromJson<ClipboardJSON>();
+				if (jsonObj == null)
+					return;
 				int.TryParse(jsonObj.Width, out width);
 				int.TryParse(jsonObj.Height, out height);
 
@@ -802,12 +804,12 @@ namespace FontMaker
 			}
 		}
 
-		public void RevalidateClipboard()
+		public bool RevalidateClipboard()
 		{
 			var jsonText = SafeGetClipboard();
 
 			if (string.IsNullOrEmpty(jsonText))
-				return;
+				return false;
 
 			int width;
 			int height;
@@ -817,6 +819,8 @@ namespace FontMaker
 			try
 			{
 				var jsonObj = jsonText.FromJson<ClipboardJSON>();
+				if (jsonObj == null)
+					return false;
 				int.TryParse(jsonObj.Width, out width);
 				int.TryParse(jsonObj.Height, out height);
 
@@ -825,7 +829,7 @@ namespace FontMaker
 
 				// Safety check
 				if (width < 1 || height < 1) 
-					return;
+					return false;
 				var cpWidth = width - 1;
 				var cpHeight = height - 1;
 
@@ -839,7 +843,7 @@ namespace FontMaker
 			}
 			catch (Exception)
 			{
-				return;
+				return false;
 			}
 
 			if (buttonMegaCopy.Checked)
@@ -884,6 +888,8 @@ namespace FontMaker
 				pictureBoxViewEditorPasteCursor.Size = new Size(4 + w, 4 + h);
 				ResizeViewEditorPasteCursor();
 			}
+
+			return true;
 		}
 
 		public void DrawChars(PictureBox targetImage, string data, string chars, int x, int y, int dataWidth, int dataHeight, bool gr0, int pixelsize)
@@ -1024,7 +1030,7 @@ namespace FontMaker
 					var bytes = Convert.FromHexString(jsonObj.Chars);
 					var fontNr = jsonObj.FontNr;
 					allUnique = CheckAllUnique(bytes, fontNr);
-					isSquare = width > 0 && width == height;
+					isSquare = width > 0 && ((InColorMode == false && width == height) || (InColorMode == true && width == height * 2));
 				}
 				catch (Exception)
 				{
@@ -1039,8 +1045,8 @@ namespace FontMaker
 			buttonCopyAreaHMirror.Enabled = on;
 			buttonCopyAreaVMirror.Enabled = on;
 			buttonCopyAreaInvert.Enabled = on && (InColorMode == false);
-			buttonCopyAreaRotateLeft.Enabled = on && (InColorMode == false) && isSquare;
-			buttonCopyAreaRotateRight.Enabled = on && (InColorMode == false) && isSquare;
+			buttonCopyAreaRotateLeft.Enabled = on && isSquare;
+			buttonCopyAreaRotateRight.Enabled = on && isSquare;
 			buttonPasteInPlace.Enabled = on && allUnique;
 			comboBoxPasteIntoFontNr.Enabled = on && allUnique;
 
@@ -1069,6 +1075,7 @@ namespace FontMaker
 				}
 				catch
 				{
+					msg = "Nothing clipped yet!";
 				}
 			}
 
@@ -1478,12 +1485,36 @@ namespace FontMaker
 				return;
 
 			var targetBuffer = (byte[,])pixelBuffer.Clone();
-
-			for (var y = 0; y < pixelHeight; ++y)
+			if (InColorMode)
 			{
-				for (var x = 0; x < pixelWidth; ++x)
+				// Color mode:
+				// The pixel space has to be a 2 to 1 ratio
+				if (pixelWidth == pixelHeight * 2)
 				{
-					targetBuffer[y, pixelWidth - 1 - x] = pixelBuffer[x, y];
+					for (var y = 0; y < pixelHeight; ++y)
+					{
+						for (var x = 0; x < pixelWidth / 2; ++x)
+						{
+							targetBuffer[y*2, pixelWidth/2 - x -1] = pixelBuffer[x * 2, y];
+							targetBuffer[y*2+1, pixelWidth/2 - x-1] = pixelBuffer[x * 2 + 1, y];
+						}
+					}
+				}
+			}
+			else
+			{
+				// Mono mode:
+				// The pixel space has to be square
+				if (pixelWidth == pixelHeight)
+				{
+
+					for (var y = 0; y < pixelHeight; ++y)
+					{
+						for (var x = 0; x < pixelWidth; ++x)
+						{
+							targetBuffer[y, pixelWidth - 1 - x] = pixelBuffer[x, y];
+						}
+					}
 				}
 			}
 
@@ -1499,11 +1530,35 @@ namespace FontMaker
 
 			var targetBuffer = (byte[,])pixelBuffer.Clone();
 
-			for (var y = 0; y < pixelHeight; ++y)
+			if (InColorMode)
 			{
-				for (var x = 0; x < pixelWidth; ++x)
+				// Color mode:
+				// The pixel space has to be a 2 to 1 ratio
+				if (pixelWidth == pixelHeight * 2)
 				{
-					targetBuffer[pixelHeight - 1 - y, x] = pixelBuffer[x, y];
+					for (var y = 0; y < pixelHeight; ++y)
+					{
+						for (var x = 0; x < pixelWidth/2; ++x)
+						{
+							targetBuffer[(pixelHeight - y) * 2 - 2, x] = pixelBuffer[x * 2, y];
+							targetBuffer[(pixelHeight - y) * 2 - 1, x] = pixelBuffer[x*2+1, y];
+						}
+					}
+				}
+			}
+			else
+			{
+				// Mono mode:
+				// The pixel space has to be square
+				if (pixelWidth == pixelHeight)
+				{
+					for (var y = 0; y < pixelHeight; ++y)
+					{
+						for (var x = 0; x < pixelWidth; ++x)
+						{
+							targetBuffer[pixelHeight - 1 - y, x] = pixelBuffer[x, y];
+						}
+					}
 				}
 			}
 

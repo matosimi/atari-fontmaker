@@ -579,7 +579,7 @@ namespace FontMaker
 						SwitchGfxMode();
 					}
 
-					if ((forceLoadFont) || (MessageBox.Show(@"Would you like to load fonts embedded in this view file?", @"Load embedded fonts", MessageBoxButtons.YesNo, MessageBoxIcon.Error) == DialogResult.Yes))
+					if ((forceLoadFont) || (MessageBox.Show(@"Would you like to load fonts embedded in this view file?", @"Load embedded fonts", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
 					{
 						Font1Filename = filenames[0];
 						Font2Filename = filenames[1];
@@ -758,7 +758,7 @@ namespace FontMaker
 
 		public void ActionEnterText()
 		{
-			var text = Interaction.InputBox("Enter text", "Enter text to be added to clipboard:", string.Empty);
+			var text = Interaction.InputBox("Enter text\nUp to 32 characters\nIf you want inverted text then hold down SHIFT when you click [Ok]", "Enter text to be added to clipboard:", string.Empty);
 
 			switch (text.Length)
 			{
@@ -1043,7 +1043,7 @@ namespace FontMaker
 		/// </summary>
 		public void ActionClearView()
 		{
-			var ok = MessageBox.Show(@"Clear view window?", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Error);
+			var ok = MessageBox.Show(@"Clear view window?", Constants.Title, MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
 			if (ok == DialogResult.Yes)
 			{
@@ -1099,7 +1099,7 @@ namespace FontMaker
 		public void ActionDeletePage()
 		{
 			if (Pages.Count <= 1) return;
-			var answer = MessageBox.Show("Are you sure you want to delete the page?", "Delete page", MessageBoxButtons.YesNo);
+			var answer = MessageBox.Show("Are you sure you want to delete the page?", "Delete page", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 			if (answer == DialogResult.No) return;
 
 			// Delete the page at the current index

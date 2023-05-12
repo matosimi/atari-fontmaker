@@ -1,4 +1,5 @@
-﻿using System.Drawing.Drawing2D;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Drawing.Drawing2D;
 using System.Text;
 
 namespace FontMaker
@@ -8,7 +9,8 @@ namespace FontMaker
 		private int PreviousExportType { get; set; } = -1;
 		private int PreviousDataType { get; set; } = -1;
 
-		private Rectangle PreviousRegion = new Rectangle(0, 0, 40, 26);
+		private Rectangle FullViewRegion = new Rectangle(0, 0, 40, 26);
+		//private Rectangle PreviousRegion = new Rectangle(0, 0, 40, 26);
 
 		private bool RememberSelection { get; set; }
 
@@ -41,6 +43,30 @@ namespace FontMaker
 			RememberSelection = true;
 		}
 
+		public void LoadConfiguration(bool rememberSelection, int exportType, int dataType, Rectangle box)
+		{
+			if (rememberSelection)
+			{
+				if (exportType < 0 || exportType >= ComboBoxExportType.Items.Count)
+					exportType = 0;
+				PreviousExportType = exportType;
+
+				PreviousDataType = dataType;
+				_exportRegion = box;
+				if (_exportRegion.X < 0) _exportRegion.X = 0;
+				if (_exportRegion.Y < 0) _exportRegion.Y = 0;
+				if (_exportRegion.X + _exportRegion.Width >= 40) _exportRegion.Width = 40 - _exportRegion.X;
+				if (_exportRegion.Y + _exportRegion.Height >= 26) _exportRegion.Height = 26 - _exportRegion.X;
+				if (_exportRegion.Width < 1) _exportRegion.Width = 1;
+				if (_exportRegion.Height < 1) _exportRegion.Height = 1;
+			}
+		}
+
+		public (bool, int, int, Rectangle) SaveConfiguration()
+		{
+			return (RememberSelection, PreviousExportType, PreviousDataType, _exportRegion);
+		}
+
 		private void ExportViewWindow_Load(object sender, EventArgs e)
 		{
 			RedrawSmallView();
@@ -52,6 +78,10 @@ namespace FontMaker
 			if (RememberSelection)
 			{
 				ComboBoxExportType.SelectedIndex = PreviousExportType != -1 ? PreviousExportType : 0; // This will fire the export type handler and setup the rest of the GUI
+
+				// Check that the range is still valid
+				if (PreviousDataType < 0 || PreviousDataType >= ComboBoxDataType.Items.Count)
+					PreviousDataType = 0;
 				ComboBoxDataType.SelectedIndex = PreviousDataType != -1 ? PreviousDataType : 0;
 			}
 			else
@@ -609,9 +639,18 @@ namespace FontMaker
 		private void ButtonCopyClipboard_Click(object sender, EventArgs e)
 		{
 			if (MemoExport.Text.Length > 0)
-				Clipboard.SetText(MemoExport.Text);
-		}
+			{
+				try
+				{
+					Clipboard.SetText(MemoExport.Text);
+				}
+				catch
+				{
 
+				}
+			}
+		}
+	
 		private void ButtonExport_Click(object sender, EventArgs e)
 		{
 			if ((FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.BinaryData)
@@ -664,6 +703,66 @@ namespace FontMaker
 			}
 		}
 
+		/// <summary>
+		/// Handle Ctrl+C which will copy the exported text to the clipboard
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ExportViewWindow_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.Control && e.KeyCode == Keys.C)
+			{
+				if (MemoExport.Text.Length > 0)
+				{
+					try
+					{
+						Clipboard.SetText(MemoExport.Text);
+					}
+					catch
+					{
 
+					}
+				}
+				return;
+			}
+		}
+
+		/// <summary>
+		/// Move the export selection box around the screen.
+		/// Mouse wheel Up/Down moves in the X-axis.
+		/// Ctrl + Mouse wheel Up/Down moves in the Y-axis.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void ExportViewWindow_MouseWheel(object sender, MouseEventArgs e)
+		{
+			var stepX = e.Delta > 0 ? -1 : 1;
+			var stepY = 0;
+			if (Control.ModifierKeys == Keys.Control)
+			{
+				stepY = stepX;
+				stepX = 0;
+			}
+
+			var newRect = _exportRegion;
+			newRect.Offset(stepX, stepY);
+			if (newRect.IntersectsWith(FullViewRegion))
+			{
+				var i = Rectangle.Intersect(FullViewRegion, newRect);
+				if (newRect == i)
+				{
+					_exportRegion = newRect;
+				}
+				else
+					return;
+			}
+
+			UpdateRegionEdits();
+
+
+			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
+			pictureBoxViewEditorRubberBand.Visible = true;
+
+		}
 	}
 }

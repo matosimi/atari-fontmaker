@@ -236,6 +236,7 @@
 			textBoxUsageInfo.Location = new Point(525, 173);
 			textBoxUsageInfo.Multiline = true;
 			textBoxUsageInfo.Name = "textBoxUsageInfo";
+			textBoxUsageInfo.ReadOnly = true;
 			textBoxUsageInfo.ScrollBars = ScrollBars.Both;
 			textBoxUsageInfo.ShortcutsEnabled = false;
 			textBoxUsageInfo.Size = new Size(281, 254);

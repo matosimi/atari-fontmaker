@@ -236,6 +236,13 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.7.5
+- View export window enhancements
+    - You can now use the mouse-wheel to move your selection box. Up/Down moves in X-direction, CTRL+Up/Down moves in the Y-direction
+    - CTRL-C copies the generated export text. Would be same as pressing the [To Clipboard] button.
+    - The view export selection values (type and area) are persistet.
+- Rotation of pixels in MegaCopy with GFX mode turned on and the width being 2x the height is now possible.
+
 V1.6.7.4
 - Added multiple color sets (6 in total).
     You can quickly switch between different color sets via the drop-down.

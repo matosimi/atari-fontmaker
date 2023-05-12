@@ -318,6 +318,7 @@
 			Controls.Add(Button_Cancel);
 			Controls.Add(ButtonCopyClipboard);
 			FormBorderStyle = FormBorderStyle.FixedDialog;
+			KeyPreview = true;
 			MaximizeBox = false;
 			MinimizeBox = false;
 			Name = "ExportViewWindow";
@@ -325,6 +326,8 @@
 			Text = "Export view to ...";
 			FormClosing += ExportViewWindow_FormClosing;
 			Load += ExportViewWindow_Load;
+			KeyDown += ExportViewWindow_KeyDown;
+			MouseWheel += ExportViewWindow_MouseWheel;
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariViewSmall).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).EndInit();
 			((System.ComponentModel.ISupportInitialize)numericFromX).EndInit();
