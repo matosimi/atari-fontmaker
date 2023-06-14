@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Drawing.Drawing2D;
+﻿using System.Drawing.Drawing2D;
 using System.Text;
 
 namespace FontMaker
@@ -9,8 +8,7 @@ namespace FontMaker
 		private int PreviousExportType { get; set; } = -1;
 		private int PreviousDataType { get; set; } = -1;
 
-		private Rectangle FullViewRegion = new Rectangle(0, 0, 40, 26);
-		//private Rectangle PreviousRegion = new Rectangle(0, 0, 40, 26);
+		private Rectangle FullViewRegion = new(0, 0, 40, 26);
 
 		private bool RememberSelection { get; set; }
 
@@ -33,7 +31,7 @@ namespace FontMaker
 
 		private static readonly SolidBrush cyanBrush = new(Color.Cyan);
 
-		private Rectangle _exportRegion = new Rectangle(0, 0, 40, 26);
+		private Rectangle _exportRegion = new(0, 0, 40, 26);
 
 		private SelectionStatusFlags _selectionStatus;
 
@@ -288,7 +286,6 @@ namespace FontMaker
 		{
 			var sb = new StringBuilder();
 
-			var line = 0;
 			var lineNumber = 10010;
 			var charCounter = 0;
 
@@ -349,7 +346,6 @@ namespace FontMaker
 				if (charCounter == 8 && bytesLeft > 0)
 				{
 					charCounter = 0;
-					line++;
 
 					if (exportType == FormatTypes.FastBasic)
 					{
@@ -530,7 +526,7 @@ namespace FontMaker
 			}
 		}
 
-		private static bool _busyWith_ViewEditorRubberBandResize = false;
+		private static bool _busyWith_ViewEditorRubberBandResize;
 
 		private void pictureBoxViewEditorRubberBand_Resize(object sender, EventArgs e)
 		{
@@ -546,7 +542,7 @@ namespace FontMaker
 				pictureBoxViewEditorRubberBand.Size = new Size(img.Width, img.Height);
 
 			}
-			var graphicsPath = new GraphicsPath();
+			using var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, pictureBoxViewEditorRubberBand.Width, 2));
 			graphicsPath.AddRectangle(new Rectangle(pictureBoxViewEditorRubberBand.Width - 2, 0, 2, pictureBoxViewEditorRubberBand.Height));
 			graphicsPath.AddRectangle(new Rectangle(0, pictureBoxViewEditorRubberBand.Height - 2, pictureBoxViewEditorRubberBand.Width, 2));
@@ -655,9 +651,9 @@ namespace FontMaker
 		{
 			if ((FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.BinaryData)
 			{
-				saveDialog.Filter = $@"View (*.dat)|*.dat";
+				saveDialog.Filter = @"View (*.dat)|*.dat";
 				saveDialog.DefaultExt = "dat";
-				saveDialog.FileName = $@"View.dat";
+				saveDialog.FileName = @"View.dat";
 
 				if (saveDialog.ShowDialog() == DialogResult.OK)
 				{
@@ -668,7 +664,7 @@ namespace FontMaker
 			}
 
 			// Rest of the options are text / .txt
-			saveDialog.Filter = $@"View (*.txt)|*.txt";
+			saveDialog.Filter = @"View (*.txt)|*.txt";
 			saveDialog.DefaultExt = "txt";
 
 			if (saveDialog.ShowDialog() == DialogResult.OK)
@@ -723,7 +719,6 @@ namespace FontMaker
 
 					}
 				}
-				return;
 			}
 		}
 

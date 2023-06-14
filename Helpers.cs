@@ -13,7 +13,7 @@ namespace FontMaker
 				return 0;
 			}
 
-			if ((character >= 48) && (character <= 90))
+			if (character is >= 48 and <= 90)
 			{
 				return (byte)(character - 32);
 			}
@@ -159,14 +159,6 @@ namespace FontMaker
 			}
 
 			return best;
-		}
-
-		public static void CopyRegionIntoImage(Bitmap srcBitmap, Rectangle srcRegion, ref Bitmap destBitmap, Rectangle destRegion)
-		{
-			using (Graphics grD = Graphics.FromImage(destBitmap))
-			{
-				grD.DrawImage(srcBitmap, destRegion, srcRegion, GraphicsUnit.Pixel);
-			}
 		}
 	}
 }

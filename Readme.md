@@ -236,6 +236,13 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.7.6
+- Lots of memory leak fixes
+    Thank you MrFish on AtariAge for noticing that the app sometime uses lots of memory.
+- Added a duplicate character finder to the Analysis window
+    Click the [Mark Duplicated] check box and all duplicate characters will be linked via a solid line
+    This makes it easy to see all duplicate characters in all four fonts.
+
 V1.6.7.5
 - View export window enhancements
     - You can now use the mouse-wheel to move your selection box. Up/Down moves in X-direction, CTRL+Up/Down moves in the Y-direction
@@ -301,10 +308,10 @@ V1.6.4.0
   - Shift+Click to switch to the previous font
   - Ctrl+Click to reset to font #1
 
-1.6.0.0 - Switched to C# implementation
+V1.6.0.0 - Switched to C# implementation
 
-1.5.4.67 – Fixed searching for duplicates of Megacopy exit (wrong behavior causing application hanging), fixed recolor panel refresh
+V1.5.4.67 – Fixed searching for duplicates of Megacopy exit (wrong behavior causing application hanging), fixed recolor panel refresh
 
-1.5.3.66 – Added display of character index under mouse cursor in view window; Added DUP checkbox which controls display of duplicate characters in font
+V1.5.3.66 – Added display of character index under mouse cursor in view window; Added DUP checkbox which controls display of duplicate characters in font
 
-1.5.2.65 – Added new export option: Save as Basic listing *.LST file that can be applied to your existing Basic program by calling ENTER “D:MYFONT.LST”
+V1.5.2.65 – Added new export option: Save as Basic listing *.LST file that can be applied to your existing Basic program by calling ENTER “D:MYFONT.LST”

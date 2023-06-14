@@ -141,8 +141,8 @@ namespace FontMaker
 
 		public void ActionFontSelectorMouseDown(MouseEventArgs e)
 		{
-			int fontchar;
-			int fontnr;
+			int fontChar;
+			int fontNr;
 
 			if (e.X < 0 || e.X >= pictureBoxFontSelector.Width || e.Y < 0 || e.Y >= pictureBoxFontSelector.Height)
 			{
@@ -163,18 +163,18 @@ namespace FontMaker
 
 			if (SelectedCharacterIndex > 255)
 			{
-				fontchar = SelectedCharacterIndex % 256;
-				fontnr = 2;
+				fontChar = SelectedCharacterIndex % 256;
+				fontNr = 2;
 			}
 			else
 			{
-				fontchar = SelectedCharacterIndex;
-				fontnr = 1;
+				fontChar = SelectedCharacterIndex;
+				fontNr = 1;
 			}
 
-			fontnr += checkBoxFontBank.Checked ? 2 : 0;
+			fontNr += checkBoxFontBank.Checked ? 2 : 0;
 
-			comboBoxPasteIntoFontNr.SelectedIndex = fontnr - 1;
+			comboBoxPasteIntoFontNr.SelectedIndex = fontNr - 1;
 
 			if (buttonMegaCopy.Checked)
 			{
@@ -217,14 +217,6 @@ namespace FontMaker
 								ExecutePasteFromClipboard(false);
 								ResetMegaCopyStatus();
 							}
-
-							// reset selection by right doubleclick
-							/* TODO:
-							if ((Shift.Contains(ssDouble)) && (Shift.Contains(ssRight)))
-							{
-								ResetMegaCopyStatus();
-							}
-							*/
 						}
 						break;
 				}
@@ -239,7 +231,7 @@ namespace FontMaker
 				CopyPasteRange.Width = 0;
 				CopyPasteRange.Height = 0;
 
-				labelEditCharInfo.Text = $@"Char: Font {fontnr} ${fontchar:X2} #{fontchar}";
+				labelEditCharInfo.Text = $@"Char: Font {fontNr} ${fontChar:X2} #{fontChar}";
 				RedrawChar();
 				CheckDuplicate();
 			}
@@ -350,12 +342,12 @@ namespace FontMaker
 			var img = Helpers.NewImage(pictureBoxFontSelectorPasteCursor);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(greenBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(GreenBrush, new Rectangle(0, 0, img.Width, img.Height));
 				pictureBoxFontSelectorPasteCursor.Region?.Dispose();
 				pictureBoxFontSelectorPasteCursor.Size = new Size(img.Width, img.Height);
 
 			}
-			var graphicsPath = new GraphicsPath();
+			using var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, pictureBoxFontSelectorPasteCursor.Width, 2));
 			graphicsPath.AddRectangle(new Rectangle(pictureBoxFontSelectorPasteCursor.Width - 2, 0, 2, pictureBoxFontSelectorPasteCursor.Height));
 			graphicsPath.AddRectangle(new Rectangle(0, pictureBoxFontSelectorPasteCursor.Height - 2, pictureBoxFontSelectorPasteCursor.Width, 2));

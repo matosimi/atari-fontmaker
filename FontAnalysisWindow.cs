@@ -14,8 +14,9 @@ namespace FontMaker
 		public static int AnalysisMinAlpha = 64;
 		public static int AnalysisMaxAlpha = 192;
 
-		private int PreviousHighlightColor { get; set; } = 0;
+		private int PreviousHighlightColor { get; set; }
 		private int PreviousAlpha { get; set; } = 128;
+		private bool PreviousDuplicates { get; set; }
 		#endregion
 
 		private bool _inLoad;
@@ -26,9 +27,14 @@ namespace FontMaker
 			public int PageIndex { get; set; }
 			public int FirstOccurrenceIndex { get; set; }
 		}
-		private readonly List<AnalysisDetailsEntry> _analysisDetailsPerLine = new List<AnalysisDetailsEntry>();
+		private readonly List<AnalysisDetailsEntry> _analysisDetailsPerLine = new();
 		private readonly int[] _fullFontCharCounter = new int[256 * 4];       // Normal and inverse characters separated
 		private readonly int[] _combinedCharCounter = new int[128 * 4];       // Normal and inverse characters counted as one
+
+
+
+		private readonly int[] _duplicateOfChar = new int[128 * 4];             // Indicate if a char at position x is a duplicate of another char.  If its -1 then no duplicate
+		private readonly List<int> _duplicateDetailsPerLine = new();
 
 		/// <summary>
 		/// Which char was selected for detailed analysis?
@@ -62,6 +68,7 @@ namespace FontMaker
 
 			pictureBoxCursor.Region = new Region(graphicsPath);
 			pictureBoxCursor.Refresh();
+			graphicsPath.Dispose();
 
 			pictureBoxCursor.SetBounds(0, 0, 20, 20);
 			pictureBoxCursor.Visible = true;
@@ -73,6 +80,7 @@ namespace FontMaker
 				using var trans = new SolidBrush(Color.Red);
 				gr.FillRectangle(trans, new Rectangle(0, 0, img.Width, img.Height));
 			}
+
 			graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 4));
 			graphicsPath.AddRectangle(new Rectangle(16, 0, 4, 20));
@@ -81,6 +89,7 @@ namespace FontMaker
 
 			pictureBoxInfoCursor.Region = new Region(graphicsPath);
 			pictureBoxInfoCursor.Refresh();
+			graphicsPath.Dispose();
 
 			pictureBoxInfoCursor.SetBounds(0, 0, 20, 20);
 			pictureBoxInfoCursor.Visible = false;
@@ -120,14 +129,16 @@ namespace FontMaker
 		}
 
 		#region Load/Save settings for later restore
-		public void SetDefaults(int whichColor, int whichAlpha)
+		public void SetDefaults(int whichColor, int whichAlpha, bool markDuplicates)
 		{
 			PreviousHighlightColor = whichColor;
 			PreviousAlpha = whichAlpha;
+			PreviousDuplicates = markDuplicates;
 		}
 
 		public int GetHighlightColor => PreviousHighlightColor;
 		public int GetHighlightAlpha => PreviousAlpha;
+		public bool GetDuplicates => PreviousDuplicates;
 
 		#endregion
 
@@ -154,6 +165,8 @@ namespace FontMaker
 			}
 
 			trackBarAlpha.Value = PreviousAlpha;
+			chkMarkDuplicates.Checked = PreviousDuplicates;
+
 			_inLoad = false;
 
 			MakeBrushes();
@@ -179,6 +192,7 @@ namespace FontMaker
 				PreviousHighlightColor = 4;
 
 			PreviousAlpha = trackBarAlpha.Value;
+			PreviousDuplicates = chkMarkDuplicates.Checked;
 		}
 
 		/// <summary>
@@ -209,6 +223,33 @@ namespace FontMaker
 						var y = (ch / 32) * 16;
 						gr.FillRectangle(_drawBrush, x, yOffset + y, 16, 16);
 						gr.FillRectangle(_drawBrush, x, yOffset + y + 64, 16, 16);
+					}
+				}
+
+				// Check if we want to mark duplicate characters in a font
+				if (chkMarkDuplicates.Checked)
+				{
+					using var pen = new Pen(_drawBrush);
+					// Yup, draw the marks
+					for (var fontNr = 0; fontNr < 4; ++fontNr)
+					{
+						var fontIndex = 128 * fontNr;
+						var yOffset = fontNr * 128;
+						for (var ch = 0; ch < 128; ++ch)
+						{
+							if (_duplicateOfChar[fontIndex + ch] != -1)
+							{
+								var fromX = (ch * 16) % 512;
+								var fromY = (ch / 32) * 16;
+								var toX = (_duplicateOfChar[fontIndex + ch] * 16) % 512;
+								var toY = (_duplicateOfChar[fontIndex + ch] / 32) * 16;
+
+								gr.DrawLine(pen, 8 + fromX, yOffset + 8 + fromY, 8 + toX, yOffset + 8 + toY);
+								gr.DrawLine(pen, 8 + fromX, yOffset + 64 + 8 + fromY, 8 + toX, yOffset + 64 + 8 + toY);
+								gr.DrawRectangle(pen, fromX, yOffset + fromY, 16, 16);
+								gr.DrawRectangle(pen, fromX, yOffset + fromY + 64, 16, 16);
+							}
+						}
 					}
 				}
 			}
@@ -246,6 +287,29 @@ namespace FontMaker
 					}
 				}
 			});
+
+			// Run over each character in a font and find if there are any duplicates.
+			// 128 chars per font
+			for (var i = 0; i < _duplicateOfChar.Length; ++i)
+				_duplicateOfChar[i] = -1;
+
+			for (var fontNr = 0; fontNr < 4; ++fontNr)
+			{
+				var fontIndex = fontNr * 128;
+				for (var srcCharIndex = 0; srcCharIndex < 128; ++srcCharIndex)
+				{
+					for (var lookAtCharNr = 0; lookAtCharNr < 128; ++lookAtCharNr)
+					{
+						if (_duplicateOfChar[fontIndex + lookAtCharNr] == -1
+							&& srcCharIndex != lookAtCharNr && AtariFont.IsDuplicate(fontNr, srcCharIndex, lookAtCharNr)
+						   )
+						{
+							var minCharNr = Math.Min(lookAtCharNr, srcCharIndex);
+							_duplicateOfChar[fontIndex + lookAtCharNr] = minCharNr;
+						}
+					}
+				}
+			}
 
 			// Draw the analysis to the bitmap
 			RedrawAnalysisView();
@@ -323,6 +387,28 @@ namespace FontMaker
 			textBoxUsageInfo.Text = sb.ToString();
 		}
 
+		private void DoDetailedDuplicateAnalysis(int fontNr, int baseCharNr)
+		{
+			_duplicateDetailsPerLine.Clear();
+
+			var sb = new StringBuilder();
+			sb.AppendLine($"Font {fontNr + 1} ${baseCharNr:X2} #{baseCharNr}");
+
+			var fontOffset = fontNr * 128;
+			var charToLookFor = _duplicateOfChar[fontNr * 128 + baseCharNr];
+			for (var i = 0; i < 128; ++i)
+			{
+				if (_duplicateOfChar[fontOffset + i] == charToLookFor && baseCharNr != i)
+				{
+					sb.AppendLine($"Dup @ ${i:X2} #{i}");
+					_duplicateDetailsPerLine.Add(fontOffset + i);
+				}
+
+			}
+			textBoxDuplicates.Text = sb.ToString();
+
+		}
+
 		private void ShowQuickCharacterInfo(int x, int y)
 		{
 			var rx = x / 16;
@@ -339,7 +425,7 @@ namespace FontMaker
 			labelCursorInfo.Text = $@"Font {fontNr + 1} ${fontChar:X2} #{fontChar} {(fontChar >= 128 ? "[Inverse]" : "")}";
 			labelUsedInfo.Text = $@"Base used {_fullFontCharCounter[baseFontChar + fontNr * 256]} x. Inverse used {_fullFontCharCounter[invFontChar + fontNr * 256]} x";
 
-			labelClickForUsageInfo.Visible = (nrUsed > 0) ? true : false;
+			labelClickForUsageInfo.Visible = (nrUsed > 0);
 		}
 
 		private void ShowDetailedCharacterInfo(int x, int y)
@@ -364,6 +450,22 @@ namespace FontMaker
 			textBoxUsageInfo.Visible = nrUsed > 0;
 
 			Program.MainForm.PickCharacter((rx + ry * 32));
+
+			var showDuplicates = chkMarkDuplicates.Checked;
+			if (showDuplicates)
+			{
+				// Check if the char has any duplicates
+				if (_duplicateOfChar[fontNr * 128 + baseFontChar] != -1)
+				{
+					DoDetailedDuplicateAnalysis(fontNr, baseFontChar);
+					showDuplicates = true;
+				}
+				else
+				{
+					showDuplicates = false;
+				}
+			}
+			textBoxDuplicates.Visible = showDuplicates;
 		}
 
 		private void pictureBoxFonts_MouseMove(object sender, MouseEventArgs e)
@@ -480,6 +582,27 @@ namespace FontMaker
 			{
 				var locationInfo = _analysisDetailsPerLine[lineNr - 1];
 				Program.MainForm.PickPage(locationInfo.PageIndex);
+			}
+		}
+
+		private void chkMarkDuplicates_CheckedChanged(object sender, EventArgs e)
+		{
+			UpdateAfterGuiChange();
+		}
+
+		private void textBoxDuplicates_MouseUp(object sender, MouseEventArgs e)
+		{
+			var charIndex = textBoxDuplicates.GetCharIndexFromPosition(e.Location);
+			var lineNr = textBoxDuplicates.GetLineFromCharIndex(charIndex);
+
+			if (lineNr > 0)
+			{
+				var nextCharacterIndex = _duplicateDetailsPerLine[lineNr - 1];
+				var bx = nextCharacterIndex % 32;
+				var by = (nextCharacterIndex / 32) % 4;
+				var fontNr = nextCharacterIndex / 128;
+
+				pictureBoxFonts_MouseDown(null!, new MouseEventArgs(MouseButtons.Left, 0, bx * 16 + 4, fontNr * 128 + by * 16 + 4, 0));
 			}
 		}
 	}

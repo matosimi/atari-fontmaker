@@ -58,7 +58,7 @@
 	public partial class FontMakerForm
 	{
 		// Everything to do with pages goes here
-		public List<PageData> Pages = new List<PageData>();
+		public List<PageData> Pages = new();
 
 		/// <summary>
 		/// The index in the combo box that is currently selected

@@ -10,8 +10,8 @@
 		/// </summary>
 		public static byte[] FontBytes { get; set; } = new byte[NumFontBytes];
 
-		private static byte[] OneCharacterBuffer = new byte[8];
-		private static byte[,] One8x8Buffer = new byte[8, 8];
+		private static readonly byte[] OneCharacterBuffer = new byte[8];
+		private static readonly byte[,] One8X8Buffer = new byte[8, 8];
 
 		#endregion
 
@@ -125,14 +125,14 @@
 			byte mask = 128;
 			for (var i = 0; i < 8; ++i)
 			{
-				One8x8Buffer[0, 7 - i] = (byte)(OneCharacterBuffer[0] & mask);
-				One8x8Buffer[1, 7 - i] = (byte)(OneCharacterBuffer[1] & mask);
-				One8x8Buffer[2, 7 - i] = (byte)(OneCharacterBuffer[2] & mask);
-				One8x8Buffer[3, 7 - i] = (byte)(OneCharacterBuffer[3] & mask);
-				One8x8Buffer[4, 7 - i] = (byte)(OneCharacterBuffer[4] & mask);
-				One8x8Buffer[5, 7 - i] = (byte)(OneCharacterBuffer[5] & mask);
-				One8x8Buffer[6, 7 - i] = (byte)(OneCharacterBuffer[6] & mask);
-				One8x8Buffer[7, 7 - i] = (byte)(OneCharacterBuffer[7] & mask);
+				One8X8Buffer[0, 7 - i] = (byte)(OneCharacterBuffer[0] & mask);
+				One8X8Buffer[1, 7 - i] = (byte)(OneCharacterBuffer[1] & mask);
+				One8X8Buffer[2, 7 - i] = (byte)(OneCharacterBuffer[2] & mask);
+				One8X8Buffer[3, 7 - i] = (byte)(OneCharacterBuffer[3] & mask);
+				One8X8Buffer[4, 7 - i] = (byte)(OneCharacterBuffer[4] & mask);
+				One8X8Buffer[5, 7 - i] = (byte)(OneCharacterBuffer[5] & mask);
+				One8X8Buffer[6, 7 - i] = (byte)(OneCharacterBuffer[6] & mask);
+				One8X8Buffer[7, 7 - i] = (byte)(OneCharacterBuffer[7] & mask);
 				mask >>= 1;
 			}
 
@@ -142,7 +142,7 @@
 				byte v = 0;
 				for (var x = 0; x < 8; ++x)
 				{
-					v = (byte)(v | ((One8x8Buffer[x, y] == 0) ? 0 : mask));
+					v = (byte)(v | ((One8X8Buffer[x, y] == 0) ? 0 : mask));
 					mask >>= 1;
 				}
 
@@ -158,14 +158,14 @@
 			byte mask = 128;
 			for (var i = 0; i < 8; ++i)
 			{
-				One8x8Buffer[0, i] = (byte)(OneCharacterBuffer[7] & mask);
-				One8x8Buffer[1, i] = (byte)(OneCharacterBuffer[6] & mask);
-				One8x8Buffer[2, i] = (byte)(OneCharacterBuffer[5] & mask);
-				One8x8Buffer[3, i] = (byte)(OneCharacterBuffer[4] & mask);
-				One8x8Buffer[4, i] = (byte)(OneCharacterBuffer[3] & mask);
-				One8x8Buffer[5, i] = (byte)(OneCharacterBuffer[2] & mask);
-				One8x8Buffer[6, i] = (byte)(OneCharacterBuffer[1] & mask);
-				One8x8Buffer[7, i] = (byte)(OneCharacterBuffer[0] & mask);
+				One8X8Buffer[0, i] = (byte)(OneCharacterBuffer[7] & mask);
+				One8X8Buffer[1, i] = (byte)(OneCharacterBuffer[6] & mask);
+				One8X8Buffer[2, i] = (byte)(OneCharacterBuffer[5] & mask);
+				One8X8Buffer[3, i] = (byte)(OneCharacterBuffer[4] & mask);
+				One8X8Buffer[4, i] = (byte)(OneCharacterBuffer[3] & mask);
+				One8X8Buffer[5, i] = (byte)(OneCharacterBuffer[2] & mask);
+				One8X8Buffer[6, i] = (byte)(OneCharacterBuffer[1] & mask);
+				One8X8Buffer[7, i] = (byte)(OneCharacterBuffer[0] & mask);
 				mask >>= 1;
 			}
 
@@ -175,7 +175,7 @@
 				byte v = 0;
 				for (var x = 0; x < 8; ++x)
 				{
-					v = (byte)(v | ((One8x8Buffer[x, y] == 0) ? 0 : mask));
+					v = (byte)(v | ((One8X8Buffer[x, y] == 0) ? 0 : mask));
 					mask >>= 1;
 				}
 
@@ -414,22 +414,6 @@
 			return res;
 		}
 
-		public static void Set2ColorCharacter(byte[,] pixels, int character, bool onBank2)
-		{
-			var charline2 = new byte[8];
-			var fontByteIndex = GetCharacterOffset(character, onBank2);
-
-			for (var a = 0; a < 8; a++)
-			{
-				for (var b = 0; b < 8; b++)
-				{
-					charline2[b] = pixels[b, a];
-				}
-
-				FontBytes[fontByteIndex + a] = EncodeMono(charline2);
-			}
-		}
-
 		public static void Set5ColorCharacter(byte[,] character5Color, int character, bool onBank2)
 		{
 			var fourPixels = new byte[4];
@@ -537,7 +521,21 @@
 				// Clear the char at the current location
 				Array.Clear(FontBytes, hp, 8);
 			}
+		}
 
+
+		public static bool IsDuplicate(int fontNr, int c1, int c2)
+		{
+			var p1 = (c1 % 128) * 8 + 1024 * fontNr;
+			var p2 = (c2 % 128) * 8 + 1024 * fontNr;
+			var diff = false;
+
+			for (var i = 7; i >= 0 && diff == false; --i)
+			{
+				diff = FontBytes[p1 + i] != FontBytes[p2 + i];
+			}
+
+			return !diff;
 		}
 
 		#endregion

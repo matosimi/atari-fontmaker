@@ -8,6 +8,7 @@ namespace FontMaker
 		public List<string> ColorSets { get; set; }
 		public int AnalysisColor { get; set; }
 		public int AnalysisAlpha { get; set; }
+		public bool AnalysisDuplicates { get; set; }
 
 		public bool ExportViewRemember {get; set; }
 		public int ExportViewExportType { get; set; }
@@ -96,7 +97,7 @@ namespace FontMaker
 			// Transfer the loaded values
 			ColorSets = Configuration.Values.ColorSets;
 
-			FontAnalysisWindowForm.SetDefaults(Configuration.Values.AnalysisColor, Configuration.Values.AnalysisAlpha);
+			FontAnalysisWindowForm.SetDefaults(Configuration.Values.AnalysisColor, Configuration.Values.AnalysisAlpha, Configuration.Values.AnalysisDuplicates);
 			ExportViewWindowForm.LoadConfiguration(
 				Configuration.Values.ExportViewRemember,
 				Configuration.Values.ExportViewExportType,
@@ -111,6 +112,7 @@ namespace FontMaker
 			Configuration.Values.ColorSets = ColorSets;
 			Configuration.Values.AnalysisColor = FontAnalysisWindowForm.GetHighlightColor;
 			Configuration.Values.AnalysisAlpha = FontAnalysisWindowForm.GetHighlightAlpha;
+			Configuration.Values.AnalysisDuplicates = FontAnalysisWindowForm.GetDuplicates;
 
 			(Configuration.Values.ExportViewRemember, Configuration.Values.ExportViewExportType, Configuration.Values.ExportViewDataType, var exportRegion)
 				= ExportViewWindowForm.SaveConfiguration();

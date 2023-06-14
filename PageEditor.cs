@@ -22,13 +22,13 @@ namespace FontMaker
 		/// <summary>
 		/// Original page data copy
 		/// </summary>
-		private List<PageData> MyPages { get; set; }
+		private List<PageData> MyPages { get; }
 
 		/// <summary>
 		/// What is the order the original pages will be arranged in.
 		/// Uses the "Index" field of the page to set the order
 		/// </summary>
-		private ObservableCollection<int> PageOrder { get; set; }
+		private ObservableCollection<int> PageOrder { get; }
 
 		/// <summary>
 		/// Index into Pages[] to indicate which one is being edited

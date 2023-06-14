@@ -60,7 +60,7 @@ namespace FontMaker
 		internal int LastViewCharacterX { get; set; }
 		internal int LastViewCharacterY { get; set; }
 
-		internal bool ContinueViewDrawInMove { get; set; } = false;
+		internal bool ContinueViewDrawInMove { get; set; }
 
 		/// <summary>
 		/// Detect a right-double-click and reset/cancel the mega copy paste mode
@@ -499,10 +499,10 @@ namespace FontMaker
 			var img = Helpers.GetImage(pictureBoxCharacterSetSelector);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(whiteBrush, 0, 0, img.Width, img.Height);
+				gr.FillRectangle(WhiteBrush, 0, 0, img.Width, img.Height);
 				for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
 				{
-					gr.DrawString(ToDraw[AtariView.UseFontOnLine[a]], this.Font, blackBrush, 4, 2 + a * 16);
+					gr.DrawString(ToDraw[AtariView.UseFontOnLine[a]], this.Font, BlackBrush, 4, 2 + a * 16);
 				}
 			}
 			pictureBoxCharacterSetSelector.Refresh();
@@ -674,7 +674,7 @@ namespace FontMaker
 			{
 				for (var j = 0; j < AtariView.VIEW_WIDTH; j++)
 				{
-					characterBytes = characterBytes + String.Format("{0:X2}", AtariView.ViewBytes[j, i]);
+					characterBytes = characterBytes + $"{AtariView.ViewBytes[j, i]:X2}";
 				}
 			}
 
@@ -811,7 +811,7 @@ namespace FontMaker
 
 					try
 					{
-						var read = fsDat.Read(buf, 0, loadSize);
+						fsDat.Read(buf, 0, loadSize);
 					}
 					finally
 					{
@@ -877,14 +877,7 @@ namespace FontMaker
 				{
 				}
 
-				if (c == 0)
-				{
-					InColorMode = true;
-				}
-				else
-				{
-					InColorMode = false;
-				}
+				InColorMode = c == 0;
 				SwitchGfxMode();
 
 				if (ext == ".vf2")
@@ -1173,12 +1166,12 @@ namespace FontMaker
 			var img = Helpers.NewImage(pictureBoxViewEditorPasteCursor);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(yellowBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(YellowBrush, new Rectangle(0, 0, img.Width, img.Height));
 				pictureBoxViewEditorPasteCursor.Region?.Dispose();
 				pictureBoxViewEditorPasteCursor.Size = new Size(img.Width, img.Height);
 
 			}
-			var graphicsPath = new GraphicsPath();
+			using var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, pictureBoxViewEditorPasteCursor.Width, 2));
 			graphicsPath.AddRectangle(new Rectangle(pictureBoxViewEditorPasteCursor.Width - 2, 0, 2, pictureBoxViewEditorPasteCursor.Height));
 			graphicsPath.AddRectangle(new Rectangle(0, pictureBoxViewEditorPasteCursor.Height - 2, pictureBoxViewEditorPasteCursor.Width, 2));

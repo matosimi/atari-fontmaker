@@ -44,20 +44,20 @@ namespace FontMaker
 
 		internal MegaCopyStatusFlags megaCopyStatus = MegaCopyStatusFlags.None;
 
-		private static readonly SolidBrush blackBrush = new(Color.Black);
-		private static readonly SolidBrush whiteBrush = new(Color.White);
-		private static readonly SolidBrush cyanBrush = new(Color.Cyan);
-		private static readonly SolidBrush redBrush = new(Color.Red);
-		private static readonly SolidBrush yellowBrush = new(Color.Yellow);
-		private static readonly SolidBrush greenBrush = new(Color.Green);
+		private static readonly SolidBrush BlackBrush = new(Color.Black);
+		private static readonly SolidBrush WhiteBrush = new(Color.White);
+		private static readonly SolidBrush CyanBrush = new(Color.Cyan);
+		private static readonly SolidBrush RedBrush = new(Color.Red);
+		private static readonly SolidBrush YellowBrush = new(Color.Yellow);
+		private static readonly SolidBrush GreenBrush = new(Color.Green);
 
 		private readonly List<Button> ActionListNormalModeOnly = new();
 
 		#region All data used by Atari Font Maker
-		public AtariColorSelectorForm AtariColorSelector { get; set; } = new AtariColorSelectorForm();
-		public ExportFontWindow ExportFontWindowForm { get; set; } = new ExportFontWindow();
-		public ExportViewWindow ExportViewWindowForm { get; set; } = new ExportViewWindow();
-		public FontAnalysisWindow FontAnalysisWindowForm { get; set; } = new FontAnalysisWindow();
+		public AtariColorSelectorForm AtariColorSelector { get; set; } = new();
+		public ExportFontWindow ExportFontWindowForm { get; set; } = new();
+		public ExportViewWindow ExportViewWindowForm { get; set; } = new();
+		public FontAnalysisWindow FontAnalysisWindowForm { get; set; } = new();
 
 		/// <summary>
 		/// The Atari color palette. Loaded from "altirraPAL.pal"
@@ -84,11 +84,11 @@ namespace FontMaker
 		/// <summary>
 		/// Index of the selected character in the font bank (0-511)
 		/// </summary>
-		internal int SelectedCharacterIndex { get; set; } = 0;          // The current character 0 - 511
+		internal int SelectedCharacterIndex { get; set; } // The current character 0 - 511
 		/// <summary>
 		/// Index of the last duplicate character found
 		/// </summary>
-		internal int DuplicateCharacterIndex { get; set; } = 0;
+		internal int DuplicateCharacterIndex { get; set; }
 
 		/// <summary>
 		/// Location where the currently copied data will be pasted to
@@ -271,7 +271,7 @@ namespace FontMaker
 			var img = Helpers.GetImage(pictureBoxFontSelectorRubberBand);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(redBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(RedBrush, new Rectangle(0, 0, img.Width, img.Height));
 			}
 			GraphicsPath graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 2));
@@ -281,12 +281,13 @@ namespace FontMaker
 
 			pictureBoxFontSelectorRubberBand.Region = new Region(graphicsPath);
 			pictureBoxFontSelectorRubberBand.Refresh();
+			graphicsPath.Dispose();
 
 			// Paint something into the window
 			img = Helpers.GetImage(pictureBoxViewEditorRubberBand);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(cyanBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(CyanBrush, new Rectangle(0, 0, img.Width, img.Height));
 			}
 			graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 2));
@@ -295,14 +296,14 @@ namespace FontMaker
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 2, 20));
 
 			pictureBoxViewEditorRubberBand.Region = new Region(graphicsPath);
-
 			pictureBoxViewEditorRubberBand.Refresh();
+			graphicsPath.Dispose();
 
 			// Paint something into the window
 			img = Helpers.GetImage(pictureBoxFontSelectorPasteCursor);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(greenBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(GreenBrush, new Rectangle(0, 0, img.Width, img.Height));
 			}
 			graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 2));
@@ -312,12 +313,13 @@ namespace FontMaker
 
 			pictureBoxFontSelectorPasteCursor.Region = new Region(graphicsPath);
 			pictureBoxFontSelectorPasteCursor.Refresh();
+			graphicsPath.Dispose();
 
 			// Paint something into the window
 			img = Helpers.GetImage(pictureBoxViewEditorPasteCursor);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(yellowBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(YellowBrush, new Rectangle(0, 0, img.Width, img.Height));
 			}
 			graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 2));
@@ -327,12 +329,13 @@ namespace FontMaker
 
 			pictureBoxViewEditorPasteCursor.Region = new Region(graphicsPath);
 			pictureBoxViewEditorPasteCursor.Refresh();
+			graphicsPath.Dispose();
 
 			// Paint something into the window
 			img = Helpers.GetImage(pictureBoxDuplicateIndicator);
 			using (var gr = Graphics.FromImage(img))
 			{
-				var trans = new SolidBrush(Color.Purple);
+				using var trans = new SolidBrush(Color.Purple);
 				gr.FillRectangle(trans, new Rectangle(0, 0, img.Width, img.Height));
 			}
 			graphicsPath = new GraphicsPath();
@@ -348,6 +351,7 @@ namespace FontMaker
 
 			pictureBoxDuplicateIndicator.Region = new Region(graphicsPath);
 			pictureBoxDuplicateIndicator.Refresh();
+			graphicsPath.Dispose();
 		}
 
 
@@ -819,7 +823,7 @@ namespace FontMaker
 			ActionAtariViewMouseUp(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorRubberBand.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorRubberBand.Top - pictureBoxAtariView.Top, 0));
 		}
 
-		private static bool _busyWith_ViewEditorRubberBandResize = false;
+		private static bool _busyWith_ViewEditorRubberBandResize;
 		private void ViewEditor_RubberBand_Resize(object sender, EventArgs e)
 		{
 			if (_busyWith_ViewEditorRubberBandResize)
@@ -829,12 +833,11 @@ namespace FontMaker
 			var img = Helpers.NewImage(pictureBoxViewEditorRubberBand);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(cyanBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(CyanBrush, new Rectangle(0, 0, img.Width, img.Height));
 				pictureBoxViewEditorRubberBand.Region?.Dispose();
 				pictureBoxViewEditorRubberBand.Size = new Size(img.Width, img.Height);
-
 			}
-			var graphicsPath = new GraphicsPath();
+			using var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, pictureBoxViewEditorRubberBand.Width, 2));
 			graphicsPath.AddRectangle(new Rectangle(pictureBoxViewEditorRubberBand.Width - 2, 0, 2, pictureBoxViewEditorRubberBand.Height));
 			graphicsPath.AddRectangle(new Rectangle(0, pictureBoxViewEditorRubberBand.Height - 2, pictureBoxViewEditorRubberBand.Width, 2));
@@ -1174,12 +1177,12 @@ namespace FontMaker
 			var img = Helpers.NewImage(pictureBoxFontSelectorRubberBand);
 			using (var gr = Graphics.FromImage(img))
 			{
-				gr.FillRectangle(redBrush, new Rectangle(0, 0, img.Width, img.Height));
+				gr.FillRectangle(RedBrush, new Rectangle(0, 0, img.Width, img.Height));
 				pictureBoxFontSelectorRubberBand.Region?.Dispose();
 				pictureBoxFontSelectorRubberBand.Size = new Size(img.Width, img.Height);
 
 			}
-			var graphicsPath = new GraphicsPath();
+			using var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, pictureBoxFontSelectorRubberBand.Width, 2));
 			graphicsPath.AddRectangle(new Rectangle(pictureBoxFontSelectorRubberBand.Width - 2, 0, 2, pictureBoxFontSelectorRubberBand.Height));
 			graphicsPath.AddRectangle(new Rectangle(0, pictureBoxFontSelectorRubberBand.Height - 2, pictureBoxFontSelectorRubberBand.Width, 2));

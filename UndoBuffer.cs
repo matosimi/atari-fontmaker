@@ -7,7 +7,7 @@
 		public static byte[,] undoBuffer = new byte[UndoBufferSize + 1, AtariFont.NumFontBytes];
 
 		public static int[] undoBufferFlags = new int[UndoBufferSize + 1];
-		public static int undoBufferIndex = 0;
+		public static int undoBufferIndex;
 
 		public static void Setup()
 		{

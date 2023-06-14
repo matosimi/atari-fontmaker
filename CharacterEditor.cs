@@ -1,6 +1,5 @@
 ﻿using System.Media;
 using TinyJson;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace FontMaker
 {
@@ -38,7 +37,7 @@ namespace FontMaker
 		/// </summary>
 		private string _localCopyOfClipboardData = string.Empty;
 
-		private byte[] _tempPixelBuffer = new byte[40 * 8]; // Init to the max value that it can be and reuse it everywhere
+		private readonly byte[] _tempPixelBuffer = new byte[40 * 8]; // Init to the max value that it can be and reuse it everywhere
 		private byte[,] _pixelBuffer = new byte[8, 8];
 
 		/// <summary>
@@ -232,9 +231,10 @@ namespace FontMaker
 					{
 						for (var b = 0; b < 8; b++)
 						{
-							var brush = new SolidBrush(character2Color[b, a] == 0 ? AtariPalette[SetOfSelectedColors[1]] : AtariPalette[SetOfSelectedColors[0]]);
+							//var brush = new SolidBrush(character2Color[b, a] == 0 ? AtariPalette[SetOfSelectedColors[1]] : AtariPalette[SetOfSelectedColors[0]]);
+							var brush = character2Color[b, a] == 0 ? BrushCache[1] : BrushCache[0];
 							gr.FillRectangle(brush, b * 20, a * 20, 20, 20);
-							gr.FillRectangle(whiteBrush, b * 20, a * 20, 1, 1);
+							gr.FillRectangle(WhiteBrush, b * 20, a * 20, 1, 1);
 						}
 					}
 				}
@@ -268,7 +268,7 @@ namespace FontMaker
 				{
 					for (var a = 0; a < 8; a++)
 					{
-						gr.FillRectangle(whiteBrush, a * 20, b * 20, 1, 1);
+						gr.FillRectangle(WhiteBrush, a * 20, b * 20, 1, 1);
 					}
 				}
 			}
@@ -545,13 +545,13 @@ namespace FontMaker
 						int charInFont;
 						if (sourceIsView)
 						{
-							characterBytes = characterBytes + String.Format("{0:X2}", AtariView.ViewBytes[j, i]);
+							characterBytes = characterBytes + $"{AtariView.ViewBytes[j, i]:X2}";
 							charInFont = (AtariView.ViewBytes[j, i] % 128) * 8 + (AtariView.UseFontOnLine[i] - 1) * 1024;
 							whichFontNr = AtariView.UseFontOnLine[i];
 						}
 						else
 						{
-							characterBytes = characterBytes + String.Format("{0:X2}", (i * 32 + j) % 256);
+							characterBytes = characterBytes + $"{(i * 32 + j) % 256:X2}";
 
 							if (i / 8 == 0)
 							{
@@ -569,7 +569,7 @@ namespace FontMaker
 
 						for (var k = 0; k < 8; k++)
 						{
-							fontBytes = fontBytes + String.Format("{0:X2}", AtariFont.FontBytes[charInFont + k]);
+							fontBytes = fontBytes + $"{AtariFont.FontBytes[charInFont + k]:X2}";
 						}
 					}
 					fontNr += whichFontNr;
@@ -857,7 +857,7 @@ namespace FontMaker
 				var img = Helpers.NewImage(pictureBoxFontSelectorMegaCopyImage);
 				using (var gr = Graphics.FromImage(img))
 				{
-					gr.FillRectangle(cyanBrush, new Rectangle(0, 0, img.Width, img.Height));
+					gr.FillRectangle(CyanBrush, new Rectangle(0, 0, img.Width, img.Height));
 				}
 
 				DrawChars(pictureBoxFontSelectorMegaCopyImage, fontBytes, characterBytes, 0, 0, width, height, !InColorMode, 2);
@@ -868,7 +868,7 @@ namespace FontMaker
 				var imgPreview = Helpers.GetImage(pictureBoxClipboardPreview);
 				using (var gr = Graphics.FromImage(imgPreview))
 				{
-					gr.FillRectangle(blackBrush, new Rectangle(0, 0, imgPreview.Width, imgPreview.Height));
+					gr.FillRectangle(BlackBrush, new Rectangle(0, 0, imgPreview.Width, imgPreview.Height));
 
 					var theRect = new Rectangle
 					{
@@ -1147,11 +1147,10 @@ namespace FontMaker
 		/// </summary>
 		/// <param name="pixels">X.Y expanded pixel bitmap</param>
 		/// <returns></returns>
-		private bool StuffPixelsIntoClipboard(byte[,] pixels)
+		private void StuffPixelsIntoClipboard(byte[,] pixels)
 		{
 			var jsonText = SafeGetClipboard();
-			if (string.IsNullOrEmpty(jsonText))
-				return false;
+			if (string.IsNullOrEmpty(jsonText)) return;
 
 			int width;
 			int height;
@@ -1170,7 +1169,7 @@ namespace FontMaker
 			}
 			catch (Exception)
 			{
-				return false;
+				return;
 			}
 
 			// Convert the pixel bitmap into characters (8x8 pixels)
@@ -1208,8 +1207,6 @@ namespace FontMaker
 			};
 			var json = jo.ToJson();
 			SafeSetClipboard(json);
-
-			return true;
 		}
 
 		public void ExecuteCopyAreaShiftLeft()

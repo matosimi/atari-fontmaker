@@ -175,7 +175,7 @@
 		public void DrawColorLabels(Graphics ic, int x, int y, int num, Color color)
 		{
 			var labels = new[] { "LUM", "BAK - 00", "PF0 - 01", "PF1 - 10", "PF2 - 11", "PF3 - 11" };
-			ic.DrawString(labels[num], this.Font, color.G > 128 ? blackBrush : whiteBrush, x, y);
+			ic.DrawString(labels[num], this.Font, color.G > 128 ? BlackBrush : WhiteBrush, x, y);
 		}
 
 		public void InteractWithTheColorPalette(MouseEventArgs e)
@@ -297,6 +297,7 @@
 			if (index < 0 || index >= BrushCache.Length)
 				throw new NotImplementedException("Oi something is wrong in UpdateBrushCache");
 
+			BrushCache[index]?.Dispose();
 			BrushCache[index] = new SolidBrush(AtariPalette[SetOfSelectedColors[index]]);
 		}
 

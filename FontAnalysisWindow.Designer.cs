@@ -45,6 +45,8 @@
 			labelCursorInfo = new Label();
 			pictureBoxInfoCursor = new PictureBox();
 			textBoxUsageInfo = new TextBox();
+			chkMarkDuplicates = new CheckBox();
+			textBoxDuplicates = new TextBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFonts).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxCursor).BeginInit();
 			groupBox1.SuspendLayout();
@@ -245,12 +247,41 @@
 			textBoxUsageInfo.WordWrap = false;
 			textBoxUsageInfo.MouseDown += textBoxUsageInfo_MouseDown;
 			// 
+			// chkMarkDuplicates
+			// 
+			chkMarkDuplicates.AutoSize = true;
+			chkMarkDuplicates.Location = new Point(525, 442);
+			chkMarkDuplicates.Name = "chkMarkDuplicates";
+			chkMarkDuplicates.Size = new Size(103, 17);
+			chkMarkDuplicates.TabIndex = 34;
+			chkMarkDuplicates.Text = "Mark Duplicates";
+			chkMarkDuplicates.UseVisualStyleBackColor = true;
+			chkMarkDuplicates.CheckedChanged += chkMarkDuplicates_CheckedChanged;
+			// 
+			// textBoxDuplicates
+			// 
+			textBoxDuplicates.BackColor = SystemColors.Control;
+			textBoxDuplicates.Cursor = Cursors.Hand;
+			textBoxDuplicates.Location = new Point(622, 440);
+			textBoxDuplicates.Multiline = true;
+			textBoxDuplicates.Name = "textBoxDuplicates";
+			textBoxDuplicates.ReadOnly = true;
+			textBoxDuplicates.ScrollBars = ScrollBars.Both;
+			textBoxDuplicates.ShortcutsEnabled = false;
+			textBoxDuplicates.Size = new Size(184, 76);
+			textBoxDuplicates.TabIndex = 35;
+			textBoxDuplicates.Visible = false;
+			textBoxDuplicates.WordWrap = false;
+			textBoxDuplicates.MouseUp += textBoxDuplicates_MouseUp;
+			// 
 			// FontAnalysisWindow
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			CancelButton = buttonClose;
 			ClientSize = new Size(818, 521);
+			Controls.Add(textBoxDuplicates);
+			Controls.Add(chkMarkDuplicates);
 			Controls.Add(textBoxUsageInfo);
 			Controls.Add(pictureBoxInfoCursor);
 			Controls.Add(panel1);
@@ -297,5 +328,7 @@
 		private Label labelClickForUsageInfo;
 		private PictureBox pictureBoxInfoCursor;
 		private TextBox textBoxUsageInfo;
+		private CheckBox chkMarkDuplicates;
+		private TextBox textBoxDuplicates;
 	}
 }

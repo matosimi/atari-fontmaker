@@ -66,16 +66,16 @@
 
 				if (dual)
 				{
-					var tempstring = dialogOpenFile.FileName.Substring(0, dialogOpenFile.FileName.Length - 4);
+					var tempString = dialogOpenFile.FileName.Substring(0, dialogOpenFile.FileName.Length - 4);
 					if (checkBoxFontBank.Checked == false)
 					{
-						Font1Filename = tempstring + "1.fnt";
-						Font2Filename = tempstring + "2.fnt";
+						Font1Filename = tempString + "1.fnt";
+						Font2Filename = tempString + "2.fnt";
 					}
 					else
 					{
-						Font3Filename = tempstring + "3.fnt";
-						Font4Filename = tempstring + "4.fnt";
+						Font3Filename = tempString + "3.fnt";
+						Font4Filename = tempString + "4.fnt";
 					}
 				}
 				else

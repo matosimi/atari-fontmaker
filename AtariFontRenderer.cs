@@ -4,37 +4,37 @@ namespace FontMaker
 {
 	public static class AtariFontRenderer
 	{
-		private static Color[] _atariColors = new Color[256];
-		private static byte[] myPalette = new byte[6]; // Mono (0 + 1) Color (1, 2, 3, 4, 5)
-		private static int[] cachedColors = new int[6];
+		private static readonly Color[] AtariColors = new Color[256];
+		private static readonly byte[] MyPalette = new byte[6]; // Mono (0 + 1) Color (1, 2, 3, 4, 5)
+		private static readonly int[] CachedColors = new int[6];
 
-		private static readonly int[] _mode4Colors = new int[5]; // Map from color index to actual color value
+		private static readonly int[] Mode4Colors = new int[5]; // Map from color index to actual color value
 
 		/// <summary>
 		/// This is the bitmap that contains all 4 fonts draw in 2x2 pixel size and in mono and in color
 		/// </summary>
-		public static Bitmap BitmapFontBanks { get; set; } = new Bitmap(512, 512 + 512);
+		public static Bitmap BitmapFontBanks { get; set; } = new(512, 512 + 512);
 		// Width:  32 char @ 8 pixels (width of a char) x 2 (zoom level=2) = 512 pixels
 		// Height: 32 char @ 8 pixels (height of a char) x 2 (zoom level=2) x 4 rows x 2 (normal+inverse) x 2 (fonts per bank) x 2 (# of banks) x 2 (mono/color) = 1024 pixels
 
 		public static void SetPalette(Color[] colors)
 		{
-			_atariColors = colors;
+			colors.CopyTo(AtariColors, 0);
 		}
 
 		public static void RebuildPalette(byte[] selectorColorIndexes)
 		{
 			for (var i = 0; i < selectorColorIndexes.Length; i++)
 			{
-				myPalette[i] = selectorColorIndexes[i];
-				cachedColors[i] = _atariColors[selectorColorIndexes[i]].ToArgb();
+				MyPalette[i] = selectorColorIndexes[i];
+				CachedColors[i] = AtariColors[selectorColorIndexes[i]].ToArgb();
 			}
 			// Build the mode 4 color mappings (0-3 + inverse of 3)
-			_mode4Colors[0] = cachedColors[1];
-			_mode4Colors[1] = cachedColors[2];
-			_mode4Colors[2] = cachedColors[3];
-			_mode4Colors[3] = cachedColors[4];
-			_mode4Colors[4] = cachedColors[5];
+			Mode4Colors[0] = CachedColors[1];
+			Mode4Colors[1] = CachedColors[2];
+			Mode4Colors[2] = CachedColors[3];
+			Mode4Colors[3] = CachedColors[4];
+			Mode4Colors[4] = CachedColors[5];
 		}
 
 		/// <summary>
@@ -57,7 +57,7 @@ namespace FontMaker
 				var move2TopOfNextChar = (bmpData.Stride / 4 * 16) - 16;
 
 				// Where are each of the font's bytes to be found. Start with the first character (0)
-				var byteIndex = new int[]
+				var byteIndex = new[]
 				{
 					1024 * 0,
 					1024 * 1,
@@ -123,120 +123,119 @@ namespace FontMaker
 							var f3 = AtariFont.FontBytes[byteIndex[2]];
 							var f4 = AtariFont.FontBytes[byteIndex[3]];
 
-							int ncol;
-							int icol;
-							int colorIndex;
+							int normCol;
+							int invCol;
 							var mask = 128;
 							for (var x = 0; x < 8; ++x)
 							{
 								#region Font 1 in mono
 
-								ncol = cachedColors[((f1 & mask) != 0) ? 0 : 1];
-								icol = cachedColors[((f1 & mask) != 0) ? 1 : 0];
-								*ptrFont0Mono = ncol;
+								normCol = CachedColors[((f1 & mask) != 0) ? 0 : 1];
+								invCol = CachedColors[((f1 & mask) != 0) ? 1 : 0];
+								*ptrFont0Mono = normCol;
 								++ptrFont0Mono;
-								*ptrFont0Mono = ncol;
+								*ptrFont0Mono = normCol;
 								++ptrFont0Mono;
-								*ptrFont0MonoNext = ncol;
+								*ptrFont0MonoNext = normCol;
 								++ptrFont0MonoNext;
-								*ptrFont0MonoNext = ncol;
+								*ptrFont0MonoNext = normCol;
 								++ptrFont0MonoNext;
 
 								#endregion
 
 								#region Font 1 in mono inverted
 
-								*ptrFont0MonoInverse = icol;
+								*ptrFont0MonoInverse = invCol;
 								++ptrFont0MonoInverse;
-								*ptrFont0MonoInverse = icol;
+								*ptrFont0MonoInverse = invCol;
 								++ptrFont0MonoInverse;
-								*ptrFont0MonoInverseNext = icol;
+								*ptrFont0MonoInverseNext = invCol;
 								++ptrFont0MonoInverseNext;
-								*ptrFont0MonoInverseNext = icol;
+								*ptrFont0MonoInverseNext = invCol;
 								++ptrFont0MonoInverseNext;
 
 								#endregion
 
 								#region Font 2 in mono
 
-								ncol = cachedColors[((f2 & mask) != 0) ? 0 : 1];
-								icol = cachedColors[((f2 & mask) != 0) ? 1 : 0];
-								*ptrFont1Mono = ncol;
+								normCol = CachedColors[((f2 & mask) != 0) ? 0 : 1];
+								invCol = CachedColors[((f2 & mask) != 0) ? 1 : 0];
+								*ptrFont1Mono = normCol;
 								++ptrFont1Mono;
-								*ptrFont1Mono = ncol;
+								*ptrFont1Mono = normCol;
 								++ptrFont1Mono;
-								*ptrFont1MonoNext = ncol;
+								*ptrFont1MonoNext = normCol;
 								++ptrFont1MonoNext;
-								*ptrFont1MonoNext = ncol;
+								*ptrFont1MonoNext = normCol;
 								++ptrFont1MonoNext;
 
 								#endregion
 
 								#region Font 2 in mono inverted
 
-								*ptrFont1MonoInverse = icol;
+								*ptrFont1MonoInverse = invCol;
 								++ptrFont1MonoInverse;
-								*ptrFont1MonoInverse = icol;
+								*ptrFont1MonoInverse = invCol;
 								++ptrFont1MonoInverse;
-								*ptrFont1MonoInverseNext = icol;
+								*ptrFont1MonoInverseNext = invCol;
 								++ptrFont1MonoInverseNext;
-								*ptrFont1MonoInverseNext = icol;
+								*ptrFont1MonoInverseNext = invCol;
 								++ptrFont1MonoInverseNext;
 
 								#endregion
 
 								#region Font 3 in mono
 
-								ncol = cachedColors[((f3 & mask) != 0) ? 0 : 1];
-								icol = cachedColors[((f3 & mask) != 0) ? 1 : 0];
-								*ptrFont2Mono = ncol;
+								normCol = CachedColors[((f3 & mask) != 0) ? 0 : 1];
+								invCol = CachedColors[((f3 & mask) != 0) ? 1 : 0];
+								*ptrFont2Mono = normCol;
 								++ptrFont2Mono;
-								*ptrFont2Mono = ncol;
+								*ptrFont2Mono = normCol;
 								++ptrFont2Mono;
-								*ptrFont2MonoNext = ncol;
+								*ptrFont2MonoNext = normCol;
 								++ptrFont2MonoNext;
-								*ptrFont2MonoNext = ncol;
+								*ptrFont2MonoNext = normCol;
 								++ptrFont2MonoNext;
 
 								#endregion
 
 								#region Font 3 in mono inverted
 
-								*ptrFont2MonoInverse = icol;
+								*ptrFont2MonoInverse = invCol;
 								++ptrFont2MonoInverse;
-								*ptrFont2MonoInverse = icol;
+								*ptrFont2MonoInverse = invCol;
 								++ptrFont2MonoInverse;
-								*ptrFont2MonoInverseNext = icol;
+								*ptrFont2MonoInverseNext = invCol;
 								++ptrFont2MonoInverseNext;
-								*ptrFont2MonoInverseNext = icol;
+								*ptrFont2MonoInverseNext = invCol;
 								++ptrFont2MonoInverseNext;
 
 								#endregion
 
 								#region Font 4 in mono
 
-								ncol = cachedColors[((f4 & mask) != 0) ? 0 : 1];
-								icol = cachedColors[((f4 & mask) != 0) ? 1 : 0];
-								*ptrFont3Mono = ncol;
+								normCol = CachedColors[((f4 & mask) != 0) ? 0 : 1];
+								invCol = CachedColors[((f4 & mask) != 0) ? 1 : 0];
+								*ptrFont3Mono = normCol;
 								++ptrFont3Mono;
-								*ptrFont3Mono = ncol;
+								*ptrFont3Mono = normCol;
 								++ptrFont3Mono;
-								*ptrFont3MonoNext = ncol;
+								*ptrFont3MonoNext = normCol;
 								++ptrFont3MonoNext;
-								*ptrFont3MonoNext = ncol;
+								*ptrFont3MonoNext = normCol;
 								++ptrFont3MonoNext;
 
 								#endregion
 
 								#region Font 4 in mono inverted
 
-								*ptrFont3MonoInverse = icol;
+								*ptrFont3MonoInverse = invCol;
 								++ptrFont3MonoInverse;
-								*ptrFont3MonoInverse = icol;
+								*ptrFont3MonoInverse = invCol;
 								++ptrFont3MonoInverse;
-								*ptrFont3MonoInverseNext = icol;
+								*ptrFont3MonoInverseNext = invCol;
 								++ptrFont3MonoInverseNext;
-								*ptrFont3MonoInverseNext = icol;
+								*ptrFont3MonoInverseNext = invCol;
 								++ptrFont3MonoInverseNext;
 
 								#endregion
@@ -249,97 +248,97 @@ namespace FontMaker
 							{
 								#region Font 1 in color
 
-								colorIndex = (f1 & mask) >> (6-x*2);
-								ncol = _mode4Colors[colorIndex];
+								var colorIndex = (f1 & mask) >> (6-x*2);
+								normCol = Mode4Colors[colorIndex];
 								if (colorIndex == 3) colorIndex++;
-								icol = _mode4Colors[colorIndex];
+								invCol = Mode4Colors[colorIndex];
 
-								*ptrFont0Color = ncol;
+								*ptrFont0Color = normCol;
 								++ptrFont0Color;
-								*ptrFont0Color = ncol;
+								*ptrFont0Color = normCol;
 								++ptrFont0Color;
-								*ptrFont0Color = ncol;
+								*ptrFont0Color = normCol;
 								++ptrFont0Color;
-								*ptrFont0Color = ncol;
+								*ptrFont0Color = normCol;
 								++ptrFont0Color;
 
-								*ptrFont0ColorNext = ncol;
+								*ptrFont0ColorNext = normCol;
 								++ptrFont0ColorNext;
-								*ptrFont0ColorNext = ncol;
+								*ptrFont0ColorNext = normCol;
 								++ptrFont0ColorNext;
-								*ptrFont0ColorNext = ncol;
+								*ptrFont0ColorNext = normCol;
 								++ptrFont0ColorNext;
-								*ptrFont0ColorNext = ncol;
+								*ptrFont0ColorNext = normCol;
 								++ptrFont0ColorNext;
 
 								#endregion
 
 								#region Font 1 in color inverted
 
-								*ptrFont0ColorInverse = icol;
+								*ptrFont0ColorInverse = invCol;
 								++ptrFont0ColorInverse;
-								*ptrFont0ColorInverse = icol;
+								*ptrFont0ColorInverse = invCol;
 								++ptrFont0ColorInverse;
-								*ptrFont0ColorInverse = icol;
+								*ptrFont0ColorInverse = invCol;
 								++ptrFont0ColorInverse;
-								*ptrFont0ColorInverse = icol;
+								*ptrFont0ColorInverse = invCol;
 								++ptrFont0ColorInverse;
 
-								*ptrFont0ColorInverseNext = icol;
+								*ptrFont0ColorInverseNext = invCol;
 								++ptrFont0ColorInverseNext;
-								*ptrFont0ColorInverseNext = icol;
+								*ptrFont0ColorInverseNext = invCol;
 								++ptrFont0ColorInverseNext;
-								*ptrFont0ColorInverseNext = icol;
+								*ptrFont0ColorInverseNext = invCol;
 								++ptrFont0ColorInverseNext;
-								*ptrFont0ColorInverseNext = icol;
+								*ptrFont0ColorInverseNext = invCol;
 								++ptrFont0ColorInverseNext;
 								#endregion
 
 								#region Font 2 in color
 
 								colorIndex = (f2 & mask) >> (6 - x * 2);
-								ncol = _mode4Colors[colorIndex];
+								normCol = Mode4Colors[colorIndex];
 								if (colorIndex == 3) colorIndex++;
-								icol = _mode4Colors[colorIndex];
+								invCol = Mode4Colors[colorIndex];
 
-								*ptrFont1Color = ncol;
+								*ptrFont1Color = normCol;
 								++ptrFont1Color;
-								*ptrFont1Color = ncol;
+								*ptrFont1Color = normCol;
 								++ptrFont1Color;
-								*ptrFont1Color = ncol;
+								*ptrFont1Color = normCol;
 								++ptrFont1Color;
-								*ptrFont1Color = ncol;
+								*ptrFont1Color = normCol;
 								++ptrFont1Color;
 
-								*ptrFont1ColorNext = ncol;
+								*ptrFont1ColorNext = normCol;
 								++ptrFont1ColorNext;
-								*ptrFont1ColorNext = ncol;
+								*ptrFont1ColorNext = normCol;
 								++ptrFont1ColorNext;
-								*ptrFont1ColorNext = ncol;
+								*ptrFont1ColorNext = normCol;
 								++ptrFont1ColorNext;
-								*ptrFont1ColorNext = ncol;
+								*ptrFont1ColorNext = normCol;
 								++ptrFont1ColorNext;
 
 								#endregion
 
 								#region Font 2 in color inverted
 
-								*ptrFont1ColorInverse = icol;
+								*ptrFont1ColorInverse = invCol;
 								++ptrFont1ColorInverse;
-								*ptrFont1ColorInverse = icol;
+								*ptrFont1ColorInverse = invCol;
 								++ptrFont1ColorInverse;
-								*ptrFont1ColorInverse = icol;
+								*ptrFont1ColorInverse = invCol;
 								++ptrFont1ColorInverse;
-								*ptrFont1ColorInverse = icol;
+								*ptrFont1ColorInverse = invCol;
 								++ptrFont1ColorInverse;
 
-								*ptrFont1ColorInverseNext = icol;
+								*ptrFont1ColorInverseNext = invCol;
 								++ptrFont1ColorInverseNext;
-								*ptrFont1ColorInverseNext = icol;
+								*ptrFont1ColorInverseNext = invCol;
 								++ptrFont1ColorInverseNext;
-								*ptrFont1ColorInverseNext = icol;
+								*ptrFont1ColorInverseNext = invCol;
 								++ptrFont1ColorInverseNext;
-								*ptrFont1ColorInverseNext = icol;
+								*ptrFont1ColorInverseNext = invCol;
 								++ptrFont1ColorInverseNext;
 
 								#endregion
@@ -347,48 +346,48 @@ namespace FontMaker
 								#region Font 3 in color
 
 								colorIndex = (f3 & mask) >> (6 - x * 2);
-								ncol = _mode4Colors[colorIndex];
+								normCol = Mode4Colors[colorIndex];
 								if (colorIndex == 3) colorIndex++;
-								icol = _mode4Colors[colorIndex];
+								invCol = Mode4Colors[colorIndex];
 
-								*ptrFont2Color = ncol;
+								*ptrFont2Color = normCol;
 								++ptrFont2Color;
-								*ptrFont2Color = ncol;
+								*ptrFont2Color = normCol;
 								++ptrFont2Color;
-								*ptrFont2Color = ncol;
+								*ptrFont2Color = normCol;
 								++ptrFont2Color;
-								*ptrFont2Color = ncol;
+								*ptrFont2Color = normCol;
 								++ptrFont2Color;
 
-								*ptrFont2ColorNext = ncol;
+								*ptrFont2ColorNext = normCol;
 								++ptrFont2ColorNext;
-								*ptrFont2ColorNext = ncol;
+								*ptrFont2ColorNext = normCol;
 								++ptrFont2ColorNext;
-								*ptrFont2ColorNext = ncol;
+								*ptrFont2ColorNext = normCol;
 								++ptrFont2ColorNext;
-								*ptrFont2ColorNext = ncol;
+								*ptrFont2ColorNext = normCol;
 								++ptrFont2ColorNext;
 
 								#endregion
 
 								#region Font 3 in color inverted
 
-								*ptrFont2ColorInverse = icol;
+								*ptrFont2ColorInverse = invCol;
 								++ptrFont2ColorInverse;
-								*ptrFont2ColorInverse = icol;
+								*ptrFont2ColorInverse = invCol;
 								++ptrFont2ColorInverse;
-								*ptrFont2ColorInverse = icol;
+								*ptrFont2ColorInverse = invCol;
 								++ptrFont2ColorInverse;
-								*ptrFont2ColorInverse = icol;
+								*ptrFont2ColorInverse = invCol;
 								++ptrFont2ColorInverse;
 
-								*ptrFont2ColorInverseNext = icol;
+								*ptrFont2ColorInverseNext = invCol;
 								++ptrFont2ColorInverseNext;
-								*ptrFont2ColorInverseNext = icol;
+								*ptrFont2ColorInverseNext = invCol;
 								++ptrFont2ColorInverseNext;
-								*ptrFont2ColorInverseNext = icol;
+								*ptrFont2ColorInverseNext = invCol;
 								++ptrFont2ColorInverseNext;
-								*ptrFont2ColorInverseNext = icol;
+								*ptrFont2ColorInverseNext = invCol;
 								++ptrFont2ColorInverseNext;
 
 								#endregion
@@ -396,48 +395,48 @@ namespace FontMaker
 								#region Font 4 in color
 
 								colorIndex = (f4 & mask) >> (6 - x * 2);
-								ncol = _mode4Colors[colorIndex];
+								normCol = Mode4Colors[colorIndex];
 								if (colorIndex == 3) colorIndex++;
-								icol = _mode4Colors[colorIndex];
+								invCol = Mode4Colors[colorIndex];
 
-								*ptrFont3Color = ncol;
+								*ptrFont3Color = normCol;
 								++ptrFont3Color;
-								*ptrFont3Color = ncol;
+								*ptrFont3Color = normCol;
 								++ptrFont3Color;
-								*ptrFont3Color = ncol;
+								*ptrFont3Color = normCol;
 								++ptrFont3Color;
-								*ptrFont3Color = ncol;
+								*ptrFont3Color = normCol;
 								++ptrFont3Color;
 
-								*ptrFont3ColorNext = ncol;
+								*ptrFont3ColorNext = normCol;
 								++ptrFont3ColorNext;
-								*ptrFont3ColorNext = ncol;
+								*ptrFont3ColorNext = normCol;
 								++ptrFont3ColorNext;
-								*ptrFont3ColorNext = ncol;
+								*ptrFont3ColorNext = normCol;
 								++ptrFont3ColorNext;
-								*ptrFont3ColorNext = ncol;
+								*ptrFont3ColorNext = normCol;
 								++ptrFont3ColorNext;
 
 								#endregion
 
 								#region Font 4 in color inverted
 
-								*ptrFont3ColorInverse = icol;
+								*ptrFont3ColorInverse = invCol;
 								++ptrFont3ColorInverse;
-								*ptrFont3ColorInverse = icol;
+								*ptrFont3ColorInverse = invCol;
 								++ptrFont3ColorInverse;
-								*ptrFont3ColorInverse = icol;
+								*ptrFont3ColorInverse = invCol;
 								++ptrFont3ColorInverse;
-								*ptrFont3ColorInverse = icol;
+								*ptrFont3ColorInverse = invCol;
 								++ptrFont3ColorInverse;
 
-								*ptrFont3ColorInverseNext = icol;
+								*ptrFont3ColorInverseNext = invCol;
 								++ptrFont3ColorInverseNext;
-								*ptrFont3ColorInverseNext = icol;
+								*ptrFont3ColorInverseNext = invCol;
 								++ptrFont3ColorInverseNext;
-								*ptrFont3ColorInverseNext = icol;
+								*ptrFont3ColorInverseNext = invCol;
 								++ptrFont3ColorInverseNext;
-								*ptrFont3ColorInverseNext = icol;
+								*ptrFont3ColorInverseNext = invCol;
 								++ptrFont3ColorInverseNext;
 
 								#endregion
@@ -599,37 +598,35 @@ namespace FontMaker
 					// Get the bytes of the character
 					var fontByte = AtariFont.FontBytes[startOf8FontBytes];
 
-					int ncol;
-					int icol;
-					int colorIndex;
-					int invIndex;
+					int normCol;
+					int invCol;
 					var mask = 128;
 					for (var x = 0; x < 8; ++x)
 					{
 						#region Font in mono
 
-						ncol = cachedColors[((fontByte & mask) != 0) ? 0 : 1];
-						icol = cachedColors[((fontByte & mask) != 0) ? 1 : 0];
-						*ptrMono = ncol;
+						normCol = CachedColors[((fontByte & mask) != 0) ? 0 : 1];
+						invCol = CachedColors[((fontByte & mask) != 0) ? 1 : 0];
+						*ptrMono = normCol;
 						++ptrMono;
-						*ptrMono = ncol;
+						*ptrMono = normCol;
 						++ptrMono;
-						*ptrMonoNext = ncol;
+						*ptrMonoNext = normCol;
 						++ptrMonoNext;
-						*ptrMonoNext = ncol;
+						*ptrMonoNext = normCol;
 						++ptrMonoNext;
 
 						#endregion
 
 						#region Font in mono inverted
 
-						*ptrMonoInverse = icol;
+						*ptrMonoInverse = invCol;
 						++ptrMonoInverse;
-						*ptrMonoInverse = icol;
+						*ptrMonoInverse = invCol;
 						++ptrMonoInverse;
-						*ptrMonoInverseNext = icol;
+						*ptrMonoInverseNext = invCol;
 						++ptrMonoInverseNext;
-						*ptrMonoInverseNext = icol;
+						*ptrMonoInverseNext = invCol;
 						++ptrMonoInverseNext;
 
 						#endregion
@@ -642,49 +639,49 @@ namespace FontMaker
 					{
 						#region Font in color
 
-						colorIndex = (fontByte & mask) >> (6 - x * 2);
-						ncol = _mode4Colors[colorIndex];
+						var colorIndex = (fontByte & mask) >> (6 - x * 2);
+						normCol = Mode4Colors[colorIndex];
 						if (colorIndex == 3) colorIndex++;
-						icol = _mode4Colors[colorIndex];
+						invCol = Mode4Colors[colorIndex];
 
-						*ptrColor = ncol;
+						*ptrColor = normCol;
 						++ptrColor;
-						*ptrColor = ncol;
+						*ptrColor = normCol;
 						++ptrColor;
-						*ptrColor = ncol;
+						*ptrColor = normCol;
 						++ptrColor;
-						*ptrColor = ncol;
+						*ptrColor = normCol;
 						++ptrColor;
 
-						*ptrColorNext = ncol;
+						*ptrColorNext = normCol;
 						++ptrColorNext;
-						*ptrColorNext = ncol;
+						*ptrColorNext = normCol;
 						++ptrColorNext;
-						*ptrColorNext = ncol;
+						*ptrColorNext = normCol;
 						++ptrColorNext;
-						*ptrColorNext = ncol;
+						*ptrColorNext = normCol;
 						++ptrColorNext;
 
 						#endregion
 
 						#region Font in color inverted
 
-						*ptrColorInverse = icol;
+						*ptrColorInverse = invCol;
 						++ptrColorInverse;
-						*ptrColorInverse = icol;
+						*ptrColorInverse = invCol;
 						++ptrColorInverse;
-						*ptrColorInverse = icol;
+						*ptrColorInverse = invCol;
 						++ptrColorInverse;
-						*ptrColorInverse = icol;
+						*ptrColorInverse = invCol;
 						++ptrColorInverse;
 
-						*ptrColorInverseNext = icol;
+						*ptrColorInverseNext = invCol;
 						++ptrColorInverseNext;
-						*ptrColorInverseNext = icol;
+						*ptrColorInverseNext = invCol;
 						++ptrColorInverseNext;
-						*ptrColorInverseNext = icol;
+						*ptrColorInverseNext = invCol;
 						++ptrColorInverseNext;
-						*ptrColorInverseNext = icol;
+						*ptrColorInverseNext = invCol;
 						++ptrColorInverseNext;
 
 						#endregion

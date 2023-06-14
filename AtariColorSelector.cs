@@ -2,6 +2,8 @@
 {
 	public partial class AtariColorSelectorForm : Form
 	{
+		private static readonly SolidBrush WhiteBrush = new(Color.White);
+
 		public AtariColorSelectorForm()
 		{
 			InitializeComponent();
@@ -19,28 +21,32 @@
 
 		public void DrawPalette()
 		{
+			using var foreColorBrush = new SolidBrush(ForeColor);
+
 			var matrix = new Bitmap(128 + 16, 256 + 16);
-			var gr = Graphics.FromImage(matrix);
+			using var gr = Graphics.FromImage(matrix);
 			gr.Clear(this.BackColor);
 
 			for (var y = 0; y < 16; y++)
 			{
 				// Vertical marks
-				gr.DrawString($"{y:X}", this.Font, new SolidBrush(ForeColor), 16 * 8 + 2, y * 16);
+				gr.DrawString($"{y:X}", this.Font, foreColorBrush, 16 * 8 + 2, y * 16);
 				for (var x = 0; x < 8; x++)
-					gr.FillRectangle(new SolidBrush(palette[y * 16 + x * 2]), x * 16, y * 16, 16, 16);
+				{
+					using var thisColorBrush = new SolidBrush(palette[y * 16 + x * 2]);
+					gr.FillRectangle(thisColorBrush, x * 16, y * 16, 16, 16);
+				}
 			}
-			gr.DrawRectangle(new Pen(new SolidBrush(Color.White)), (selectedColorIndex % 16) * 8, (selectedColorIndex / 16) * 16, 15, 15);
+			using var pen = new Pen(WhiteBrush);
+			gr.DrawRectangle(pen, (selectedColorIndex % 16) * 8, (selectedColorIndex / 16) * 16, 15, 15);
 
 			// Horizontal marks
 			for (var x = 0; x < 8; x++)
-				gr.DrawString($"{(x * 2):X}", this.Font, new SolidBrush(this.ForeColor), 16 * x, 16 * 16 + 2);
+				gr.DrawString($"{(x * 2):X}", this.Font, foreColorBrush, 16 * x, 16 * 16 + 2);
+
 			// Clear the old image and set new bitmap
 			ImagePalette.Image?.Dispose();
 			ImagePalette.Image = matrix;
-
-			gr.Dispose();
-
 		}
 
 		public void DrawActualColor()
@@ -49,11 +55,16 @@
 			var h = ImageSelected.Height;
 			LabelOldColor.Text = $@"${selectedColorIndex:X2} - {selectedColorIndex}";
 			LabelActualColor.Text = $@"${actualColorIndex:X2} - {actualColorIndex}";
+
 			var clr = new Bitmap(w, h);
-			var gr = Graphics.FromImage(clr);
-			gr.FillRectangle(new SolidBrush(palette[selectedColorIndex]), 0, 0, w, h / 2);
-			gr.FillRectangle(new SolidBrush(palette[actualColorIndex]), 0, h / 2, w, h / 2);
-			gr.Dispose();
+			using var gr = Graphics.FromImage(clr);
+
+			using var selColorBrush = new SolidBrush(palette[selectedColorIndex]);
+			gr.FillRectangle(selColorBrush, 0, 0, w, h / 2);
+
+			using var actualColorBrush = new SolidBrush(palette[actualColorIndex]);
+			gr.FillRectangle(actualColorBrush, 0, h / 2, w, h / 2);
+
 			ImageSelected.Image?.Dispose();
 			ImageSelected.Image = clr;
 		}
@@ -93,10 +104,10 @@
 
 		public void SetPalette(Color[] pal)
 		{
-			palette = pal;
+			pal.CopyTo(palette, 0);
 		}
 
-		internal Color[] palette;// = new Color[256];
+		internal Color[] palette = new Color[256];
 		public byte selectedColorIndex;
 		public byte actualColorIndex;
 		public Color actualColor = Color.Empty;
