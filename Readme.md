@@ -236,6 +236,10 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.8.0
+    - Fixed a bug in the Action! exporter. Thank you to pedromagician for notifying us.
+    - Added a color change option to the duplicate char indicator.
+        Duplicate chars and unused chars can now be highlighted in different colors.
 V1.6.7.6
 - Lots of memory leak fixes
     Thank you MrFish on AtariAge for noticing that the app sometime uses lots of memory.

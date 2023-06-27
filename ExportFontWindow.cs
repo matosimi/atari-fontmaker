@@ -330,7 +330,8 @@ namespace FontMaker
 
 			if (exportType == FormatTypes.Action)
 			{
-				sb.AppendLine("PROC font()=[");
+				sb.AppendLine("PROC FONT=*()");
+				sb.AppendLine("[");
 			}
 
 			if (exportType == FormatTypes.AtariBasic)

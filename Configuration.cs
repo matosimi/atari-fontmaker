@@ -8,7 +8,10 @@ namespace FontMaker
 		public List<string> ColorSets { get; set; }
 		public int AnalysisColor { get; set; }
 		public int AnalysisAlpha { get; set; }
+
 		public bool AnalysisDuplicates { get; set; }
+		public int AnalysisDupColor { get; set; }
+		public int AnalysisDupAlpha { get; set; }
 
 		public bool ExportViewRemember {get; set; }
 		public int ExportViewExportType { get; set; }
@@ -81,6 +84,15 @@ namespace FontMaker
 				Values.AnalysisAlpha = FontAnalysisWindow.AnalysisMinAlpha + (FontAnalysisWindow.AnalysisMaxAlpha - FontAnalysisWindow.AnalysisMinAlpha) / 2;
 			}
 
+			if (Values.AnalysisDupColor < FontAnalysisWindow.AnalysisMinColorIndex || Values.AnalysisDupColor > FontAnalysisWindow.AnalysisMaxDuplicateColorIndex)
+			{
+				Values.AnalysisDupColor = FontAnalysisWindow.AnalysisMinColorIndex;
+			}
+			if (Values.AnalysisDupAlpha < FontAnalysisWindow.AnalysisMinAlpha || Values.AnalysisDupAlpha > FontAnalysisWindow.AnalysisMaxAlpha)
+			{
+				Values.AnalysisDupAlpha = FontAnalysisWindow.AnalysisMinAlpha + (FontAnalysisWindow.AnalysisMaxAlpha - FontAnalysisWindow.AnalysisMinAlpha) / 2;
+			}
+
 			if (Values.ExportViewRegionX < 0 || Values.ExportViewRegionX >= 40) Values.ExportViewRegionX = 0;
 			if (Values.ExportViewRegionY < 0 || Values.ExportViewRegionY >= 26) Values.ExportViewRegionY = 0;
 			if (Values.ExportViewRegionX + Values.ExportViewRegionW >= 40) Values.ExportViewRegionW = 1;
@@ -97,7 +109,13 @@ namespace FontMaker
 			// Transfer the loaded values
 			ColorSets = Configuration.Values.ColorSets;
 
-			FontAnalysisWindowForm.SetDefaults(Configuration.Values.AnalysisColor, Configuration.Values.AnalysisAlpha, Configuration.Values.AnalysisDuplicates);
+			FontAnalysisWindowForm.SetDefaults(
+				Configuration.Values.AnalysisColor,
+				Configuration.Values.AnalysisAlpha,
+				Configuration.Values.AnalysisDuplicates,
+				Configuration.Values.AnalysisDupColor,
+				Configuration.Values.AnalysisDupAlpha
+			);
 			ExportViewWindowForm.LoadConfiguration(
 				Configuration.Values.ExportViewRemember,
 				Configuration.Values.ExportViewExportType,
@@ -112,7 +130,10 @@ namespace FontMaker
 			Configuration.Values.ColorSets = ColorSets;
 			Configuration.Values.AnalysisColor = FontAnalysisWindowForm.GetHighlightColor;
 			Configuration.Values.AnalysisAlpha = FontAnalysisWindowForm.GetHighlightAlpha;
+
 			Configuration.Values.AnalysisDuplicates = FontAnalysisWindowForm.GetDuplicates;
+			Configuration.Values.AnalysisDupColor = FontAnalysisWindowForm.GetDuplicateColor;
+			Configuration.Values.AnalysisDupAlpha = FontAnalysisWindowForm.GetDuplicateAlpha;
 
 			(Configuration.Values.ExportViewRemember, Configuration.Values.ExportViewExportType, Configuration.Values.ExportViewDataType, var exportRegion)
 				= ExportViewWindowForm.SaveConfiguration();

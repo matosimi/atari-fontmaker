@@ -29,7 +29,6 @@
 		private void InitializeComponent()
 		{
 			pictureBoxFonts = new PictureBox();
-			buttonClose = new Button();
 			checkBoxGFX = new CheckBox();
 			pictureBoxCursor = new PictureBox();
 			groupBox1 = new GroupBox();
@@ -47,12 +46,20 @@
 			textBoxUsageInfo = new TextBox();
 			chkMarkDuplicates = new CheckBox();
 			textBoxDuplicates = new TextBox();
+			buttonClose = new Button();
+			groupBoxDuplicates = new GroupBox();
+			trackBarDuplicates = new TrackBar();
+			radioButtonDupBlue = new RadioButton();
+			radioButtonDupGreen = new RadioButton();
+			radioButtonDupRed = new RadioButton();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFonts).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxCursor).BeginInit();
 			groupBox1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)trackBarAlpha).BeginInit();
 			panel1.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)pictureBoxInfoCursor).BeginInit();
+			groupBoxDuplicates.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)trackBarDuplicates).BeginInit();
 			SuspendLayout();
 			// 
 			// pictureBoxFonts
@@ -64,15 +71,6 @@
 			pictureBoxFonts.TabStop = false;
 			pictureBoxFonts.MouseDown += pictureBoxFonts_MouseDown;
 			pictureBoxFonts.MouseMove += pictureBoxFonts_MouseMove;
-			// 
-			// buttonClose
-			// 
-			buttonClose.Location = new Point(524, 493);
-			buttonClose.Name = "buttonClose";
-			buttonClose.Size = new Size(75, 23);
-			buttonClose.TabIndex = 21;
-			buttonClose.Text = "Close";
-			buttonClose.UseVisualStyleBackColor = true;
 			// 
 			// checkBoxGFX
 			// 
@@ -241,7 +239,7 @@
 			textBoxUsageInfo.ReadOnly = true;
 			textBoxUsageInfo.ScrollBars = ScrollBars.Both;
 			textBoxUsageInfo.ShortcutsEnabled = false;
-			textBoxUsageInfo.Size = new Size(281, 254);
+			textBoxUsageInfo.Size = new Size(281, 233);
 			textBoxUsageInfo.TabIndex = 33;
 			textBoxUsageInfo.Visible = false;
 			textBoxUsageInfo.WordWrap = false;
@@ -250,7 +248,7 @@
 			// chkMarkDuplicates
 			// 
 			chkMarkDuplicates.AutoSize = true;
-			chkMarkDuplicates.Location = new Point(525, 442);
+			chkMarkDuplicates.Location = new Point(524, 417);
 			chkMarkDuplicates.Name = "chkMarkDuplicates";
 			chkMarkDuplicates.Size = new Size(103, 17);
 			chkMarkDuplicates.TabIndex = 34;
@@ -262,17 +260,89 @@
 			// 
 			textBoxDuplicates.BackColor = SystemColors.Control;
 			textBoxDuplicates.Cursor = Cursors.Hand;
-			textBoxDuplicates.Location = new Point(622, 440);
+			textBoxDuplicates.Location = new Point(689, 412);
 			textBoxDuplicates.Multiline = true;
 			textBoxDuplicates.Name = "textBoxDuplicates";
 			textBoxDuplicates.ReadOnly = true;
 			textBoxDuplicates.ScrollBars = ScrollBars.Both;
 			textBoxDuplicates.ShortcutsEnabled = false;
-			textBoxDuplicates.Size = new Size(184, 76);
+			textBoxDuplicates.Size = new Size(117, 104);
 			textBoxDuplicates.TabIndex = 35;
 			textBoxDuplicates.Visible = false;
 			textBoxDuplicates.WordWrap = false;
 			textBoxDuplicates.MouseUp += textBoxDuplicates_MouseUp;
+			// 
+			// buttonClose
+			// 
+			buttonClose.Location = new Point(737, 4);
+			buttonClose.Name = "buttonClose";
+			buttonClose.Size = new Size(75, 23);
+			buttonClose.TabIndex = 21;
+			buttonClose.Text = "Close";
+			buttonClose.UseVisualStyleBackColor = true;
+			// 
+			// groupBoxDuplicates
+			// 
+			groupBoxDuplicates.Controls.Add(trackBarDuplicates);
+			groupBoxDuplicates.Controls.Add(radioButtonDupBlue);
+			groupBoxDuplicates.Controls.Add(radioButtonDupGreen);
+			groupBoxDuplicates.Controls.Add(radioButtonDupRed);
+			groupBoxDuplicates.Location = new Point(524, 440);
+			groupBoxDuplicates.Name = "groupBoxDuplicates";
+			groupBoxDuplicates.Size = new Size(164, 76);
+			groupBoxDuplicates.TabIndex = 31;
+			groupBoxDuplicates.TabStop = false;
+			groupBoxDuplicates.Text = "Duplicate color";
+			groupBoxDuplicates.Visible = false;
+			// 
+			// trackBarDuplicates
+			// 
+			trackBarDuplicates.AutoSize = false;
+			trackBarDuplicates.Location = new Point(3, 39);
+			trackBarDuplicates.Maximum = 192;
+			trackBarDuplicates.Minimum = 64;
+			trackBarDuplicates.Name = "trackBarDuplicates";
+			trackBarDuplicates.Size = new Size(150, 31);
+			trackBarDuplicates.TabIndex = 4;
+			trackBarDuplicates.TickFrequency = 10;
+			trackBarDuplicates.TickStyle = TickStyle.TopLeft;
+			trackBarDuplicates.Value = 128;
+			trackBarDuplicates.Scroll += trackBarDuplicates_Scroll;
+			// 
+			// radioButtonDupBlue
+			// 
+			radioButtonDupBlue.AutoSize = true;
+			radioButtonDupBlue.Location = new Point(113, 16);
+			radioButtonDupBlue.Name = "radioButtonDupBlue";
+			radioButtonDupBlue.Size = new Size(46, 17);
+			radioButtonDupBlue.TabIndex = 2;
+			radioButtonDupBlue.Text = "Blue";
+			radioButtonDupBlue.UseVisualStyleBackColor = true;
+			radioButtonDupBlue.CheckedChanged += radioButtonDupBlue_CheckedChanged;
+			// 
+			// radioButtonDupGreen
+			// 
+			radioButtonDupGreen.AutoSize = true;
+			radioButtonDupGreen.Location = new Point(55, 16);
+			radioButtonDupGreen.Name = "radioButtonDupGreen";
+			radioButtonDupGreen.Size = new Size(54, 17);
+			radioButtonDupGreen.TabIndex = 1;
+			radioButtonDupGreen.Text = "Green";
+			radioButtonDupGreen.UseVisualStyleBackColor = true;
+			radioButtonDupGreen.CheckedChanged += radioButtonDupGreen_CheckedChanged;
+			// 
+			// radioButtonDupRed
+			// 
+			radioButtonDupRed.AutoSize = true;
+			radioButtonDupRed.Checked = true;
+			radioButtonDupRed.Location = new Point(7, 16);
+			radioButtonDupRed.Name = "radioButtonDupRed";
+			radioButtonDupRed.Size = new Size(45, 17);
+			radioButtonDupRed.TabIndex = 0;
+			radioButtonDupRed.TabStop = true;
+			radioButtonDupRed.Text = "Red";
+			radioButtonDupRed.UseVisualStyleBackColor = true;
+			radioButtonDupRed.CheckedChanged += radioButtonDupRed_CheckedChanged;
 			// 
 			// FontAnalysisWindow
 			// 
@@ -280,6 +350,7 @@
 			AutoScaleMode = AutoScaleMode.Font;
 			CancelButton = buttonClose;
 			ClientSize = new Size(818, 521);
+			Controls.Add(groupBoxDuplicates);
 			Controls.Add(textBoxDuplicates);
 			Controls.Add(chkMarkDuplicates);
 			Controls.Add(textBoxUsageInfo);
@@ -305,6 +376,9 @@
 			((System.ComponentModel.ISupportInitialize)trackBarAlpha).EndInit();
 			panel1.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)pictureBoxInfoCursor).EndInit();
+			groupBoxDuplicates.ResumeLayout(false);
+			groupBoxDuplicates.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)trackBarDuplicates).EndInit();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -312,7 +386,6 @@
 		#endregion
 
 		private PictureBox pictureBoxFonts;
-		private Button buttonClose;
 		private CheckBox checkBoxGFX;
 		private PictureBox pictureBoxCursor;
 		private GroupBox groupBox1;
@@ -330,5 +403,11 @@
 		private TextBox textBoxUsageInfo;
 		private CheckBox chkMarkDuplicates;
 		private TextBox textBoxDuplicates;
+		private Button buttonClose;
+		private GroupBox groupBoxDuplicates;
+		private TrackBar trackBarDuplicates;
+		private RadioButton radioButtonDupBlue;
+		private RadioButton radioButtonDupGreen;
+		private RadioButton radioButtonDupRed;
 	}
 }

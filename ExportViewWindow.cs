@@ -296,7 +296,8 @@ namespace FontMaker
 
 			if (exportType == FormatTypes.Action)
 			{
-				sb.AppendLine("PROC view()=[");
+				sb.AppendLine("PROC VIEW=*()");
+				sb.AppendLine("[");
 			}
 
 			if (exportType == FormatTypes.AtariBasic)

@@ -11,16 +11,21 @@ namespace FontMaker
 		#region Load/Save ranges and values
 		public static int AnalysisMinColorIndex = 0;
 		public static int AnalysisMaxColorIndex = 4;
+		public static int AnalysisMaxDuplicateColorIndex = 2;
 		public static int AnalysisMinAlpha = 64;
 		public static int AnalysisMaxAlpha = 192;
 
 		private int PreviousHighlightColor { get; set; }
 		private int PreviousAlpha { get; set; } = 128;
+
 		private bool PreviousDuplicates { get; set; }
+		private int PreviousDuplicateColor { get; set; }
+		private int PreviousDuplicateAlpha { get; set; } = 128;
 		#endregion
 
 		private bool _inLoad;
 		private SolidBrush? _drawBrush;
+		private SolidBrush? _duplicateBrush;
 
 		internal class AnalysisDetailsEntry
 		{
@@ -30,8 +35,6 @@ namespace FontMaker
 		private readonly List<AnalysisDetailsEntry> _analysisDetailsPerLine = new();
 		private readonly int[] _fullFontCharCounter = new int[256 * 4];       // Normal and inverse characters separated
 		private readonly int[] _combinedCharCounter = new int[128 * 4];       // Normal and inverse characters counted as one
-
-
 
 		private readonly int[] _duplicateOfChar = new int[128 * 4];             // Indicate if a char at position x is a duplicate of another char.  If its -1 then no duplicate
 		private readonly List<int> _duplicateDetailsPerLine = new();
@@ -73,7 +76,6 @@ namespace FontMaker
 			pictureBoxCursor.SetBounds(0, 0, 20, 20);
 			pictureBoxCursor.Visible = true;
 
-
 			img = Helpers.GetImage(pictureBoxInfoCursor);
 			using (var gr = Graphics.FromImage(img))
 			{
@@ -103,6 +105,7 @@ namespace FontMaker
 		private void MakeBrushes()
 		{
 			if (_drawBrush != null) _drawBrush.Dispose();
+			if (_duplicateBrush != null) _duplicateBrush.Dispose();
 
 			var alpha = trackBarAlpha.Value;
 			// Which color
@@ -126,19 +129,38 @@ namespace FontMaker
 			{
 				_drawBrush = new SolidBrush(Color.FromArgb(alpha, 255, 255, 0));
 			}
+
+			alpha = trackBarDuplicates.Value;
+			if (radioButtonDupRed.Checked)
+			{
+				_duplicateBrush = new SolidBrush(Color.FromArgb(alpha, 255, 0, 0));
+			}
+			else if (radioButtonDupGreen.Checked)
+			{
+				_duplicateBrush = new SolidBrush(Color.FromArgb(alpha, 0, 255, 0));
+			}
+			else
+			{
+				_duplicateBrush = new SolidBrush(Color.FromArgb(alpha, 0, 0, 255));
+			}
 		}
 
 		#region Load/Save settings for later restore
-		public void SetDefaults(int whichColor, int whichAlpha, bool markDuplicates)
+		public void SetDefaults(int whichColor, int whichAlpha, bool markDuplicates, int whichDupColor, int whichDupAlpha)
 		{
 			PreviousHighlightColor = whichColor;
 			PreviousAlpha = whichAlpha;
+			
 			PreviousDuplicates = markDuplicates;
+			PreviousDuplicateColor = whichDupColor;
+			PreviousDuplicateAlpha = whichDupAlpha;
 		}
 
 		public int GetHighlightColor => PreviousHighlightColor;
 		public int GetHighlightAlpha => PreviousAlpha;
 		public bool GetDuplicates => PreviousDuplicates;
+		public int GetDuplicateColor => PreviousDuplicateColor;
+		public int GetDuplicateAlpha => PreviousDuplicateAlpha;
 
 		#endregion
 
@@ -165,7 +187,22 @@ namespace FontMaker
 			}
 
 			trackBarAlpha.Value = PreviousAlpha;
+
+			// Duplicate section
 			chkMarkDuplicates.Checked = PreviousDuplicates;
+			trackBarDuplicates.Value = PreviousDuplicateAlpha;
+			switch (PreviousDuplicateColor)
+			{
+				case 0:
+					radioButtonDupRed.Checked = true;
+					break;
+				case 1:
+					radioButtonDupGreen.Checked = true;
+					break;
+				case 2:
+					radioButtonDupBlue.Checked = true;
+					break;
+			}
 
 			_inLoad = false;
 
@@ -192,7 +229,16 @@ namespace FontMaker
 				PreviousHighlightColor = 4;
 
 			PreviousAlpha = trackBarAlpha.Value;
+
+			// Duplicate section
 			PreviousDuplicates = chkMarkDuplicates.Checked;
+			PreviousDuplicateAlpha = trackBarDuplicates.Value;
+			if (radioButtonDupRed.Checked)
+				PreviousDuplicateColor = 0;
+			else if (radioButtonDupGreen.Checked)
+				PreviousDuplicateColor = 1;
+			else
+				PreviousHighlightColor = 2;
 		}
 
 		/// <summary>
@@ -229,7 +275,7 @@ namespace FontMaker
 				// Check if we want to mark duplicate characters in a font
 				if (chkMarkDuplicates.Checked)
 				{
-					using var pen = new Pen(_drawBrush);
+					using var pen = new Pen(_duplicateBrush);
 					// Yup, draw the marks
 					for (var fontNr = 0; fontNr < 4; ++fontNr)
 					{
@@ -588,6 +634,9 @@ namespace FontMaker
 		private void chkMarkDuplicates_CheckedChanged(object sender, EventArgs e)
 		{
 			UpdateAfterGuiChange();
+			groupBoxDuplicates.Visible = chkMarkDuplicates.Checked;
+			if (chkMarkDuplicates.Checked == false)
+				textBoxDuplicates.Visible = false;
 		}
 
 		private void textBoxDuplicates_MouseUp(object sender, MouseEventArgs e)
@@ -604,6 +653,26 @@ namespace FontMaker
 
 				pictureBoxFonts_MouseDown(null!, new MouseEventArgs(MouseButtons.Left, 0, bx * 16 + 4, fontNr * 128 + by * 16 + 4, 0));
 			}
+		}
+
+		private void radioButtonDupRed_CheckedChanged(object sender, EventArgs e)
+		{
+			UpdateAfterGuiChange();
+		}
+
+		private void radioButtonDupGreen_CheckedChanged(object sender, EventArgs e)
+		{
+			UpdateAfterGuiChange();
+		}
+
+		private void radioButtonDupBlue_CheckedChanged(object sender, EventArgs e)
+		{
+			UpdateAfterGuiChange();
+		}
+
+		private void trackBarDuplicates_Scroll(object sender, EventArgs e)
+		{
+			UpdateAfterGuiChange();
 		}
 	}
 }
