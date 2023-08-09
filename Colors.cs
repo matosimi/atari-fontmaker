@@ -277,18 +277,27 @@
 			SetOfSelectedColors[3] = 202;
 			SetOfSelectedColors[4] = 148;
 			SetOfSelectedColors[5] = 70;
-			BuildBrushCache();
+            SetOfSelectedColors[6] = 0x14;
+            SetOfSelectedColors[7] = 0x48;
+            SetOfSelectedColors[8] = 0xb6;
+
+            BuildBrushCache();
 		}
 
 		public void BuildBrushCache()
 		{
 			// Create the solid brushes to use for drawing the GUI and bitmaps
+			if (SetOfSelectedColors.Length < 9)
+			{
+				SetOfSelectedColors = new byte[9];
+				SetupDefaultPalColors();
+			}
 			for (var i = 0; i < SetOfSelectedColors.Length; ++i)
 			{
 				BrushCache[i]?.Dispose();
 				BrushCache[i] = new SolidBrush(AtariPalette[SetOfSelectedColors[i]]);
 			}
-
+			
 			AtariFontRenderer.RebuildPalette(SetOfSelectedColors);
 		}
 

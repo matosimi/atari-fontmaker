@@ -157,8 +157,12 @@ namespace FontMaker
 						charline5col[rx] = 1;
 					} //delete
 
-					// Draw pixel
-					gr.FillRectangle(BrushCache[charline5col[rx]], rx * 40, ry * 20, 40, 20);
+                    // Draw pixel
+                    int num = charline5col[rx];
+                    if (ry % 2 == 1)
+                        num = translate[num];   //altercolors
+
+                    gr.FillRectangle(BrushCache[num], rx * 40, ry * 20, 40, 20);
 
 					// Recode to byte and save to charset
 					for (var a = 0; a < 4; a++)
@@ -216,6 +220,8 @@ namespace FontMaker
 
 		#region Draw font character
 
+
+		public byte[] translate = { 0, 1, 6, 3, 7, 8 };
 		// redraws character that is being edited/selected in character edit window
 		public void RedrawChar()
 		{
@@ -246,7 +252,11 @@ namespace FontMaker
 					{
 						for (var b = 0; b < 4; b++)
 						{
-							var brush = BrushCache[Constants.Bits2ColorIndex[character5color[b, a]]];
+							int num = Constants.Bits2ColorIndex[character5color[b, a]];
+							if (a % 2 == 1)
+								num = translate[num];	//altercolors
+							
+							var brush = BrushCache[num];
 							gr.FillRectangle(brush, b * 40, a * 20, 40, 20);
 						}
 					}

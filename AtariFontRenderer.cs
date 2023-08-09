@@ -5,10 +5,10 @@ namespace FontMaker
 	public static class AtariFontRenderer
 	{
 		private static readonly Color[] AtariColors = new Color[256];
-		private static readonly byte[] MyPalette = new byte[6]; // Mono (0 + 1) Color (1, 2, 3, 4, 5)
-		private static readonly int[] CachedColors = new int[6];
+		private static readonly byte[] MyPalette = new byte[9]; // Mono (0 + 1) Color (1, 2, 3, 4, 5)
+		private static readonly int[] CachedColors = new int[9];
 
-		private static readonly int[] Mode4Colors = new int[5]; // Map from color index to actual color value
+		private static readonly int[] Mode4Colors = new int[8]; // Map from color index to actual color value
 
 		/// <summary>
 		/// This is the bitmap that contains all 4 fonts draw in 2x2 pixel size and in mono and in color
@@ -30,11 +30,13 @@ namespace FontMaker
 				CachedColors[i] = AtariColors[selectorColorIndexes[i]].ToArgb();
 			}
 			// Build the mode 4 color mappings (0-3 + inverse of 3)
-			Mode4Colors[0] = CachedColors[1];
+			/*Mode4Colors[0] = CachedColors[1];
 			Mode4Colors[1] = CachedColors[2];
 			Mode4Colors[2] = CachedColors[3];
 			Mode4Colors[3] = CachedColors[4];
-			Mode4Colors[4] = CachedColors[5];
+			Mode4Colors[4] = CachedColors[5];*/
+			for (int i = 0; i < 8; i++)
+				Mode4Colors[i] = CachedColors[i + 1];
 		}
 
 		/// <summary>
@@ -249,11 +251,20 @@ namespace FontMaker
 								#region Font 1 in color
 
 								var colorIndex = (f1 & mask) >> (6-x*2);
-								normCol = Mode4Colors[colorIndex];
-								if (colorIndex == 3) colorIndex++;
-								invCol = Mode4Colors[colorIndex];
 
-								*ptrFont0Color = normCol;
+
+                                if (y % 2 == 0)
+                                    normCol = Mode4Colors[colorIndex];
+                                else
+                                    normCol = Mode4Colors[translatex[colorIndex]];
+
+                                if (colorIndex == 3) colorIndex++;
+                                if (y % 2 == 0)
+                                    invCol = Mode4Colors[colorIndex];
+                                else
+                                    invCol = Mode4Colors[translatex[colorIndex]];
+
+                                *ptrFont0Color = normCol;
 								++ptrFont0Color;
 								*ptrFont0Color = normCol;
 								++ptrFont0Color;
@@ -297,11 +308,18 @@ namespace FontMaker
 								#region Font 2 in color
 
 								colorIndex = (f2 & mask) >> (6 - x * 2);
-								normCol = Mode4Colors[colorIndex];
-								if (colorIndex == 3) colorIndex++;
-								invCol = Mode4Colors[colorIndex];
+                                if (y % 2 == 0)
+                                    normCol = Mode4Colors[colorIndex];
+                                else
+                                    normCol = Mode4Colors[translatex[colorIndex]];
 
-								*ptrFont1Color = normCol;
+                                if (colorIndex == 3) colorIndex++;
+                                if (y % 2 == 0)
+                                    invCol = Mode4Colors[colorIndex];
+                                else
+                                    invCol = Mode4Colors[translatex[colorIndex]];
+
+                                *ptrFont1Color = normCol;
 								++ptrFont1Color;
 								*ptrFont1Color = normCol;
 								++ptrFont1Color;
@@ -346,11 +364,18 @@ namespace FontMaker
 								#region Font 3 in color
 
 								colorIndex = (f3 & mask) >> (6 - x * 2);
-								normCol = Mode4Colors[colorIndex];
-								if (colorIndex == 3) colorIndex++;
-								invCol = Mode4Colors[colorIndex];
+                                if (y % 2 == 0)
+                                    normCol = Mode4Colors[colorIndex];
+                                else
+                                    normCol = Mode4Colors[translatex[colorIndex]];
 
-								*ptrFont2Color = normCol;
+                                if (colorIndex == 3) colorIndex++;
+                                if (y % 2 == 0)
+                                    invCol = Mode4Colors[colorIndex];
+                                else
+                                    invCol = Mode4Colors[translatex[colorIndex]];
+
+                                *ptrFont2Color = normCol;
 								++ptrFont2Color;
 								*ptrFont2Color = normCol;
 								++ptrFont2Color;
@@ -395,11 +420,18 @@ namespace FontMaker
 								#region Font 4 in color
 
 								colorIndex = (f4 & mask) >> (6 - x * 2);
-								normCol = Mode4Colors[colorIndex];
-								if (colorIndex == 3) colorIndex++;
-								invCol = Mode4Colors[colorIndex];
+                                if (y % 2 == 0)
+                                    normCol = Mode4Colors[colorIndex];
+                                else
+                                    normCol = Mode4Colors[translatex[colorIndex]];
 
-								*ptrFont3Color = normCol;
+                                if (colorIndex == 3) colorIndex++;
+                                if (y % 2 == 0)
+                                    invCol = Mode4Colors[colorIndex];
+                                else
+                                    invCol = Mode4Colors[translatex[colorIndex]];
+
+                                *ptrFont3Color = normCol;
 								++ptrFont3Color;
 								*ptrFont3Color = normCol;
 								++ptrFont3Color;
@@ -539,17 +571,19 @@ namespace FontMaker
 			BitmapFontBanks.UnlockBits(bmpData);
 		}
 
-		/// <summary>
-		/// Render a single character into the correct font (in mono and in color)
-		/// Screen layout is
-		/// Normal:  32 chars x 4 lines for font 1 or 3
-		/// Inverse: 32 chars x 4 lines
-		/// Normal:  32 chars x 4 lines for font 2 or 4
-		/// Inverse: 32 chars x 4 lines
-		/// </summary>
-		/// <param name="selectedCharacterIndex">0-511 selecting which of the visible characters needs to be redrawn</param>
-		/// <param name="onBank2">Font bank 2 indicator. Set to select font 3+4</param>
-		public static void RenderOneCharacter(int selectedCharacterIndex, bool onBank2)
+        public static readonly byte[] translatex = { 0, 5, 2, 6, 7 };	//altercolor translator 
+
+        /// <summary>
+        /// Render a single character into the correct font (in mono and in color)
+        /// Screen layout is
+        /// Normal:  32 chars x 4 lines for font 1 or 3
+        /// Inverse: 32 chars x 4 lines
+        /// Normal:  32 chars x 4 lines for font 2 or 4
+        /// Inverse: 32 chars x 4 lines
+        /// </summary>
+        /// <param name="selectedCharacterIndex">0-511 selecting which of the visible characters needs to be redrawn</param>
+        /// <param name="onBank2">Font bank 2 indicator. Set to select font 3+4</param>
+        public static void RenderOneCharacter(int selectedCharacterIndex, bool onBank2)
 		{
 			var ry = selectedCharacterIndex / 32;	// 0 - 15
 			var rx = selectedCharacterIndex % 32;	// 0 - 31
@@ -640,10 +674,17 @@ namespace FontMaker
 						#region Font in color
 
 						var colorIndex = (fontByte & mask) >> (6 - x * 2);
-						normCol = Mode4Colors[colorIndex];
-						if (colorIndex == 3) colorIndex++;
-						invCol = Mode4Colors[colorIndex];
+						if (y % 2 == 0)
+							normCol = Mode4Colors[colorIndex];
+						else
+							normCol = Mode4Colors[translatex[colorIndex]];
 
+						if (colorIndex == 3) colorIndex++;
+                        if (y % 2 == 0)
+                            invCol = Mode4Colors[colorIndex];
+                        else
+                            invCol = Mode4Colors[translatex[colorIndex]];
+                        
 						*ptrColor = normCol;
 						++ptrColor;
 						*ptrColor = normCol;

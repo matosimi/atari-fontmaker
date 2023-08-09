@@ -70,8 +70,8 @@ namespace FontMaker
 		/// 2 for mono (index 0 + 1)
 		/// 5 for color (index 1, 2, 3, 4, 5 [inverse of 4])
 		/// </summary>
-		internal byte[] SetOfSelectedColors { get; set; } = new byte[6];
-		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[6];
+		internal byte[] SetOfSelectedColors { get; set; } = new byte[9];
+		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[9];
 
 
 		internal string CurrentDataFolder { get; set; } = string.Empty;
