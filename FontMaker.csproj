@@ -12,10 +12,10 @@
 	<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
 	<ApplicationDefaultFont>Microsoft Sans Serif, 8.25pt</ApplicationDefaultFont>
 	<ApplicationIcon>Resources\FontMaker.ico</ApplicationIcon>
-	<FileVersion>1.6.8.0</FileVersion>
-	<AssemblyVersion>1.6.8.0</AssemblyVersion>
+	<FileVersion>1.6.9.0</FileVersion>
+	<AssemblyVersion>1.6.9.0</AssemblyVersion>
 	<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	<Version>1.6.8.0</Version>
+	<Version>1.6.9.0</Version>
 	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 

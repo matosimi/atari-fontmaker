@@ -236,10 +236,16 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.9.0
+- When working on an inverse version of a character the PF2 (bits 11) color will be drawn in the correct color.
+  Either in the base color or PF3 (alternative) color
+- The color selection and active color boxes now show the PF2 / PF3 colors as a split background color
+
 V1.6.8.0
-    - Fixed a bug in the Action! exporter. Thank you to pedromagician for notifying us.
-    - Added a color change option to the duplicate char indicator.
-        Duplicate chars and unused chars can now be highlighted in different colors.
+- Fixed a bug in the Action! exporter. Thank you to pedromagician for notifying us.
+- Added a color change option to the duplicate char indicator.
+  Duplicate chars and unused chars can now be highlighted in different colors.
+
 V1.6.7.6
 - Lots of memory leak fixes
     Thank you MrFish on AtariAge for noticing that the app sometime uses lots of memory.
