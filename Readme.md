@@ -104,7 +104,7 @@ Tip: Keep in mind that multi-character clipboard is working only in Mega Copy mo
 You can cancel clipboard paste by pressing ESC key or double-clicking the right mouse button.
 
 ** Expanded Mega Copy mode **
-From version 1.6.7 of the Atari Font Maker there is a new  list of font manipulation commands located just above the font selection section.
+From version 1.6.7 of the Atari Font Maker there is a new list of font manipulation commands located just above the font selection section.
 
 The first four buttons allow the font characters to be shifted in bulk. You can either rotate all 128 characters left or right, basically shifting the look of each character.  Two buttons allow shifting with hole insertion.  This can be used to create a free spot in a font.
 
@@ -236,6 +236,9 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.10.0
+- Clear MegaCopy mode indicator in the bottom right corner
+
 V1.6.9.0
 - When working on an inverse version of a character the PF2 (bits 11) color will be drawn in the correct color.
   Either in the base color or PF3 (alternative) color
