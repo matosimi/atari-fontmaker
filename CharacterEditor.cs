@@ -609,7 +609,7 @@ namespace FontMaker
 			}
 		}
 
-		public void RenderTextToClipboard(string text, bool inverse)
+		public void RenderTextToClipboard(string text, bool inverse, bool secondFont)
 		{
 			var characterBytes = string.Empty;
 			var fontBytes = string.Empty;
@@ -632,11 +632,11 @@ namespace FontMaker
 				}
 
 				characterBytes = characterBytes + $"{character:X2}";
-				var charInFont = character * 8;
+				var charInFont = (character & 127) * 8;
 
 				for (var k = 0; k < 8; k++)
 				{
-					fontBytes = fontBytes + $"{AtariFont.FontBytes[charInFont + k + fontInBankOffset]:X2}";
+					fontBytes = fontBytes + $"{AtariFont.FontBytes[charInFont + k + fontInBankOffset + (secondFont ? 1024 : 0)]:X2}";
 				}
 			}
 

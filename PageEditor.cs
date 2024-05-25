@@ -4,6 +4,9 @@ namespace FontMaker
 {
 	public partial class PageEditor : Form
 	{
+		private Color _restoreTextBoxColor;
+		private Color _restoreListBoxToColor;
+
 		/// <summary>
 		/// Build the new list of page data in the correct order
 		/// </summary>
@@ -75,6 +78,9 @@ namespace FontMaker
 
 			// Build the list for the re-order list box
 			RebuildListBox(CurrentPageIndex);
+
+			_restoreTextBoxColor = txtPageName.BackColor;
+			_restoreListBoxToColor = lbPages.BackColor;
 
 			_inSetup = false;
 		}
@@ -219,6 +225,42 @@ namespace FontMaker
 			txtPageName.Text = page.Name;
 
 			_inSetup = false;
+		}
+
+		private void txtPageName_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				btnUpdate.Focus();
+			}
+		}
+
+		private void lbPages_KeyDown(object sender, KeyEventArgs e)
+		{
+			if (e.KeyCode == Keys.Enter)
+			{
+				txtPageName.Focus();
+			}
+		}
+
+		private void lbPages_Enter(object sender, EventArgs e)
+		{
+			lbPages.BackColor = Color.Beige;
+		}
+
+		private void lbPages_Leave(object sender, EventArgs e)
+		{
+			lbPages.BackColor = _restoreListBoxToColor;
+		}
+
+		private void txtPageName_Enter(object sender, EventArgs e)
+		{
+			txtPageName.BackColor = Color.Beige;
+		}
+
+		private void txtPageName_Leave(object sender, EventArgs e)
+		{
+			txtPageName.BackColor = _restoreTextBoxColor;
 		}
 	}
 }

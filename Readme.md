@@ -236,6 +236,16 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **ESC** - close a dialog or exit from paste mode
 
 ## Changes/History ##
+V1.6.10.1
+- Improved the page name editing dialog.
+    Pressing Enter the page name list switches input to the name edit field at the top.
+    Pressing Enter in the name edit field will switch to the [Update] button.
+- Bug fixes
+    - Loading an .atrview file that switches graphics mode could cause a load error
+    - When in MegaMode you can enter text to add to the paste buffer. Pressing Shift when pressing [Ok]
+      would invert the text and shift it by a font bank. That has been fixed.  SHIFT inverts the characters.
+      CONTROL will shift to the 2nd font.
+
 V1.6.10.0
 - Clear MegaCopy mode indicator in the bottom right corner
 

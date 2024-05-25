@@ -554,7 +554,10 @@ namespace FontMaker
 
 					AtariView.UseFontOnLine = Convert.FromHexString(lineTypes);
 					for (var i = 0; i < AtariView.UseFontOnLine.Length; i++)
-						++AtariView.UseFontOnLine[i];
+					{
+						if (AtariView.UseFontOnLine[i] == 0)
+							++AtariView.UseFontOnLine[i];
+					}
 
 					var bytes = Convert.FromHexString(characterBytes);
 					var idx = 0;
@@ -572,12 +575,6 @@ namespace FontMaker
 					SetPrimaryColorSetData();
 					BuildBrushCache();
 					InColorSetSetup = false;
-
-					// If the GFX (mode 0 or 4) does not match then hit the GFX button to switch the mode of the GUI
-					if (InColorMode != (coloredGfx == 1))
-					{
-						SwitchGfxMode();
-					}
 
 					if ((forceLoadFont) || (MessageBox.Show(@"Would you like to load fonts embedded in this view file?", @"Load embedded fonts", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
 					{
@@ -631,6 +628,12 @@ namespace FontMaker
 						}
 
 						SwopPageAction(0);
+					}
+
+					// If the GFX (mode 0 or 4) does not match then hit the GFX button to switch the mode of the GUI
+					if (InColorMode != (coloredGfx == 1))
+					{
+						SwitchGfxMode();
 					}
 				}
 
@@ -758,7 +761,7 @@ namespace FontMaker
 
 		public void ActionEnterText()
 		{
-			var text = Interaction.InputBox("Enter text\nUp to 32 characters\nIf you want inverted text then hold down SHIFT when you click [Ok]", "Enter text to be added to clipboard:", string.Empty);
+			var text = Interaction.InputBox("Enter text of up to 32 characters\nIf you want inverted text then hold down SHIFT when you click [Ok]\nIf you want to use the 2nd font hold down CONTROL when you click [Ok]", "Enter text to be added to clipboard:", string.Empty);
 
 			switch (text.Length)
 			{
@@ -769,7 +772,7 @@ namespace FontMaker
 					break;
 			}
 
-			RenderTextToClipboard(text, Control.ModifierKeys == Keys.Shift);
+			RenderTextToClipboard(text, (Control.ModifierKeys & Keys.Shift) == Keys.Shift, (Control.ModifierKeys & Keys.Control) == Keys.Control);
 		}
 
 		/// <summary>
