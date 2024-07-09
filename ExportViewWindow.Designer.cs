@@ -53,6 +53,7 @@
 			label7 = new Label();
 			saveDialog = new SaveFileDialog();
 			checkBoxRememberState = new CheckBox();
+			checkBoxTranspose = new CheckBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariViewSmall).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericFromX).BeginInit();
@@ -289,12 +290,26 @@
 			checkBoxRememberState.Text = "Remember current selection?";
 			checkBoxRememberState.UseVisualStyleBackColor = true;
 			// 
+			// checkBoxTranspose
+			// 
+			checkBoxTranspose.AutoSize = true;
+			checkBoxTranspose.Checked = true;
+			checkBoxTranspose.CheckState = CheckState.Checked;
+			checkBoxTranspose.Location = new Point(12, 383);
+			checkBoxTranspose.Name = "checkBoxTranspose";
+			checkBoxTranspose.Size = new Size(172, 17);
+			checkBoxTranspose.TabIndex = 34;
+			checkBoxTranspose.Text = "Column export (transpose data)";
+			checkBoxTranspose.UseVisualStyleBackColor = true;
+			checkBoxTranspose.CheckedChanged += CheckBoxTranspose_CheckedChanged;
+			// 
 			// ExportViewWindow
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			CancelButton = Button_Cancel;
 			ClientSize = new Size(690, 412);
+			Controls.Add(checkBoxTranspose);
 			Controls.Add(checkBoxRememberState);
 			Controls.Add(label7);
 			Controls.Add(buttonResetSelection);
@@ -363,5 +378,6 @@
 		private Label label7;
 		private SaveFileDialog saveDialog;
 		private CheckBox checkBoxRememberState;
+		private CheckBox checkBoxTranspose;
 	}
 }
