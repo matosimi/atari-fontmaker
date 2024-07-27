@@ -1,5 +1,5 @@
 # Atari FontMaker #
-#### by matosimi ####
+#### by matosimi and RetroCoder ####
 
 ![1](https://user-images.githubusercontent.com/2360950/231547441-307ec9f6-3c92-47cf-99f0-5dd4a1a1919a.JPG)
 
@@ -235,7 +235,38 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 - **Ctrl+Z Ctrl+Y** – undo and redo
 - **ESC** - close a dialog or exit from paste mode
 
+## View Actions (new since V1.6.11.0)
+Press the [View Actions] button to open a new window.  It contains actions that can be applied to the contents in the View.
+At the top you find the page selector. Use this to select the page you want to perform an action on.
+
+### Replace all instances of one character with another
+- Select the character in the font area.
+- Click the left hand box to set the character to replace
+- Select another character in the font area
+- Click the right hand box to set the character to replace the one on the left
+- Check which font's characters should take part in the replacement
+- Press the [Replace in View] button to replace all characters in the view
+
+If you only want to replace the area in a smaller area:
+- Hit the [Mega Copy] button to switch into "MegoCopy Mode"
+- Select an area
+- Press the [Replace in Area] button to replace all characters in the selected area
+
+### Shift View/Area
+Press the arrow buttons to move the whole view area in the required direction.
+Or select an area and use the area shift buttons on the right to move its contents.
+
 ## Changes/History ##
+V1.6.11.0
+- Added a popup with actions that can be applied to the view area
+    Replace one character with another in the whole view or a selected area.
+     Shift/Move a section or the whole view left/right/up/down
+
+V1.6.10.2
+- Added option to transpose exported view data. 
+  Normally data is exported by row.  
+  When transposed it is exported by column.
+
 V1.6.10.1
 - Improved the page name editing dialog.
     Pressing Enter the page name list switches input to the name edit field at the top.

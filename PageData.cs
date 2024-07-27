@@ -58,7 +58,7 @@
 	public partial class FontMakerForm
 	{
 		// Everything to do with pages goes here
-		public List<PageData> Pages = new();
+		public List<PageData> Pages { get; set; }= new();
 
 		/// <summary>
 		/// The index in the combo box that is currently selected
@@ -106,6 +106,7 @@
 			InPagesSetup = false;
 
 			UpdatePageDisplay();
+			TransferPagesToViewActions();
 		}
 
 		private void SaveCurrentPage()
@@ -126,7 +127,12 @@
 			}
 
 			SwopPageAction(nextPageIndex);
+		}
 
+		private void SwopToPage(int nextPageIndex)
+		{
+			SaveCurrentPage();
+			SwopPageAction(nextPageIndex);
 		}
 
 		private void SwopPageAction(int nextPageIndex)

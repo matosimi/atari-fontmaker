@@ -87,7 +87,7 @@ namespace FontMaker
 			var want2ndBank = by >= 16;
 			// Check if the font bank needs to be switched
 			if ((checkBoxFontBank.Checked == false && want2ndBank) ||
-			    (checkBoxFontBank.Checked == true && !want2ndBank) )
+			    (checkBoxFontBank.Checked == true && !want2ndBank))
 			{
 				checkBoxFontBank.Checked = !checkBoxFontBank.Checked;
 				SwitchFontBank();
@@ -108,7 +108,7 @@ namespace FontMaker
 
 		public void PickPage(int pageIndex)
 		{
-			comboBoxPages.SelectedIndex = pageIndex = pageIndex;
+			comboBoxPages.SelectedIndex = pageIndex;
 		}
 
 		public void ActionAtariViewEditorMouseDown(MouseEventArgs e)
@@ -127,38 +127,38 @@ namespace FontMaker
 				{
 					case MegaCopyStatusFlags.None:
 					case MegaCopyStatusFlags.Selected:
+					{
+						if (e.Button == MouseButtons.Left)
 						{
-							if (e.Button == MouseButtons.Left)
-							{
-								// Define copy origin point
-								CopyPasteRange.Y = ry;
-								CopyPasteRange.X = rx;
-								megaCopyStatus = MegaCopyStatusFlags.Selecting;
-								pictureBoxViewEditorRubberBand.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
-								pictureBoxViewEditorRubberBand.Top = pictureBoxAtariView.Top + e.Y - e.Y % 16 - 2;
-								pictureBoxViewEditorRubberBand.Width = 20;
-								pictureBoxViewEditorRubberBand.Height = 20;
-								pictureBoxViewEditorRubberBand.Visible = true;
-								pictureBoxFontSelectorRubberBand.Visible = false;
-							}
+							// Define copy origin point
+							CopyPasteRange.Y = ry;
+							CopyPasteRange.X = rx;
+							megaCopyStatus = MegaCopyStatusFlags.Selecting;
+							pictureBoxViewEditorRubberBand.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
+							pictureBoxViewEditorRubberBand.Top = pictureBoxAtariView.Top + e.Y - e.Y % 16 - 2;
+							pictureBoxViewEditorRubberBand.Width = 20;
+							pictureBoxViewEditorRubberBand.Height = 20;
+							pictureBoxViewEditorRubberBand.Visible = true;
+							pictureBoxFontSelectorRubberBand.Visible = false;
 						}
+					}
 						break;
 
 					case MegaCopyStatusFlags.Pasting:
+					{
+						if (!MouseValidView(e.X, e.Y))
 						{
-							if (!MouseValidView(e.X, e.Y))
-							{
-								return;
-							}
-
-							// Paste
-							if (e.Button == MouseButtons.Left)
-							{
-								CopyPasteTargetLocation = new Point(rx, ry);
-								ExecutePasteFromClipboard(true);
-								ResetMegaCopyStatus();
-							}
+							return;
 						}
+
+						// Paste
+						if (e.Button == MouseButtons.Left)
+						{
+							CopyPasteTargetLocation = new Point(rx, ry);
+							ExecutePasteFromClipboard(true);
+							ResetMegaCopyStatus();
+						}
+					}
 						break;
 				}
 			}
@@ -201,11 +201,12 @@ namespace FontMaker
 					var bx = readChar % 32;
 					var by = readChar / 32;
 
-					// If its the 2nd font on the bank then add 8 to the y offset
+					// If it is the 2nd font on the bank then add 8 to the y offset
 					if (AtariView.UseFontOnLine[ry] == 2 || AtariView.UseFontOnLine[ry] == 4)
 					{
 						by = by | 8;
 					}
+
 					// Check if the font bank needs to be switched
 					if ((checkBoxFontBank.Checked == false && (AtariView.UseFontOnLine[ry] == 3 || AtariView.UseFontOnLine[ry] == 4)) ||
 					    (checkBoxFontBank.Checked == true && (AtariView.UseFontOnLine[ry] == 1 || AtariView.UseFontOnLine[ry] == 2)))
@@ -237,30 +238,32 @@ namespace FontMaker
 				switch (megaCopyStatus)
 				{
 					case MegaCopyStatusFlags.Selecting:
+					{
+						if (ry <= CopyPasteRange.Y)
 						{
-							if (ry <= CopyPasteRange.Y)
-							{
-								CopyPasteRange.Height = 0;
-							}
-							else
-							{
-								CopyPasteRange.Height = ry - CopyPasteRange.Y;
-							}
-
-							if (rx <= CopyPasteRange.X)
-							{
-								CopyPasteRange.Width = 0;
-							}
-							else
-							{
-								CopyPasteRange.Width = rx - CopyPasteRange.X;
-							}
-
-
-							megaCopyStatus = MegaCopyStatusFlags.Selected;
-
-							break;
+							CopyPasteRange.Height = 0;
 						}
+						else
+						{
+							CopyPasteRange.Height = ry - CopyPasteRange.Y;
+						}
+
+						if (rx <= CopyPasteRange.X)
+						{
+							CopyPasteRange.Width = 0;
+						}
+						else
+						{
+							CopyPasteRange.Width = rx - CopyPasteRange.X;
+						}
+
+
+						megaCopyStatus = MegaCopyStatusFlags.Selected;
+
+						UpdateViewActions();
+
+						break;
+					}
 				}
 			}
 		}
@@ -274,61 +277,61 @@ namespace FontMaker
 				switch (megaCopyStatus)
 				{
 					case MegaCopyStatusFlags.Selecting:
+					{
+						if ((e.X >= pictureBoxAtariView.Width) || (e.Y >= pictureBoxAtariView.Height))
 						{
-							if ((e.X >= pictureBoxAtariView.Width) || (e.Y >= pictureBoxAtariView.Height))
-							{
-								return;
-							}
-
-							rx = e.X / 16;
-							ry = e.Y / 16;
-
-							int origWidth = pictureBoxViewEditorRubberBand.Width;
-							int origHeight = pictureBoxViewEditorRubberBand.Height;
-
-							int w = 20;
-							int h = 20;
-							var temp = (rx - CopyPasteRange.X + 1) * 16 + 4;
-							if (temp >= 20)
-								w = temp;
-
-							temp = (ry - CopyPasteRange.Y + 1) * 16 + 4;
-							if (temp >= 20)
-								h = temp;
-
-							if (w != origWidth || h != origHeight)
-							{
-								pictureBoxViewEditorRubberBand.Size = new Size(w, h);
-							}
+							return;
 						}
+
+						rx = e.X / 16;
+						ry = e.Y / 16;
+
+						int origWidth = pictureBoxViewEditorRubberBand.Width;
+						int origHeight = pictureBoxViewEditorRubberBand.Height;
+
+						int w = 20;
+						int h = 20;
+						var temp = (rx - CopyPasteRange.X + 1) * 16 + 4;
+						if (temp >= 20)
+							w = temp;
+
+						temp = (ry - CopyPasteRange.Y + 1) * 16 + 4;
+						if (temp >= 20)
+							h = temp;
+
+						if (w != origWidth || h != origHeight)
+						{
+							pictureBoxViewEditorRubberBand.Size = new Size(w, h);
+						}
+					}
 						break;
 
 					case MegaCopyStatusFlags.Pasting:
+					{
+						if (!MouseValidView(e.X, e.Y))
 						{
-							if (!MouseValidView(e.X, e.Y))
-							{
-								pictureBoxViewEditorPasteCursor.Visible = false;
-								pictureBoxViewEditorMegaCopyImage.Visible = false;
-								return;
-							}
-
-							pictureBoxViewEditorPasteCursor.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
-							pictureBoxViewEditorPasteCursor.Top = pictureBoxAtariView.Top + e.Y - e.Y % 16 - 2;
-							pictureBoxViewEditorPasteCursor.Visible = true;
-							pictureBoxViewEditorMegaCopyImage.Visible = true;
-							pictureBoxFontSelectorPasteCursor.Visible = false;
-							pictureBoxFontSelectorMegaCopyImage.Visible = false;
-							pictureBoxViewEditorMegaCopyImage.Left = pictureBoxViewEditorPasteCursor.Left + 2;
-							pictureBoxViewEditorMegaCopyImage.Top = pictureBoxViewEditorPasteCursor.Top + 2;
+							pictureBoxViewEditorPasteCursor.Visible = false;
+							pictureBoxViewEditorMegaCopyImage.Visible = false;
+							return;
 						}
+
+						pictureBoxViewEditorPasteCursor.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
+						pictureBoxViewEditorPasteCursor.Top = pictureBoxAtariView.Top + e.Y - e.Y % 16 - 2;
+						pictureBoxViewEditorPasteCursor.Visible = true;
+						pictureBoxViewEditorMegaCopyImage.Visible = true;
+						pictureBoxFontSelectorPasteCursor.Visible = false;
+						pictureBoxFontSelectorMegaCopyImage.Visible = false;
+						pictureBoxViewEditorMegaCopyImage.Left = pictureBoxViewEditorPasteCursor.Left + 2;
+						pictureBoxViewEditorMegaCopyImage.Top = pictureBoxViewEditorPasteCursor.Top + 2;
+					}
 						break;
 				}
 			}
 			else
 			{
 				if (ContinueViewDrawInMove && e.X >= 0 && e.X < pictureBoxAtariView.Width &&
-                   e.Y >= 0 && e.Y < pictureBoxAtariView.Height &&
-                   (e.X / 16 != LastViewCharacterX || e.Y / 16 != LastViewCharacterY))
+				    e.Y >= 0 && e.Y < pictureBoxAtariView.Height &&
+				    (e.X / 16 != LastViewCharacterX || e.Y / 16 != LastViewCharacterY))
 				{
 					ActionAtariViewEditorMouseDown(new MouseEventArgs(MouseButtons.Left, 1, e.X, e.Y, 0));
 				}
@@ -395,6 +398,7 @@ namespace FontMaker
 					}
 				}
 			}
+
 			pictureBoxAtariView.Refresh();
 		}
 
@@ -413,13 +417,13 @@ namespace FontMaker
 					Height = 16,
 				};
 
-				var rx = SelectedCharacterIndex % 32;       // Character x,y
+				var rx = SelectedCharacterIndex % 32; // Character x,y
 				var ry = SelectedCharacterIndex / 32;
 
 				var srcRect = new Rectangle
 				{
 					X = rx * 16,
-					Y = ry * 16,        // Will be set below
+					Y = ry * 16, // Will be set below
 					Width = 16,
 					Height = 16,
 				};
@@ -461,6 +465,7 @@ namespace FontMaker
 					}
 				}
 			}
+
 			pictureBoxAtariView.Refresh();
 		}
 
@@ -488,7 +493,7 @@ namespace FontMaker
 			RedrawLineTypes();
 		}
 
-		private static string?[] ToDraw = new string?[] { null, "1", "2", "3", "4" };
+		private static readonly string?[] ToDraw = new string?[] { null, "1", "2", "3", "4" };
 
 		/// <summary>
 		/// Draw the font indicator next to the sample screen.
@@ -505,6 +510,7 @@ namespace FontMaker
 					gr.DrawString(ToDraw[AtariView.UseFontOnLine[a]], this.Font, BlackBrush, 4, 2 + a * 16);
 				}
 			}
+
 			pictureBoxCharacterSetSelector.Refresh();
 		}
 
@@ -569,6 +575,7 @@ namespace FontMaker
 							++idx;
 						}
 					}
+
 					// Load the AtariPalette selection
 					InColorSetSetup = true;
 					SetOfSelectedColors = Convert.FromHexString(colors);
@@ -587,6 +594,7 @@ namespace FontMaker
 						{
 							fontBytes = fontBytes + fontBytes;
 						}
+
 						AtariFont.FontBytes = Convert.FromHexString(fontBytes);
 
 						UpdateFormCaption();
@@ -596,7 +604,7 @@ namespace FontMaker
 
 					// 40 bytes width
 					if ((FortyBytes == "1" && !checkBox40Bytes.Checked)
-						|| (FortyBytes == "0" && !checkBox40Bytes.Checked))
+					    || (FortyBytes == "0" && !checkBox40Bytes.Checked))
 					{
 						checkBox40Bytes.Checked = !checkBox40Bytes.Checked;
 						ViewEditor_CheckBox40Bytes_Click(0, EventArgs.Empty);
@@ -842,6 +850,7 @@ namespace FontMaker
 					RedrawChar();
 					return;
 				}
+
 				// Handle old binary versions of view file
 				// Bytes:
 				// version : 1 byte
@@ -885,7 +894,7 @@ namespace FontMaker
 
 				if (ext == ".vf2")
 				{
-					for (int a = 0; a <= 7; a++)
+					for (var a = 0; a <= 7; a++)
 					{
 						fs.Read(buf, fsIndex, 4);
 						AtariView.UseFontOnLine[a] = (byte)BitConverter.ToInt32(buf, 0);
@@ -919,51 +928,51 @@ namespace FontMaker
 					switch (version)
 					{
 						case 2:
+						{
+							// 31 x 8 screen = 248 bytes
+							try
 							{
-								// 31 x 8 screen = 248 bytes
-								try
-								{
-									fs.Read(buf, fsIndex, 248);
-									fsIndex += 248;
-								}
-								finally
-								{
-								}
-
-								for (int a = 0; a < 8; a++)
-								{
-									for (int b = 0; b < 31; b++)
-									{
-										AtariView.ViewBytes[b, a] = buf[a * 31 + b];
-									}
-								}
-
-								RedrawLineTypes();
+								fs.Read(buf, fsIndex, 248);
+								fsIndex += 248;
 							}
+							finally
+							{
+							}
+
+							for (var a = 0; a < 8; a++)
+							{
+								for (var b = 0; b < 31; b++)
+								{
+									AtariView.ViewBytes[b, a] = buf[a * 31 + b];
+								}
+							}
+
+							RedrawLineTypes();
+						}
 							break;
 
 						case 3:
+						{
+							// 32x26 screen = 832 bytes
+							try
 							{
-								// 32x26 screen = 832 bytes
-								try
-								{
-									fs.Read(buf, fsIndex, 32 * 26);
-									fsIndex += 32 * 26;
-								}
-								finally
-								{
-								}
-
-								for (int a = 0; a < 26; a++)
-								{
-									for (int b = 0; b < 32; b++)
-									{
-										AtariView.ViewBytes[b, a] = buf[a * 32 + b];
-									}
-								}
-
-								RedrawLineTypes();
+								fs.Read(buf, fsIndex, 32 * 26);
+								fsIndex += 32 * 26;
 							}
+							finally
+							{
+							}
+
+							for (int a = 0; a < 26; a++)
+							{
+								for (int b = 0; b < 32; b++)
+								{
+									AtariView.ViewBytes[b, a] = buf[a * 32 + b];
+								}
+							}
+
+							RedrawLineTypes();
+						}
 							break;
 					}
 				}
@@ -979,14 +988,14 @@ namespace FontMaker
 					{
 					}
 
-					for (int b = 0; b < 31; b++)
+					for (var b = 0; b < 31; b++)
 					{
-						for (int a = 0; a < 6; a++)
+						for (var a = 0; a < 6; a++)
 						{
 							AtariView.ViewBytes[b, a] = buf[a + b * 6];
 						}
 
-						for (int a = 6; a < 8; a++)
+						for (var a = 6; a < 8; a++)
 						{
 							AtariView.ViewBytes[b, a] = 0;
 						}
@@ -1023,8 +1032,8 @@ namespace FontMaker
 				{
 					var data = new byte[AtariView.VIEW_HEIGHT * GetActualViewWidth()];
 					for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
-						for (var b = 0; b < GetActualViewWidth(); b++)
-							data[b + a * GetActualViewWidth()] = AtariView.ViewBytes[b, a];
+					for (var b = 0; b < GetActualViewWidth(); b++)
+						data[b + a * GetActualViewWidth()] = AtariView.ViewBytes[b, a];
 					File.WriteAllBytes(dialogSaveFile.FileName, data);
 				}
 
@@ -1090,6 +1099,7 @@ namespace FontMaker
 
 			InPagesSetup = false;
 			UpdatePageDisplay();
+			TransferPagesToViewActions();
 		}
 
 		public void ActionDeletePage()
@@ -1124,6 +1134,7 @@ namespace FontMaker
 			SwopPage(saveCurrent: false);
 
 			UpdatePageDisplay();
+			TransferPagesToViewActions();
 		}
 
 		public void ActionEditPages()
@@ -1161,6 +1172,7 @@ namespace FontMaker
 				InPagesSetup = false;
 
 				UpdatePageDisplay();
+				TransferPagesToViewActions();
 			}
 		}
 
@@ -1174,6 +1186,7 @@ namespace FontMaker
 				pictureBoxViewEditorPasteCursor.Size = new Size(img.Width, img.Height);
 
 			}
+
 			using var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, pictureBoxViewEditorPasteCursor.Width, 2));
 			graphicsPath.AddRectangle(new Rectangle(pictureBoxViewEditorPasteCursor.Width - 2, 0, 2, pictureBoxViewEditorPasteCursor.Height));
@@ -1182,6 +1195,219 @@ namespace FontMaker
 			pictureBoxViewEditorPasteCursor.Region = new Region(graphicsPath);
 
 			pictureBoxViewEditorPasteCursor.Refresh();
+		}
+
+		private void TransferPagesToViewActions()
+		{
+			ViewActionsWindowForm?.RebuildPagesDropDown(Pages, comboBoxPages.SelectedIndex);
+		}
+
+		private void TransferPageSelectionToViewActions()
+		{
+			ViewActionsWindowForm?.SelectPage(comboBoxPages.SelectedIndex);
+		}
+
+		private void UpdateViewActions()
+		{
+			ViewActionsWindowForm?.UpdateViewInformation(
+				buttonMegaCopy.Checked
+				, megaCopyStatus == MegaCopyStatusFlags.Selected && pictureBoxViewEditorRubberBand.Visible
+				, CopyPasteRange
+			);
+		}
+
+		public void ActionPageSwitch(int pageNr)
+		{
+			if (InPagesSetup) return;
+
+			comboBoxPages.SelectedIndex = pageNr;
+		}
+
+		/// <summary>
+		/// Shift a region/whole screen left/right/up/down
+		/// </summary>
+		/// <param name="onPageNr">Which page </param>
+		/// <param name="direction"></param>
+		/// <param name="area"></param>
+		public void ActionAreaShift(int onPageNr, DirectionFlags direction, Rectangle area)
+		{
+			switch (direction)
+			{
+				case DirectionFlags.Up:
+				case DirectionFlags.Down:
+					if (area.Height == 0) return;
+					break;
+				case DirectionFlags.Left:
+				case DirectionFlags.Right:
+					if (area.Width == 0) return;
+					break;
+			}
+
+			SwopToPage(onPageNr);
+			// AtariView.ViewBytes now has the selected page's data
+			// Adjust the data in the selected area
+			var from = AtariView.ViewBytes.Clone() as byte[,];
+
+			switch (direction)
+			{
+				case DirectionFlags.Up:
+				{
+					for (var x = area.Left; x <= area.Right; ++x)
+					{
+						AtariView.ViewBytes[x, area.Bottom] = from[x, area.Top];
+					}
+
+					for (var y = area.Top + 1; y <= area.Bottom; ++y)
+					{
+						for (var x = area.Left; x <= area.Right; ++x)
+						{
+							AtariView.ViewBytes[x, y - 1] = from[x, y];
+						}
+					}
+
+					break;
+				}
+				case DirectionFlags.Down:
+				{
+					for (var x = area.Left; x <= area.Right; ++x)
+					{
+						AtariView.ViewBytes[x, area.Top] = from[x, area.Bottom];
+					}
+
+					for (var y = area.Top; y < area.Bottom; ++y)
+					{
+						for (var x = area.Left; x <= area.Right; ++x)
+						{
+							AtariView.ViewBytes[x, y + 1] = from[x, y];
+						}
+					}
+
+					break;
+				}
+				case DirectionFlags.Left:
+				{
+					for (var y = area.Top; y <= area.Bottom; ++y)
+					{
+						AtariView.ViewBytes[area.Right, y] = from[area.Left, y];
+					}
+
+					for (var x = area.Left + 1; x <= area.Right; ++x)
+					{
+						for (var y = area.Top; y <= area.Bottom; ++y)
+						{
+							AtariView.ViewBytes[x - 1, y] = from[x, y];
+						}
+					}
+
+					break;
+				}
+				case DirectionFlags.Right:
+				{
+					for (var y = area.Top; y <= area.Bottom; ++y)
+					{
+						AtariView.ViewBytes[area.Left, y] = from[area.Right, y];
+					}
+
+					for (var x = area.Left; x < area.Right; ++x)
+					{
+						for (var y = area.Top; y <= area.Bottom; ++y)
+						{
+							AtariView.ViewBytes[x + 1, y] = from[x, y];
+						}
+					}
+
+					break;
+				}
+			}
+
+			UpdatePageDisplay();
+		}
+
+		public byte RenderCharIntoPictureBox(PictureBox target)
+		{
+			var onBank2 = checkBoxFontBank.Checked;
+			var theChar = (byte)(SelectedCharacterIndex % 256);
+			if (Control.ModifierKeys == Keys.Shift)
+			{
+				theChar += 128;
+			}
+
+			var colorOffset = InColorMode ? 512 : 0;
+			var img = Helpers.GetImage(target);
+			using (var gr = Graphics.FromImage(img))
+			{
+				var destRect = new Rectangle
+				{
+					X = 0,
+					Y = 0,
+					Width = 16,
+					Height = 16,
+				};
+
+				var rx = SelectedCharacterIndex % 32; // Character x,y
+				var ry = SelectedCharacterIndex / 32;
+
+				var srcRect = new Rectangle
+				{
+					X = rx * 16,
+					Y = ry * 16, // Will be set below
+					Width = 16,
+					Height = 16,
+				};
+
+				var whichFontNr = (onBank2 ? 2 : 0) + (SelectedCharacterIndex >= 256 ? 1 : 0);
+				var fontYOffset = Constants.FontPageOffset[whichFontNr] + colorOffset;
+
+				ry = ry | 8;
+
+				if (whichFontNr is 0 or 2)
+				{
+					ry = (ry ^ 8);
+				}
+
+				var ny = ry ^ 4; //ny checks invert notes sign (ry)
+				var ep = (rx + ry * 32) % 256;
+				var dp = (rx + ny * 32) % 256;
+
+				if (theChar == (byte)ep)
+				{
+					srcRect.Y = ry * 16 + fontYOffset;
+					gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect, GraphicsUnit.Pixel);
+				}
+
+				if (theChar == (byte)dp)
+				{
+					srcRect.Y = ny * 16 + fontYOffset;
+					gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect, GraphicsUnit.Pixel);
+				}
+			}
+
+			target.Refresh();
+
+			return theChar;
+		}
+
+		public void ReplaceCharXWithY(byte charX, byte charY, bool inFont1, bool inFont2, bool inFont3, bool inFont4, Rectangle area)
+		{
+			var activeFontNr = new List<int>();
+			if (inFont1) activeFontNr.Add(1);
+			if (inFont2) activeFontNr.Add(2);
+			if (inFont3) activeFontNr.Add(3);
+			if (inFont4) activeFontNr.Add(4);
+
+			for (var y = area.Top; y <= area.Bottom; y++)
+			{
+				if (activeFontNr.Contains(AtariView.UseFontOnLine[y]))
+				{
+					for (var x = area.Left; x <= area.Right; x++)
+					{
+						if (AtariView.ViewBytes[x, y] == charX)
+							AtariView.ViewBytes[x, y] = charY;
+					}
+				}
+			}
+
+			RedrawView();
 		}
 	}
 }

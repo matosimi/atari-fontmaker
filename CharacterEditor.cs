@@ -553,7 +553,7 @@ namespace FontMaker
 
 				for (var i = CopyPasteRange.Y; i <= CopyPasteRange.Bottom; i++)
 				{
-					int whichFontNr = 1;
+					var whichFontNr = 1;
 					for (var j = CopyPasteRange.X; j <= CopyPasteRange.Right; j++)
 					{
 						int charInFont;
@@ -583,7 +583,7 @@ namespace FontMaker
 
 						for (var k = 0; k < 8; k++)
 						{
-							fontBytes = fontBytes + $"{AtariFont.FontBytes[charInFont + k]:X2}";
+							fontBytes += $"{AtariFont.FontBytes[charInFont + k]:X2}";
 						}
 					}
 					fontNr += whichFontNr;

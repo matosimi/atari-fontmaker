@@ -42,7 +42,12 @@ namespace FontMaker
 			None, Selecting, Selected, Pasting
 		}
 
-		internal MegaCopyStatusFlags megaCopyStatus = MegaCopyStatusFlags.None;
+		public enum DirectionFlags
+		{
+			Left, Right, Up, Down
+		}
+
+		internal MegaCopyStatusFlags megaCopyStatus { get; set; } = MegaCopyStatusFlags.None;
 
 		private static readonly SolidBrush BlackBrush = new(Color.Black);
 		private static readonly SolidBrush WhiteBrush = new(Color.White);
@@ -58,6 +63,8 @@ namespace FontMaker
 		public ExportFontWindow ExportFontWindowForm { get; set; } = new();
 		public ExportViewWindow ExportViewWindowForm { get; set; } = new();
 		public FontAnalysisWindow FontAnalysisWindowForm { get; set; } = new();
+
+		public ViewActionsWindow? ViewActionsWindowForm { get; set; } = null;
 
 		/// <summary>
 		/// The Atari color palette. Loaded from "altirraPAL.pal"
@@ -122,6 +129,10 @@ namespace FontMaker
 			ActionListNormalModeOnly.Add(buttonFontShiftRightRotate);
 			ActionListNormalModeOnly.Add(buttonFontShiftLeftRotate);
 			ActionListNormalModeOnly.Add(buttonFontShiftLeftInsert);
+			ActionListNormalModeOnly.Add(buttonFontDeleteCharShiftRight);
+			ActionListNormalModeOnly.Add(buttonFontDeleteCharShiftLeft);
+
+			ViewActionsWindowForm = new ViewActionsWindow(this);
 
 			this.Load += FormCreate!;
 		}
@@ -753,8 +764,8 @@ namespace FontMaker
 			if (InPagesSetup) return;
 
 			SwopPage(saveCurrent: true);
-
 			UpdatePageDisplay();
+			TransferPageSelectionToViewActions();
 		}
 
 		public void ViewEditor_AddPage_Click(object sender, EventArgs e)
@@ -808,6 +819,12 @@ namespace FontMaker
 			{
 				ResetMegaCopyStatus();
 			}
+		}
+
+		private void ViewEditor_RubberBand_VisibleChanged(object sender, EventArgs e)
+		{
+			// Rubber band visibility has changed
+			UpdateViewActions();
 		}
 
 		public void ViewEditor_RubberBand_MouseDown(object sender, MouseEventArgs e)
@@ -871,6 +888,17 @@ namespace FontMaker
 			FontAnalysisWindowForm.InColorMode = InColorMode;
 			FontAnalysisWindowForm.Pages = Pages;
 			FontAnalysisWindowForm.ShowDialog();
+		}
+
+		private void ViewEditor_ViewActions_Click(object sender, EventArgs e)
+		{
+			SaveCurrentPage();
+			UpdateViewActions();
+
+			ViewActionsWindowForm?.Show();
+
+			TransferPagesToViewActions();
+			//TransferPageSelectionToViewActions();
 		}
 
 		#endregion
@@ -978,6 +1006,8 @@ namespace FontMaker
 				checkBoxShowDuplicates.Enabled = true;
 				CheckDuplicate();
 			}
+
+			UpdateViewActions();
 		}
 
 		public void FontBank_Click(object sender, EventArgs e)
@@ -1243,5 +1273,8 @@ namespace FontMaker
 		}
 
 		#endregion
+
+
+
 	}
 }

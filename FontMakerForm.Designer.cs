@@ -135,6 +135,7 @@
 			labelCurrentPageIndex = new Label();
 			buttonExportView = new Button();
 			lblInMegaCopyMode = new Label();
+			buttonViewActions = new Button();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -1291,6 +1292,7 @@
 			pictureBoxViewEditorRubberBand.TabIndex = 13;
 			pictureBoxViewEditorRubberBand.TabStop = false;
 			pictureBoxViewEditorRubberBand.Visible = false;
+			pictureBoxViewEditorRubberBand.VisibleChanged += ViewEditor_RubberBand_VisibleChanged;
 			pictureBoxViewEditorRubberBand.MouseDown += ViewEditor_RubberBand_MouseDown;
 			pictureBoxViewEditorRubberBand.MouseMove += ViewEditor_RubberBand_MouseMove;
 			pictureBoxViewEditorRubberBand.MouseUp += ViewEditor_RubberBand_MouseUp;
@@ -1413,12 +1415,23 @@
 			lblInMegaCopyMode.UseMnemonic = false;
 			lblInMegaCopyMode.Visible = false;
 			// 
+			// buttonViewActions
+			// 
+			buttonViewActions.Location = new Point(601, 462);
+			buttonViewActions.Name = "buttonViewActions";
+			buttonViewActions.Size = new Size(80, 23);
+			buttonViewActions.TabIndex = 24;
+			buttonViewActions.Text = "View Actions";
+			buttonViewActions.UseVisualStyleBackColor = true;
+			buttonViewActions.Click += ViewEditor_ViewActions_Click;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1048, 491);
+			Controls.Add(buttonViewActions);
 			Controls.Add(lblInMegaCopyMode);
 			Controls.Add(buttonFontAnalysis);
 			Controls.Add(buttonExportView);
@@ -1601,5 +1614,6 @@
 		private ComboBox comboBoxColorSets;
 		private Button buttonFontAnalysis;
 		private Label lblInMegaCopyMode;
+		private Button buttonViewActions;
 	}
 }
