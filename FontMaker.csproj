@@ -10,7 +10,7 @@
 	<ApplicationVisualStyles>true</ApplicationVisualStyles>
 	<ApplicationUseCompatibleTextRendering>false</ApplicationUseCompatibleTextRendering>
 	<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
-	<ApplicationDefaultFont>Microsoft Sans Serif, 8.25pt</ApplicationDefaultFont>
+	<ApplicationDefaultFont>Segoe UI, 8.25pt</ApplicationDefaultFont>
 	<ApplicationIcon>Resources\FontMaker.ico</ApplicationIcon>
 	<FileVersion>1.6.11.0</FileVersion>
 	<AssemblyVersion>1.6.11.0</AssemblyVersion>
