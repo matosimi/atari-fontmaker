@@ -678,7 +678,7 @@
             // 
             comboBoxColorSets.DropDownStyle = ComboBoxStyle.DropDownList;
             comboBoxColorSets.FormattingEnabled = true;
-            comboBoxColorSets.Location = new Point(7, 92);
+            comboBoxColorSets.Location = new Point(7, 94);
             comboBoxColorSets.MaxDropDownItems = 6;
             comboBoxColorSets.Name = "comboBoxColorSets";
             comboBoxColorSets.Size = new Size(92, 21);
@@ -951,7 +951,7 @@
             buttonPasteInPlace.RightToLeft = RightToLeft.No;
             buttonPasteInPlace.Size = new Size(104, 24);
             buttonPasteInPlace.TabIndex = 21;
-            buttonPasteInPlace.Text = "Paste in location";
+            buttonPasteInPlace.Text = "Paste to Font 1";
             toolTips.SetToolTip(buttonPasteInPlace, "Paste into original characters");
             buttonPasteInPlace.UseVisualStyleBackColor = true;
             buttonPasteInPlace.Click += buttonPasteInPlace_Click;
@@ -1205,6 +1205,7 @@
             // listBoxRecolorSource
             // 
             listBoxRecolorSource.FormattingEnabled = true;
+            listBoxRecolorSource.ItemHeight = 13;
             listBoxRecolorSource.Items.AddRange(new object[] { "BAK (00)", "PF0 (01)", "PF1 (10)", "PF2 (11)" });
             listBoxRecolorSource.Location = new Point(8, 8);
             listBoxRecolorSource.Name = "listBoxRecolorSource";
@@ -1215,6 +1216,7 @@
             // listBoxRecolorTarget
             // 
             listBoxRecolorTarget.FormattingEnabled = true;
+            listBoxRecolorTarget.ItemHeight = 13;
             listBoxRecolorTarget.Items.AddRange(new object[] { "BAK (00)", "PF0 (01)", "PF1 (10)", "PF2 (11)" });
             listBoxRecolorTarget.Location = new Point(80, 8);
             listBoxRecolorTarget.Name = "listBoxRecolorTarget";
@@ -1402,7 +1404,7 @@
             lblInMegaCopyMode.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             lblInMegaCopyMode.AutoSize = true;
             lblInMegaCopyMode.BackColor = SystemColors.ActiveCaption;
-            lblInMegaCopyMode.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold, GraphicsUnit.Point);
+            lblInMegaCopyMode.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
             lblInMegaCopyMode.Location = new Point(860, 466);
             lblInMegaCopyMode.Name = "lblInMegaCopyMode";
             lblInMegaCopyMode.Size = new Size(188, 25);

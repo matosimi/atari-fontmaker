@@ -1140,7 +1140,7 @@ namespace FontMaker
 
 		private void comboBoxPasteIntoFontNr_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			buttonPasteInPlace.Text = $"Paste in location {comboBoxPasteIntoFontNr.SelectedIndex + 1}";
+			buttonPasteInPlace.Text = $"Paste to Font {comboBoxPasteIntoFontNr.SelectedIndex + 1}";
 		}
 
 		#endregion

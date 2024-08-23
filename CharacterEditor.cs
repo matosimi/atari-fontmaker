@@ -160,10 +160,11 @@ namespace FontMaker
 					// Draw pixel
 					// take into account that color 3 is different if the characters is inverted
 					var shiftColor3 = SelectedCharacterIndex switch
-					{
-						((>= 0) and (< 128)) or ((>= 256) and (< 384)) => false,
-						((>= 128) and (< 256)) or ((>= 384) and (< 512)) => true,
-					};
+                    {
+                        ((>= 0) and (< 128)) or ((>= 256) and (< 384)) => false,
+                        ((>= 128) and (< 256)) or ((>= 384) and (< 512)) => true,
+                        _ => throw new NotImplementedException(),
+                    };
 					var col = charline5col[rx];
 					if (col == 4 && shiftColor3) ++col;
 					gr.FillRectangle(BrushCache[col], rx * 40, ry * 20, 40, 20);
@@ -250,10 +251,11 @@ namespace FontMaker
 				{
 					var character5color = AtariFont.Get5ColorCharacter(SelectedCharacterIndex, checkBoxFontBank.Checked);
 					var shiftColor3 = SelectedCharacterIndex switch
-					{
-						((>= 0) and (< 128)) or ((>= 256) and (< 384)) => false,
-						((>= 128) and (< 256)) or ((>= 384) and (< 512)) => true,
-					};
+                    {
+                        ((>= 0) and (< 128)) or ((>= 256) and (< 384)) => false,
+                        ((>= 128) and (< 256)) or ((>= 384) and (< 512)) => true,
+                        _ => throw new NotImplementedException(),
+                    };
 
 					for (var y = 0; y < 8; y++)
 					{
