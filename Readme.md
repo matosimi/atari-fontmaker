@@ -257,7 +257,17 @@ Press the arrow buttons to move the whole view area in the required direction.
 Or select an area and use the area shift buttons on the right to move its contents.
 
 ## Changes/History ##
-V1.6.11.0
+V1.6.12.1
+- Fixed the loading of .fn2 (dual) fonts
+- Once loaded the font data will be auto split into "filename-fn2-X.fnt", where X is the font nr.
+- RES S button now works with dual fonts.
+
+V1.6.12.0
+- Switched to .NET 8, since .NET 7 is no longer supported for couple months.
+- Renamed "Paste in location n" to "Paste to Font n" so fit in the button... and better describe what the button does.
+- Suppressed warning MSB3825 about BinaryFormatter which is now being obsoleted, but still could be used in .NET 8 winforms.
+
+- V1.6.11.0
 - Added a popup with actions that can be applied to the view area
     Replace one character with another in the whole view or a selected area.
      Shift/Move a section or the whole view left/right/up/down
