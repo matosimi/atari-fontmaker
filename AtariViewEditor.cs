@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualBasic;
 using System;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Text;
+using System.Windows.Forms;
 using TinyJson;
 
 namespace FontMaker
@@ -377,8 +379,10 @@ namespace FontMaker
 			var colorOffset = InColorMode ? 512 : 0;
 			var img = Helpers.GetImage(pictureBoxAtariView);
 			using (var gr = Graphics.FromImage(img))
-			{
-				gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+            using (ImageAttributes wrapMode = new ImageAttributes())
+            {
+                wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                gr.InterpolationMode = InterpolationMode.NearestNeighbor;
 				gr.Clear(AtariPalette[SetOfSelectedColors[1]]);
 
 				var destRect = new Rectangle
@@ -406,7 +410,7 @@ namespace FontMaker
 						srcRect.X = rx * 16;
 						srcRect.Y = ry * 16 + Constants.FontYOffset[AtariView.UseFontOnLine[y] - 1] + colorOffset;
 
-						gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect, GraphicsUnit.Pixel);
+						gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect.Left, srcRect.Top, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, wrapMode);
 					}
 				}
 			}
@@ -423,7 +427,9 @@ namespace FontMaker
 			var img = Helpers.GetImage(pictureBoxAtariView);
 			
 			using (var gr = Graphics.FromImage(img))
-			{
+            using (ImageAttributes wrapMode = new ImageAttributes())
+            {
+                wrapMode.SetWrapMode(WrapMode.TileFlipXY);
                 gr.InterpolationMode = InterpolationMode.NearestNeighbor;
                 var destRect = new Rectangle
 				{
@@ -466,19 +472,20 @@ namespace FontMaker
 						{
 							srcRect.Y = ry * 16 + fontYOffset;
 							//gr.DrawImage(pictureBoxFontSelector.Image, destRect, srcRect, GraphicsUnit.Pixel);
-							gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect, GraphicsUnit.Pixel);
+                            gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect.Left, srcRect.Top, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, wrapMode);
 
-						}
+                        }
 
-						if (AtariView.ViewBytes[x, y] == (byte)dp)
+                        if (AtariView.ViewBytes[x, y] == (byte)dp)
 						{
 							srcRect.Y = ny * 16 + fontYOffset;
 							//gr.DrawImage(pictureBoxFontSelector.Image, destRect, srcRect, GraphicsUnit.Pixel);
 							
 		
-							gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect, GraphicsUnit.Pixel);
-						}
-					}
+                            gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect.Left, srcRect.Top, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, wrapMode);
+
+                        }
+                    }
 				}
 			}
 
