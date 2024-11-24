@@ -11,6 +11,7 @@ namespace FontMaker
 	{
 		public string Width { get; set; }
 		public string Height { get; set; }
+		public bool FromView { get; set; }
 		public string Chars { get; set; }
 		/// <summary>
 		/// The bytes that make up the font characters. 8 bytes/char
@@ -68,7 +69,7 @@ namespace FontMaker
 
 		public void ActionCharacterEditorMouseDown(MouseEventArgs e)
 		{
-			if (e.X < 0 || e.Y < 0 || e.X >= pictureBoxCharacterEditor.Width || e.Y >= pictureBoxCharacterEditor.Height)
+			if (e.X < 0 || e.Y < 0 || e.X >= (pictureBoxCharacterEditor.Width / (InTallMode ? 2 : 1)) || e.Y >= pictureBoxCharacterEditor.Height)
 				return;
 
 			var img = Helpers.GetImage(pictureBoxCharacterEditor);
@@ -131,7 +132,8 @@ namespace FontMaker
 						charline5col[a] = Constants.Bits2ColorIndex[charline5col[a]];
 					}
 
-					var rx = e.X / 40;
+					var rx = e.X / CharXWidth;
+					
 					LastCharacterPixelX = rx;
 
 					if (e.Button == MouseButtons.Left)
@@ -167,7 +169,7 @@ namespace FontMaker
                     };
 					var col = charline5col[rx];
 					if (col == 4 && shiftColor3) ++col;
-					gr.FillRectangle(BrushCache[col], rx * 40, ry * 20, 40, 20);
+					gr.FillRectangle(BrushCache[col], rx * CharXWidth, ry * 20, CharXWidth, 20);
 
 					// Recode to byte and save to charset
 					for (var a = 0; a < 4; a++)
@@ -197,7 +199,7 @@ namespace FontMaker
 
 				if (InColorMode)
 				{
-					nx = e.X / 40;
+					nx = e.X / CharXWidth;
 				}
 				else
 				{
@@ -257,13 +259,19 @@ namespace FontMaker
                         _ => throw new NotImplementedException(),
                     };
 
-					for (var y = 0; y < 8; y++)
+					// If tall mode, blank the right side of the character
+					if (InTallMode)
+					{
+						gr.FillRectangle(EmptyBrush, 4 * CharXWidth, 0, 4*CharXWidth, 20*8);
+					}
+
+                    for (var y = 0; y < 8; y++)
 					{
 						for (var x = 0; x < 4; x++)
 						{
 							var col = Constants.Bits2ColorIndex[character5color[x, y]];
 							if (col == 4 && shiftColor3) ++col;
-							gr.FillRectangle(BrushCache[col], x * 40, y * 20, 40, 20);
+							gr.FillRectangle(BrushCache[col], x * CharXWidth, y * 20, CharXWidth, 20);
 						}
 					}
 				}
@@ -597,7 +605,7 @@ namespace FontMaker
 					Height = (CopyPasteRange.Height + 1).ToString(),
 					Chars = characterBytes,
 					Data = fontBytes,
-					FontNr = fontNr,
+					FontNr = fontNr
 				};
 				var json = jo.ToJson();
 				SafeSetClipboard(json);
@@ -607,6 +615,7 @@ namespace FontMaker
 				ConfigureClipboardActionButtons();
 
 				UpdateClipboardInformation(CopyPasteRange.Width + 1, CopyPasteRange.Height + 1);
+				PastingToView = sourceIsView;
 				RevalidateClipboard();
 			}
 		}
@@ -648,7 +657,7 @@ namespace FontMaker
 				Height = "1",
 				Chars = characterBytes,
 				Data = fontBytes,
-				FontNr = checkBoxFontBank.Checked ? "3" : "1",
+				FontNr = checkBoxFontBank.Checked ? "3" : "1"
 			};
 			var json = jo.ToJson();
 			SafeSetClipboard(json);
@@ -839,6 +848,7 @@ namespace FontMaker
 					return false;
 				int.TryParse(jsonObj.Width, out width);
 				int.TryParse(jsonObj.Height, out height);
+			
 
 				characterBytes = jsonObj.Chars;
 				fontBytes = jsonObj.Data;
@@ -865,7 +875,7 @@ namespace FontMaker
 			if (buttonMegaCopy.Checked)
 			{
 				var w = 16 * (width + 0);
-				var h = 16 * (height + 0);
+				var h = (PastingToView && InTallMode ? 32 : 16) * (height + 0);
 
 				pictureBoxFontSelectorMegaCopyImage.Size = new Size(w, h);
 				pictureBoxViewEditorMegaCopyImage.Size = new Size(w, h);
@@ -876,7 +886,7 @@ namespace FontMaker
 					gr.FillRectangle(CyanBrush, new Rectangle(0, 0, img.Width, img.Height));
 				}
 
-				DrawChars(pictureBoxFontSelectorMegaCopyImage, fontBytes, characterBytes, 0, 0, width, height, !InColorMode, 2);
+				DrawChars(pictureBoxFontSelectorMegaCopyImage, fontBytes, characterBytes, 0, 0, width, height, !InColorMode, 2, PastingToView && InTallMode ? 4 : 2);
 				pictureBoxViewEditorMegaCopyImage.Image?.Dispose();
 				pictureBoxViewEditorMegaCopyImage.Image = pictureBoxFontSelectorMegaCopyImage.Image;
 
@@ -908,7 +918,7 @@ namespace FontMaker
 			return true;
 		}
 
-		public void DrawChars(PictureBox targetImage, string data, string chars, int x, int y, int dataWidth, int dataHeight, bool gr0, int pixelsize)
+		public void DrawChars(PictureBox targetImage, string data, string chars, int x, int y, int dataWidth, int dataHeight, bool gr0, int pixelsizeX, int pixelsizeY)
 		{
 			var img = Helpers.GetImage(targetImage);
 			using (var gr = Graphics.FromImage(img))
@@ -917,7 +927,7 @@ namespace FontMaker
 				{
 					for (var j = 0; j < dataWidth; j++)
 					{
-						DrawChar(gr, data.Substring((i * dataWidth + j) * 16, 16), chars.Substring((i * dataWidth + j) * 2, 2), x + 8 * pixelsize * j, y + 8 * pixelsize * i, gr0, pixelsize);
+						DrawChar(gr, data.Substring((i * dataWidth + j) * 16, 16), chars.Substring((i * dataWidth + j) * 2, 2), x + 8 * pixelsizeX * j, y + 8 * pixelsizeY * i, gr0, pixelsizeX, pixelsizeY);
 					}
 				}
 			}
@@ -925,7 +935,7 @@ namespace FontMaker
 			targetImage.Refresh();
 		}
 
-		public void DrawChar(Graphics gr, string data, string character, int x, int y, bool gr0, int pixelsize)
+		public void DrawChar(Graphics gr, string data, string character, int x, int y, bool gr0, int pixelsizeX, int pixelsizeY)
 		{
 			var inverse = Convert.ToInt32($"0x{character}", 16) > 127;
 
@@ -940,7 +950,7 @@ namespace FontMaker
 					{
 						var brush = BrushCache[Convert.ToInt32(!inverse ^ (bwdata[j] == 1))];
 
-						gr.FillRectangle(brush, x + j * pixelsize, y + i * pixelsize, pixelsize, pixelsize);
+						gr.FillRectangle(brush, x + j * pixelsizeX, y + i * pixelsizeY, pixelsizeX, pixelsizeY);
 					}
 				}
 			}
@@ -963,7 +973,7 @@ namespace FontMaker
 							brush = BrushCache[1 + cldata[j]];
 						}
 
-						gr.FillRectangle(brush, x + j * pixelsize * 2, y + i * pixelsize, 2 * pixelsize, pixelsize);
+						gr.FillRectangle(brush, x + j * pixelsizeX * 2, y + i * pixelsizeY, 2 * pixelsizeX, pixelsizeY);
 					}
 				}
 			}

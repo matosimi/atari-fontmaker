@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System;
 using System.Drawing.Drawing2D;
 using System.Text;
 using TinyJson;
@@ -119,7 +120,7 @@ namespace FontMaker
 			}
 
 			var rx = e.X / 16;
-			var ry = e.Y / 16;
+			var ry = e.Y / CellHeight;
 
 			if (buttonMegaCopy.Checked)
 			{
@@ -135,7 +136,7 @@ namespace FontMaker
 							CopyPasteRange.X = rx;
 							megaCopyStatus = MegaCopyStatusFlags.Selecting;
 							pictureBoxViewEditorRubberBand.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
-							pictureBoxViewEditorRubberBand.Top = pictureBoxAtariView.Top + e.Y - e.Y % 16 - 2;
+							pictureBoxViewEditorRubberBand.Top = pictureBoxAtariView.Top + e.Y - e.Y % CellHeight - 2;
 							pictureBoxViewEditorRubberBand.Width = 20;
 							pictureBoxViewEditorRubberBand.Height = 20;
 							pictureBoxViewEditorRubberBand.Visible = true;
@@ -173,7 +174,7 @@ namespace FontMaker
 					ContinueViewDrawInMove = false;
 				} // Ctrl+click nezapina toggle
 
-				if (ry >= pictureBoxAtariView.Height / 16)
+				if (ry >= pictureBoxAtariView.Height / CellHeight)
 				{
 					return;
 				}
@@ -231,7 +232,7 @@ namespace FontMaker
 			}
 
 			var rx = e.X / 16;
-			var ry = e.Y / 16;
+			var ry = e.Y / CellHeight;
 
 			if (buttonMegaCopy.Checked)
 			{
@@ -284,19 +285,19 @@ namespace FontMaker
 						}
 
 						rx = e.X / 16;
-						ry = e.Y / 16;
+						ry = e.Y / CellHeight;
 
 						int origWidth = pictureBoxViewEditorRubberBand.Width;
 						int origHeight = pictureBoxViewEditorRubberBand.Height;
 
 						int w = 20;
-						int h = 20;
+						int h = CursorHeight;
 						var temp = (rx - CopyPasteRange.X + 1) * 16 + 4;
 						if (temp >= 20)
 							w = temp;
 
-						temp = (ry - CopyPasteRange.Y + 1) * 16 + 4;
-						if (temp >= 20)
+						temp = (ry - CopyPasteRange.Y + 1) * CellHeight + 4;
+						if (temp >= CursorHeight)
 							h = temp;
 
 						if (w != origWidth || h != origHeight)
@@ -308,15 +309,21 @@ namespace FontMaker
 
 					case MegaCopyStatusFlags.Pasting:
 					{
-						if (!MouseValidView(e.X, e.Y))
+                        if (!MouseValidView(e.X, e.Y))
 						{
 							pictureBoxViewEditorPasteCursor.Visible = false;
 							pictureBoxViewEditorMegaCopyImage.Visible = false;
 							return;
 						}
 
-						pictureBoxViewEditorPasteCursor.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
-						pictureBoxViewEditorPasteCursor.Top = pictureBoxAtariView.Top + e.Y - e.Y % 16 - 2;
+                        if (!PastingToView)
+                        {
+                            PastingToView = true;
+                            RevalidateClipboard();
+                        }
+
+                        pictureBoxViewEditorPasteCursor.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
+						pictureBoxViewEditorPasteCursor.Top = pictureBoxAtariView.Top + e.Y - e.Y % CellHeight - 2;
 						pictureBoxViewEditorPasteCursor.Visible = true;
 						pictureBoxViewEditorMegaCopyImage.Visible = true;
 						pictureBoxFontSelectorPasteCursor.Visible = false;
@@ -331,16 +338,18 @@ namespace FontMaker
 			{
 				if (ContinueViewDrawInMove && e.X >= 0 && e.X < pictureBoxAtariView.Width &&
 				    e.Y >= 0 && e.Y < pictureBoxAtariView.Height &&
-				    (e.X / 16 != LastViewCharacterX || e.Y / 16 != LastViewCharacterY))
+				    (e.X / 16 != LastViewCharacterX || e.Y / CellHeight != LastViewCharacterY))
 				{
 					ActionAtariViewEditorMouseDown(new MouseEventArgs(MouseButtons.Left, 1, e.X, e.Y, 0));
 				}
 
 				pictureBoxViewEditorPasteCursor.Width = 20;
-				pictureBoxViewEditorPasteCursor.Height = 20;
+				pictureBoxViewEditorPasteCursor.Height = CursorHeight;
 				pictureBoxViewEditorPasteCursor.Left = pictureBoxAtariView.Left + e.X - e.X % 16 - 2;
-				pictureBoxViewEditorPasteCursor.Top = pictureBoxAtariView.Top + e.Y - e.Y % 16 - 2;
-				pictureBoxViewEditorPasteCursor.Visible = true;
+				pictureBoxViewEditorPasteCursor.Top = pictureBoxAtariView.Top + e.Y - e.Y % CellHeight - 2;
+				ResizeViewEditorPasteCursor();
+
+                pictureBoxViewEditorPasteCursor.Visible = true;
 			}
 
 			// Char under cursor:
@@ -350,14 +359,14 @@ namespace FontMaker
 			}
 
 			rx = e.X / 16;
-			ry = e.Y / 16;
+			ry = e.Y / CellHeight;
 			var fontchar = AtariView.ViewBytes[rx, ry];
 			labelViewCharInfo.Text = $@"Char: Font {AtariView.UseFontOnLine[ry]} ${fontchar:X2} #{fontchar} @ {rx},{ry}";
 		}
 
 		public bool MouseValidView(int x, int y)
 		{
-			return (x < pictureBoxAtariView.Width - (CopyPasteRange.Width) * 16) && (y < pictureBoxAtariView.Height - (CopyPasteRange.Height) * 16);
+			return (x < pictureBoxAtariView.Width - (CopyPasteRange.Width) * 16) && (y < pictureBoxAtariView.Height - (CopyPasteRange.Height) * CellHeight);
 		}
 
 		/// <summary>
@@ -369,10 +378,13 @@ namespace FontMaker
 			var img = Helpers.GetImage(pictureBoxAtariView);
 			using (var gr = Graphics.FromImage(img))
 			{
+				gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+				gr.Clear(AtariPalette[SetOfSelectedColors[1]]);
+
 				var destRect = new Rectangle
 				{
 					Width = 16,
-					Height = 16,
+					Height = CellHeight,
 				};
 
 				var srcRect = new Rectangle
@@ -381,7 +393,7 @@ namespace FontMaker
 					Height = 16,
 				};
 
-				for (var y = 0; y < AtariView.VIEW_HEIGHT; y++)
+				for (var y = 0; y < ViewHeight; y++)
 				{
 					for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
 					{
@@ -389,7 +401,7 @@ namespace FontMaker
 						var ry = AtariView.ViewBytes[x, y] / 32;
 
 						destRect.X = x * 16;
-						destRect.Y = y * 16;
+						destRect.Y = y * CellHeight;
 
 						srcRect.X = rx * 16;
 						srcRect.Y = ry * 16 + Constants.FontYOffset[AtariView.UseFontOnLine[y] - 1] + colorOffset;
@@ -409,12 +421,14 @@ namespace FontMaker
 		{
 			var colorOffset = InColorMode ? 512 : 0;
 			var img = Helpers.GetImage(pictureBoxAtariView);
+			
 			using (var gr = Graphics.FromImage(img))
 			{
-				var destRect = new Rectangle
+                gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+                var destRect = new Rectangle
 				{
 					Width = 16,
-					Height = 16,
+					Height = CellHeight,
 				};
 
 				var rx = SelectedCharacterIndex % 32; // Character x,y
@@ -428,7 +442,7 @@ namespace FontMaker
 					Height = 16,
 				};
 
-				for (var y = 0; y < AtariView.VIEW_HEIGHT; y++)
+				for (var y = 0; y < ViewHeight; y++)
 				{
 					var fontYOffset = Constants.FontPageOffset[AtariView.UseFontOnLine[y] - 1] + colorOffset;
 
@@ -446,7 +460,7 @@ namespace FontMaker
 					for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
 					{
 						destRect.X = x * 16;
-						destRect.Y = y * 16;
+						destRect.Y = y * CellHeight;
 
 						if (AtariView.ViewBytes[x, y] == (byte)ep)
 						{
@@ -460,6 +474,8 @@ namespace FontMaker
 						{
 							srcRect.Y = ny * 16 + fontYOffset;
 							//gr.DrawImage(pictureBoxFontSelector.Image, destRect, srcRect, GraphicsUnit.Pixel);
+							
+		
 							gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect, GraphicsUnit.Pixel);
 						}
 					}
@@ -505,9 +521,9 @@ namespace FontMaker
 			using (var gr = Graphics.FromImage(img))
 			{
 				gr.FillRectangle(WhiteBrush, 0, 0, img.Width, img.Height);
-				for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
+				for (var a = 0; a < ViewHeight; a++)
 				{
-					gr.DrawString(ToDraw[AtariView.UseFontOnLine[a]], this.Font, BlackBrush, 4, 2 + a * 16);
+					gr.DrawString(ToDraw[AtariView.UseFontOnLine[a]], this.Font, BlackBrush, 4, 2 + a * CellHeight);
 				}
 			}
 
@@ -638,9 +654,13 @@ namespace FontMaker
 						SwopPageAction(0);
 					}
 
-					// If the GFX (mode 0 or 4) does not match then hit the GFX button to switch the mode of the GUI
-					if (InColorMode != (coloredGfx == 1))
-					{
+					// If the GFX mode does not match then hit the GFX button until we are at the correct mode
+					while (
+						(coloredGfx == 0 && InColorMode) ||
+						(coloredGfx == 1 && (!InColorMode || InTallMode)) ||
+						(coloredGfx == 2 && (!InColorMode || !InTallMode))
+						)
+					{ 
 						SwitchGfxMode();
 					}
 				}
@@ -678,7 +698,7 @@ namespace FontMaker
 			// Version
 			jo.Version = "2023";
 			// Which GFX mode is selected
-			jo.ColoredGfx = InColorMode ? "1" : "0";
+			jo.ColoredGfx = InColorMode ? (InTallMode ? "2" : "1" ) : "0";
 
 			// Characters in the current view
 			for (var i = 0; i < AtariView.VIEW_HEIGHT; i++)
@@ -741,7 +761,7 @@ namespace FontMaker
 		/// </summary>
 		public void ActionCharacterSetSelector(MouseEventArgs e)
 		{
-			var ry = e.Y / 16;
+			var ry = e.Y / CellHeight;
 
 			if (Control.ModifierKeys == Keys.Control)
 			{

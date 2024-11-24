@@ -322,8 +322,14 @@ namespace FontMaker
 								pictureBoxFontSelectorMegaCopyImage.Visible = false;
 								return;
 							}
+                            
+							if (PastingToView)
+                            {
+                                PastingToView = false;
+                                RevalidateClipboard();
+                            }
 
-							pictureBoxFontSelectorPasteCursor.Left = pictureBoxFontSelector.Left + e.X - e.X % 16 - 2;
+                            pictureBoxFontSelectorPasteCursor.Left = pictureBoxFontSelector.Left + e.X - e.X % 16 - 2;
 							pictureBoxFontSelectorPasteCursor.Top = pictureBoxFontSelector.Top + e.Y - e.Y % 16 - 2;
 							pictureBoxFontSelectorMegaCopyImage.Left = pictureBoxFontSelectorPasteCursor.Left + 2;
 							pictureBoxFontSelectorMegaCopyImage.Top = pictureBoxFontSelectorPasteCursor.Top + 2;
