@@ -38,7 +38,25 @@ namespace FontMaker
 
 		private void SwitchGfxMode()
 		{
-			InColorMode = !InColorMode;
+			// Switch to tall color mode and return
+			if (InColorMode && !InTallMode)
+			{
+				InTallMode = true;
+				RedrawLineTypes();
+                RedrawView();
+				RedrawChar();
+				return;
+			} 
+
+			if (InTallMode)
+			{
+                InTallMode = false;
+                RedrawLineTypes();
+            }
+
+            
+            InColorMode = !InColorMode;
+			
 			ShowCorrectFontBank();
 			RedrawView();
 
@@ -348,6 +366,9 @@ namespace FontMaker
 				BrushCache[i]?.Dispose();
 				BrushCache[i] = new SolidBrush(AtariPalette[SetOfSelectedColors[i]]);
 			}
+
+			if (EmptyBrush == null)
+				EmptyBrush = new SolidBrush(Color.FromKnownColor(KnownColor.DarkGray));
 
 			AtariFontRenderer.RebuildPalette(SetOfSelectedColors);
 		}

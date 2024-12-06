@@ -71,7 +71,25 @@ namespace FontMaker
 		/// </summary>
 		internal Color[] AtariPalette { get; set; } = new Color[256];
 		internal bool InColorMode { get; set; } = false;
-		internal int ActiveColorNr { get; set; }
+		private bool _inTallMode = false;
+        internal bool InTallMode { get { return _inTallMode; } 
+			set
+			{
+				_inTallMode = value;
+				CellHeight = _inTallMode ? 32 : 16;
+				CursorHeight = _inTallMode ? 40 : 20;
+				CharXWidth = _inTallMode ? 20 : 40;
+				ViewHeight = _inTallMode ? AtariView.VIEW_HEIGHT_TALL : AtariView.VIEW_HEIGHT;
+			} 
+		}
+
+		internal int CellHeight { get; set; } = 16;
+		internal int CursorHeight { get; set; } = 20;
+		internal int CharXWidth { get; set; } = 40;
+		internal int ViewHeight { get; set; } = AtariView.VIEW_HEIGHT;
+
+		internal bool PastingToView { get; set; }
+        internal int ActiveColorNr { get; set; }
 		/// <summary>
 		/// The 6 active colors: These are indexes into the Atari color palette
 		/// 2 for mono (index 0 + 1)
@@ -79,7 +97,7 @@ namespace FontMaker
 		/// </summary>
 		internal byte[] SetOfSelectedColors { get; set; } = new byte[6];
 		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[6];
-
+		internal SolidBrush EmptyBrush { get; set; }
 
 		internal string CurrentDataFolder { get; set; } = string.Empty;
 		internal string Font1Filename { get; set; } = string.Empty;

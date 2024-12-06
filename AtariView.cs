@@ -4,6 +4,7 @@
 	{
 		public const int VIEW_WIDTH = 40;
 		public const int VIEW_HEIGHT = 26;
+		public const int VIEW_HEIGHT_TALL = 13;
 
 		#region Data
 
