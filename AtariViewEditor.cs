@@ -1,10 +1,9 @@
 ﻿using Microsoft.VisualBasic;
-using System;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
-using System.Windows.Forms;
 using TinyJson;
+#pragma warning disable WFO1000
 
 namespace FontMaker
 {
@@ -12,43 +11,46 @@ namespace FontMaker
 	{
 	}
 
-	public class AtrViewInfoJSON
+	public class AtrViewInfoJson
 	{
-		public string Version { get; set; }
+		public string? Version { get; set; }
+
 		/// <summary>
-		/// Mode 4 indicator
-		/// 1 = mode 4
+		/// Mode 4/5 indicator
+		/// 0 = mode 2 B & W
+		/// 1 = mode 4 Color
+		/// 2 = mode 5 Color
 		/// </summary>
-		public string ColoredGfx { get; set; }
+		public string ColoredGfx { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Characters in the view
 		/// </summary>
-		public string Chars { get; set; }
+		public string Chars { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Use which font on which of the 26 lines of the view "1234"
 		/// </summary>
-		public string Lines { get; set; }
+		public string Lines { get; set; } = string.Empty;
 
 		/// <summary>
 		/// Hex encoded array of the 6 selected colors
 		/// </summary>
-		public string Colors { get; set; }
+		public string Colors { get; set; } = string.Empty;
 
-		public string Fontname1 { get; set; }
-		public string Fontname2 { get; set; }
+		public string Fontname1 { get; set; } = string.Empty;
+		public string Fontname2 { get; set; } = string.Empty;
 		public string? Fontname3 { get; set; }
 		public string? Fontname4 { get; set; }
 
 		/// <summary>
 		/// Hex encoded 1024 bytes per font
 		/// </summary>
-		public string Data { get; set; }
+		public string Data { get; set; } = string.Empty;
 
-		public string FortyBytes { get; set; }
+		public string FortyBytes { get; set; } = string.Empty;
 
-		public List<SavedPageData> Pages { get; set; }
+		public List<SavedPageData>? Pages { get; set; }
 	}
 
 
@@ -66,7 +68,7 @@ namespace FontMaker
 		internal bool ContinueViewDrawInMove { get; set; }
 
 		/// <summary>
-		/// Detect a right-double-click and reset/cancel the mega copy paste mode
+		/// Detect a right-double-click and reset/cancel the mega copy/paste mode
 		/// </summary>
 		/// <param name="e"></param>
 		public void ActionAtariViewDoubleClick(MouseEventArgs e)
@@ -99,14 +101,12 @@ namespace FontMaker
 			if (by > 16)
 				by -= 16;
 
-			var old_megaCopyStatus = megaCopyStatus;
+			var oldMegaCopyStatus = megaCopyStatus;
 			megaCopyStatus = MegaCopyStatusFlags.None;
 			var mouseEvent = new MouseEventArgs(MouseButtons.Left, 0, bx * 16 + 4, by * 16 + 4, 0);
 			ActionFontSelectorMouseDown(mouseEvent);
 			ActionFontSelectorMouseUp(mouseEvent);
-			megaCopyStatus = old_megaCopyStatus;
-
-			//ActionFontSelectorMouseDown(new MouseEventArgs(MouseButtons.Left, 1, bx * 16 + 4, by * 16 + 4, 0));
+			megaCopyStatus = oldMegaCopyStatus;
 		}
 
 		public void PickPage(int pageIndex)
@@ -516,7 +516,7 @@ namespace FontMaker
 			RedrawLineTypes();
 		}
 
-		private static readonly string?[] ToDraw = new string?[] { null, "1", "2", "3", "4" };
+		private static readonly string?[] ToDraw = [null, "1", "2", "3", "4"];
 
 		/// <summary>
 		/// Draw the font indicator next to the sample screen.
@@ -542,6 +542,11 @@ namespace FontMaker
 			return checkBox40Bytes.Checked ? 40 : 32;
 		}
 
+		/// <summary>
+		/// Load the default or specified .atrview file
+		/// </summary>
+		/// <param name="filename"></param>
+		/// <param name="forceLoadFont"></param>
 		public void LoadViewFile(string? filename, bool forceLoadFont = false)
 		{
 			ClearPageList();
@@ -550,8 +555,8 @@ namespace FontMaker
 
 			try
 			{
-				var jsonText = filename is null ? Helpers.GetResource<string>("default.atrview") : File.ReadAllText(filename, Encoding.UTF8);
-				var jsonObj = jsonText.FromJson<AtrViewInfoJSON>();
+				var jsonText = string.IsNullOrWhiteSpace(filename) ? Helpers.GetResource<string>("default.atrview") : File.ReadAllText(filename, Encoding.UTF8);
+				var jsonObj = jsonText.FromJson<AtrViewInfoJson>();
 
 				int.TryParse(jsonObj.Version, out var version);
 				int.TryParse(jsonObj.ColoredGfx, out var coloredGfx);
@@ -636,11 +641,10 @@ namespace FontMaker
 					// Load the page information
 					if (jsonObj.Pages?.Count > 0)
 					{
-						Pages = new List<PageData>();
+						Pages = [];
 						for (var pageIndex = 0; pageIndex < jsonObj.Pages.Count; ++pageIndex)
 						{
 							var pageSrc = jsonObj.Pages[pageIndex];
-
 
 							bytes = Convert.FromHexString(pageSrc.View);
 							idx = 0;
@@ -664,8 +668,8 @@ namespace FontMaker
 					// If the GFX mode does not match then hit the GFX button until we are at the correct mode
 					while (
 						(coloredGfx == 0 && InColorMode) ||
-						(coloredGfx == 1 && (!InColorMode || InTallMode)) ||
-						(coloredGfx == 2 && (!InColorMode || !InTallMode))
+						(coloredGfx == 1 && (!InColorMode || InMode5)) ||
+						(coloredGfx == 2 && (!InColorMode || !InMode5))
 						)
 					{ 
 						SwitchGfxMode();
@@ -692,20 +696,20 @@ namespace FontMaker
 			BuildPageList();
 		}
 
-		// save view file new edition
+		// Save view file new edition
 		public void SaveViewFile(string filename)
 		{
 			// Make sure that the current page's data is saved to the page container
 			SwopPage(saveCurrent: true);
 
-			var jo = new AtrViewInfoJSON();
+			var jo = new AtrViewInfoJson();
 
 			var characterBytes = string.Empty;
 
 			// Version
 			jo.Version = "2023";
 			// Which GFX mode is selected
-			jo.ColoredGfx = InColorMode ? (InTallMode ? "2" : "1" ) : "0";
+			jo.ColoredGfx = InColorMode ? (InMode5 ? "2" : "1" ) : "0";
 
 			// Characters in the current view
 			for (var i = 0; i < AtariView.VIEW_HEIGHT; i++)
@@ -849,7 +853,7 @@ namespace FontMaker
 
 					try
 					{
-						fsDat.Read(buf, 0, loadSize);
+						fsDat.ReadExactly(buf, 0, loadSize);
 					}
 					finally
 					{
@@ -890,17 +894,18 @@ namespace FontMaker
 					try
 					{
 
-						fs.Read(buf, fsIndex, 1);
+						fs.ReadExactly(buf, fsIndex, 1);
 						version = buf[0];
 						++fsIndex;
 					}
-					finally
+					catch
 					{
+						// ignored
 					}
 
 					if (version > 3)
 					{
-						MessageBox.Show("File was created in newer version of FontMaker (incorrect file???)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+						MessageBox.Show(@"File was created in newer version of FontMaker (incorrect file???)", @"Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
 						return;
 					}
 				}
@@ -908,12 +913,13 @@ namespace FontMaker
 				byte c = 0;
 				try
 				{
-					fs.Read(buf, fsIndex, 1);
+					fs.ReadExactly(buf, fsIndex, 1);
 					c = buf[0];
 					++fsIndex;
 				}
-				finally
+				catch
 				{
+					// ignored
 				}
 
 				InColorMode = c == 0;
@@ -923,27 +929,28 @@ namespace FontMaker
 				{
 					for (var a = 0; a <= 7; a++)
 					{
-						fs.Read(buf, fsIndex, 4);
+						fs.ReadExactly(buf, fsIndex, 4);
 						AtariView.UseFontOnLine[a] = (byte)BitConverter.ToInt32(buf, 0);
 						fsIndex += 4;
 					}
 				}
 
-				for (int a = 0; a < 6; a++)
+				for (var a = 0; a < 6; a++)
 				{
 					byte rr = 0;
 					byte gg = 0;
 					byte bb = 0;
 					try
 					{
-						fs.Read(buf, fsIndex, 3);
+						fs.ReadExactly(buf, fsIndex, 3);
 						fsIndex += 3;
 						rr = buf[0];
 						gg = buf[1];
 						bb = buf[2];
 					}
-					finally
+					catch
 					{
+						// ignored
 					}
 
 					SetOfSelectedColors[a] = Helpers.FindClosest(rr, gg, bb, AtariPalette);
@@ -959,11 +966,12 @@ namespace FontMaker
 							// 31 x 8 screen = 248 bytes
 							try
 							{
-								fs.Read(buf, fsIndex, 248);
+								fs.ReadExactly(buf, fsIndex, 248);
 								fsIndex += 248;
 							}
-							finally
+							catch
 							{
+								// ignored
 							}
 
 							for (var a = 0; a < 8; a++)
@@ -975,32 +983,33 @@ namespace FontMaker
 							}
 
 							RedrawLineTypes();
-						}
 							break;
+						}
 
 						case 3:
 						{
 							// 32x26 screen = 832 bytes
 							try
 							{
-								fs.Read(buf, fsIndex, 32 * 26);
+								fs.ReadExactly(buf, fsIndex, 32 * 26);
 								fsIndex += 32 * 26;
 							}
-							finally
+							catch
 							{
+								// ignored
 							}
 
-							for (int a = 0; a < 26; a++)
+							for (var a = 0; a < 26; a++)
 							{
-								for (int b = 0; b < 32; b++)
+								for (var b = 0; b < 32; b++)
 								{
 									AtariView.ViewBytes[b, a] = buf[a * 32 + b];
 								}
 							}
 
 							RedrawLineTypes();
-						}
 							break;
+						}
 					}
 				}
 
@@ -1008,11 +1017,11 @@ namespace FontMaker
 				{
 					try
 					{
-						fs.Read(buf, fsIndex, 186);
-						fsIndex += 186;
+						fs.ReadExactly(buf, fsIndex, 186);
 					}
-					finally
+					catch
 					{
+						// ignored
 					}
 
 					for (var b = 0; b < 31; b++)
@@ -1132,7 +1141,7 @@ namespace FontMaker
 		public void ActionDeletePage()
 		{
 			if (Pages.Count <= 1) return;
-			var answer = MessageBox.Show("Are you sure you want to delete the page?", "Delete page", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+			var answer = MessageBox.Show(@"Are you sure you want to delete the page?", @"Delete page", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 			if (answer == DialogResult.No) return;
 
 			// Delete the page at the current index
@@ -1274,6 +1283,7 @@ namespace FontMaker
 			// AtariView.ViewBytes now has the selected page's data
 			// Adjust the data in the selected area
 			var from = AtariView.ViewBytes.Clone() as byte[,];
+			if (from is null) return;
 
 			switch (direction)
 			{

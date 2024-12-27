@@ -1,5 +1,6 @@
 using System.Drawing.Drawing2D;
 using System.Media;
+#pragma warning disable WFO1000
 
 namespace FontMaker
 {
@@ -71,15 +72,15 @@ namespace FontMaker
 		/// </summary>
 		internal Color[] AtariPalette { get; set; } = new Color[256];
 		internal bool InColorMode { get; set; } = false;
-		private bool _inTallMode = false;
-        internal bool InTallMode { get { return _inTallMode; } 
-			set
+		private bool _inMode5 = false;
+        internal bool InMode5 { get => _inMode5;
+	        set
 			{
-				_inTallMode = value;
-				CellHeight = _inTallMode ? 32 : 16;
-				CursorHeight = _inTallMode ? 40 : 20;
-				CharXWidth = _inTallMode ? 20 : 40;
-				ViewHeight = _inTallMode ? AtariView.VIEW_HEIGHT_TALL : AtariView.VIEW_HEIGHT;
+				_inMode5 = value;
+				CellHeight = _inMode5 ? 32 : 16;
+				CursorHeight = _inMode5 ? 36 : 20;
+				CharXWidth = _inMode5 ? 20 : 40;
+				ViewHeight = _inMode5 ? AtariView.VIEW_HEIGHT_TALL : AtariView.VIEW_HEIGHT;
 			} 
 		}
 
@@ -97,7 +98,7 @@ namespace FontMaker
 		/// </summary>
 		internal byte[] SetOfSelectedColors { get; set; } = new byte[6];
 		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[6];
-		internal SolidBrush EmptyBrush { get; set; }
+		internal SolidBrush? EmptyBrush { get; set; }
 
 		internal string CurrentDataFolder { get; set; } = string.Empty;
 		internal string Font1Filename { get; set; } = string.Empty;

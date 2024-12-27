@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿#pragma warning disable WFO1000
 
 namespace FontMaker
 {
@@ -9,7 +9,7 @@ namespace FontMaker
 
 	public partial class FontMakerForm
 	{
-		public List<string> ColorSets;
+		public List<string> ColorSets { get; set; } = [];
 
 		/// <summary>
 		/// The index in the combo box that is currently selected
@@ -35,25 +35,39 @@ namespace FontMaker
 			AtariFontRenderer.SetPalette(AtariPalette);
 		}
 
-
+		/// <summary>
+		/// Switch graphics mode
+		/// Mode 2 -> Mode 4 -> Mode 5 -> Mode 2
+		/// </summary>
 		private void SwitchGfxMode()
 		{
 			// Switch to tall color mode and return
-			if (InColorMode && !InTallMode)
+			// Mode #4 -> #5
+			if (InColorMode && !InMode5)
 			{
-				InTallMode = true;
+				InMode5 = true;
 				RedrawLineTypes();
                 RedrawView();
 				RedrawChar();
+
+				if (!buttonMegaCopy.Checked)
+				{
+					RevalidateCharButtons();
+				}
+				else
+				{
+					// Make sure the copy area is redrawn
+					RevalidateClipboard();
+				}
+				lblMode.Text = "5";
 				return;
 			} 
 
-			if (InTallMode)
+			if (InMode5)
 			{
-                InTallMode = false;
+                InMode5 = false;
                 RedrawLineTypes();
             }
-
             
             InColorMode = !InColorMode;
 			
@@ -88,6 +102,8 @@ namespace FontMaker
 			}
 
 			ConfigureClipboardActionButtons();
+
+			lblMode.Text = InColorMode ? "4" : "2";
 		}
 
 		private void SwitchFontBank()
@@ -103,7 +119,6 @@ namespace FontMaker
 
 			CheckDuplicate();
 		}
-
 
 		public void RedrawRecolorSource()
 		{
@@ -217,7 +232,7 @@ namespace FontMaker
 		/// <summary>
 		/// Draw the palette name into the color box.
 		/// </summary>
-		/// <param name="ic">Graohics object to draw into</param>
+		/// <param name="ic">Graphics object to draw into</param>
 		/// <param name="x">X offset of text in box</param>
 		/// <param name="y">Y offset of text in box</param>
 		/// <param name="num">Palette entry</param>
@@ -367,8 +382,7 @@ namespace FontMaker
 				BrushCache[i] = new SolidBrush(AtariPalette[SetOfSelectedColors[i]]);
 			}
 
-			if (EmptyBrush == null)
-				EmptyBrush = new SolidBrush(Color.FromKnownColor(KnownColor.DarkGray));
+			EmptyBrush ??= new SolidBrush(Color.FromKnownColor(KnownColor.DarkGray));
 
 			AtariFontRenderer.RebuildPalette(SetOfSelectedColors);
 		}

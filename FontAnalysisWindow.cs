@@ -1,5 +1,6 @@
 ﻿using System.Drawing.Drawing2D;
 using System.Text;
+#pragma warning disable WFO1000
 
 namespace FontMaker
 {

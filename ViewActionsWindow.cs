@@ -1,4 +1,5 @@
-﻿namespace FontMaker
+﻿#pragma warning disable WFO1000
+namespace FontMaker
 {
 	public partial class ViewActionsWindow : Form
 	{

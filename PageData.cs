@@ -1,4 +1,5 @@
-﻿namespace FontMaker
+﻿#pragma warning disable WFO1000
+namespace FontMaker
 {
 	/// <summary>
 	/// Page data container
@@ -58,7 +59,7 @@
 	public partial class FontMakerForm
 	{
 		// Everything to do with pages goes here
-		public List<PageData> Pages { get; set; }= new();
+		public List<PageData> Pages { get; set; } = [];
 
 		/// <summary>
 		/// The index in the combo box that is currently selected
@@ -72,7 +73,7 @@
 		/// </summary>
 		public void ClearPageList()
 		{
-			Pages = new List<PageData>();
+			Pages = [];
 			CurrentPageIndex = -1;
 		}
 
@@ -147,7 +148,7 @@
 
 		private void UpdatePageDisplay()
 		{
-			labelCurrentPageIndex.Text = $"#{comboBoxPages.SelectedIndex}";
+			labelCurrentPageIndex.Text = $@"#{comboBoxPages.SelectedIndex}";
 			RedrawView();
 			RedrawLineTypes();
 
