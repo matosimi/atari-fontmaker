@@ -63,6 +63,8 @@ namespace FontMaker
 		public AtariColorSelectorForm AtariColorSelector { get; set; } = new();
 		public ExportFontWindow ExportFontWindowForm { get; set; } = new();
 		public ExportViewWindow ExportViewWindowForm { get; set; } = new();
+
+		public ImportViewWindow ImportViewWindowForm { get; set; } = new();
 		public FontAnalysisWindow FontAnalysisWindowForm { get; set; } = new();
 
 		public ViewActionsWindow? ViewActionsWindowForm { get; set; } = null;
@@ -73,15 +75,17 @@ namespace FontMaker
 		internal Color[] AtariPalette { get; set; } = new Color[256];
 		internal bool InColorMode { get; set; } = false;
 		private bool _inMode5 = false;
-        internal bool InMode5 { get => _inMode5;
-	        set
+		internal bool InMode5
+		{
+			get => _inMode5;
+			set
 			{
 				_inMode5 = value;
 				CellHeight = _inMode5 ? 32 : 16;
 				CursorHeight = _inMode5 ? 36 : 20;
 				CharXWidth = _inMode5 ? 20 : 40;
 				ViewHeight = _inMode5 ? AtariView.VIEW_HEIGHT_TALL : AtariView.VIEW_HEIGHT;
-			} 
+			}
 		}
 
 		internal int CellHeight { get; set; } = 16;
@@ -90,14 +94,16 @@ namespace FontMaker
 		internal int ViewHeight { get; set; } = AtariView.VIEW_HEIGHT;
 
 		internal bool PastingToView { get; set; }
-        internal int ActiveColorNr { get; set; }
+		internal int ActiveColorNr { get; set; }
+		internal int Active4BitColorNr { get; set; }
 		/// <summary>
-		/// The 6 active colors: These are indexes into the Atari color palette
-		/// 2 for mono (index 0 + 1)
-		/// 5 for color (index 1, 2, 3, 4, 5 [inverse of 4])
+		/// The X active colors: These are indexes into the Atari color palette
+		/// B&W : 2 for mono (index 0 + 1)
+		/// Mode 4 & 5 : 5 for color (index 1, 2, 3, 4, 5 [inverse of 4])
+		/// Mode 10 : 9 colors
 		/// </summary>
-		internal byte[] SetOfSelectedColors { get; set; } = new byte[6];
-		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[6];
+		internal byte[] SetOfSelectedColors { get; set; } = new byte[10];
+		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[10];
 		internal SolidBrush? EmptyBrush { get; set; }
 
 		internal string CurrentDataFolder { get; set; } = string.Empty;
@@ -161,6 +167,7 @@ namespace FontMaker
 			// Init the gui
 			DoubleBuffered = true;
 			ActiveColorNr = 2;
+			Active4BitColorNr = 2;
 			SelectedCharacterIndex = 0;
 			comboBoxWriteMode.SelectedIndex = 0;
 			comboBoxPasteIntoFontNr.SelectedIndex = 0;
@@ -173,6 +180,10 @@ namespace FontMaker
 
 			LoadConfiguration();
 
+			BuildColorModeList();
+
+			BuildColorSelector();
+
 			string? ext;
 			if (Environment.GetCommandLineArgs().Length - 1 == 1)
 			{
@@ -183,37 +194,37 @@ namespace FontMaker
 				switch (ext)
 				{
 					case ".fn2":
-						{
-							// TODO: Load a .fn2 file
-							// It has 2048 bytes and effectively contains two fonts
-							//Load_font(Environment.GetCommandLineArgs()[1], 0, true);
-							//tempstring = Environment.GetCommandLineArgs()[1].Substring(-1, Environment.GetCommandLineArgs()[1].Length - 4);
-							//Font1Filename = tempstring + "1.fnt";
-							//Font2Filename = tempstring + "2.fnt";
-						}
-						break;
+					{
+						// TODO: Load a .fn2 file
+						// It has 2048 bytes and effectively contains two fonts
+						//Load_font(Environment.GetCommandLineArgs()[1], 0, true);
+						//tempstring = Environment.GetCommandLineArgs()[1].Substring(-1, Environment.GetCommandLineArgs()[1].Length - 4);
+						//Font1Filename = tempstring + "1.fnt";
+						//Font2Filename = tempstring + "2.fnt";
+					}
+					break;
 
 					case ".fnt":
-						{
-							Font1Filename = Environment.GetCommandLineArgs()[1];
-						}
-						break;
+					{
+						Font1Filename = Environment.GetCommandLineArgs()[1];
+					}
+					break;
 
 					case ".atrview":
-						{
-							LoadViewFile(Environment.GetCommandLineArgs()[1], true);
-							UpdateFormCaption();
-							RedrawFonts();
-							RedrawLineTypes();
-							RedrawView();
-							RedrawPal();
-							RedrawViewChar();
-							RedrawChar();
-							if (string.IsNullOrWhiteSpace(Font2Filename)) Font2Filename = Path.Join(loadPath, "Default.fnt");
-							if (string.IsNullOrWhiteSpace(Font3Filename)) Font3Filename = Path.Join(loadPath, "Default.fnt");
-							if (string.IsNullOrWhiteSpace(Font4Filename)) Font4Filename = Path.Join(loadPath, "Default.fnt");
-						}
-						break;
+					{
+						LoadViewFile(Environment.GetCommandLineArgs()[1], true);
+						UpdateFormCaption();
+						RedrawFonts();
+						RedrawLineTypes();
+						RedrawView();
+						RedrawPal();
+						RedrawViewChar();
+						RedrawChar();
+						if (string.IsNullOrWhiteSpace(Font2Filename)) Font2Filename = Path.Join(loadPath, "Default.fnt");
+						if (string.IsNullOrWhiteSpace(Font3Filename)) Font3Filename = Path.Join(loadPath, "Default.fnt");
+						if (string.IsNullOrWhiteSpace(Font4Filename)) Font4Filename = Path.Join(loadPath, "Default.fnt");
+					}
+					break;
 					default:
 						Font1Filename = Environment.GetCommandLineArgs()[1];
 						break;
@@ -674,6 +685,18 @@ namespace FontMaker
 		}
 		#endregion // Right button column
 
+		#region Bottom/Below character editor
+		private void CharacterEditor_Color9Menu_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			ActionCharacterEditorColor9Selected();
+		}
+
+		private void CharacterEditor_Color9Menu_DrawItem(object sender, DrawItemEventArgs e)
+		{
+			Color9Menu_DrawItem(e);
+		}
+		#endregion
+
 		#endregion
 
 		// ==========================================================================
@@ -684,7 +707,13 @@ namespace FontMaker
 
 		public void SwitchGraphicsMode_Click(object sender, EventArgs e)
 		{
-			SwitchGfxMode();
+			SwitchGfxMode();    // Switch between Mode 2 and color (which color depends on the drop-down)
+		}
+
+		private void SwitchColorMode_SelectedIndexChanged(object _, EventArgs __)
+		{
+			if (InColorSetSetup) return;
+			ColorMode_Change(); // The color mode drop down has changed!
 		}
 
 		/// <summary>
@@ -752,7 +781,16 @@ namespace FontMaker
 		private void ViewEditor_ExportView_Click(object sender, EventArgs e)
 		{
 			ExportViewWindowForm.InColorMode = InColorMode;
+			ExportViewWindowForm.WhichColorMode = WhichColorMode;
 			ExportViewWindowForm.ShowDialog();
+		}
+
+		private void ViewEditor_ImportView_Click(object sender, EventArgs e)
+		{
+			ImportViewWindowForm.InColorMode = InColorMode;
+			ImportViewWindowForm.WhichColorMode = WhichColorMode;
+			ImportViewWindowForm.ShowDialog();
+			RedrawView();
 		}
 
 		public void ViewEditor_CheckBox40Bytes_Click(object sender, EventArgs e)
@@ -1292,8 +1330,6 @@ namespace FontMaker
 		}
 
 		#endregion
-
-
 
 	}
 }

@@ -148,7 +148,7 @@ namespace FontMaker
 
 		private void UpdatePageDisplay()
 		{
-			labelCurrentPageIndex.Text = $@"#{comboBoxPages.SelectedIndex}";
+			// labelCurrentPageIndex.Text = $@"#{comboBoxPages.SelectedIndex}";
 			RedrawView();
 			RedrawLineTypes();
 

@@ -59,6 +59,13 @@
 			buttonClear = new Button();
 			buttonCopy = new Button();
 			buttonPaste = new Button();
+			pictureBoxActionColor = new PictureBox();
+			labelEditCharInfo = new Label();
+			labelColor = new Label();
+			cmbColor9Menu = new ComboBox();
+			comboBoxWriteMode = new ComboBox();
+			buttonUndo = new Button();
+			buttonRedo = new Button();
 			p_hh = new Panel();
 			buttonClearFont2 = new Button();
 			buttonClearFont1 = new Button();
@@ -72,6 +79,7 @@
 			buttonLoadFont2 = new Button();
 			buttonSaveFont2As = new Button();
 			p_zz = new Panel();
+			cmbColorMode = new ComboBox();
 			comboBoxColorSets = new ComboBox();
 			Bevel4 = new Panel();
 			pictureBoxPalette = new PictureBox();
@@ -103,14 +111,8 @@
 			buttonFontShiftLeftInsert = new Button();
 			checkBoxFontBank = new CheckBox();
 			imageListFont1234 = new ImageList(components);
-			pictureBoxActionColor = new PictureBox();
-			labelEditCharInfo = new Label();
-			labelColor = new Label();
 			checkBoxShowDuplicates = new CheckBox();
 			buttonMegaCopy = new CheckBox();
-			buttonUndo = new Button();
-			buttonRedo = new Button();
-			comboBoxWriteMode = new ComboBox();
 			panelColorSwitcher = new Panel();
 			pictureBoxRecolorSourceColor = new PictureBox();
 			pictureBoxRecolorTargetColor = new PictureBox();
@@ -132,11 +134,12 @@
 			buttonAddPage = new Button();
 			buttonDeletePage = new Button();
 			buttonEditPage = new Button();
-			labelCurrentPageIndex = new Label();
 			buttonExportView = new Button();
 			lblInMegaCopyMode = new Label();
 			buttonViewActions = new Button();
-			lblMode = new Label();
+			buttonImportView = new Button();
+			label1 = new Label();
+			panel1 = new Panel();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -151,12 +154,12 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxClipboardPreview).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxCharacterEditorColor1).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxCharacterEditorColor2).BeginInit();
+			((System.ComponentModel.ISupportInitialize)pictureBoxActionColor).BeginInit();
 			p_hh.SuspendLayout();
 			p_zz.SuspendLayout();
 			Bevel4.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)pictureBoxPalette).BeginInit();
 			p_status.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)pictureBoxActionColor).BeginInit();
 			panelColorSwitcher.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorSourceColor).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorTargetColor).BeginInit();
@@ -181,7 +184,7 @@
 			// pictureBoxFontSelector
 			// 
 			pictureBoxFontSelector.Controls.Add(pictureBoxDuplicateIndicator);
-			pictureBoxFontSelector.Location = new Point(2, 232);
+			pictureBoxFontSelector.Location = new Point(2, 289);
 			pictureBoxFontSelector.Name = "pictureBoxFontSelector";
 			pictureBoxFontSelector.Size = new Size(512, 256);
 			pictureBoxFontSelector.TabIndex = 1;
@@ -224,7 +227,7 @@
 			// 
 			// pictureBoxFontSelectorMegaCopyImage
 			// 
-			pictureBoxFontSelectorMegaCopyImage.Location = new Point(26, 256);
+			pictureBoxFontSelectorMegaCopyImage.Location = new Point(26, 333);
 			pictureBoxFontSelectorMegaCopyImage.Name = "pictureBoxFontSelectorMegaCopyImage";
 			pictureBoxFontSelectorMegaCopyImage.Size = new Size(105, 105);
 			pictureBoxFontSelectorMegaCopyImage.TabIndex = 4;
@@ -249,7 +252,7 @@
 			// labelViewCharInfo
 			// 
 			labelViewCharInfo.AutoSize = true;
-			labelViewCharInfo.Location = new Point(525, 446);
+			labelViewCharInfo.Location = new Point(523, 419);
 			labelViewCharInfo.Name = "labelViewCharInfo";
 			labelViewCharInfo.Size = new Size(104, 13);
 			labelViewCharInfo.TabIndex = 6;
@@ -275,9 +278,16 @@
 			p_xx.Controls.Add(buttonClear);
 			p_xx.Controls.Add(buttonCopy);
 			p_xx.Controls.Add(buttonPaste);
+			p_xx.Controls.Add(pictureBoxActionColor);
+			p_xx.Controls.Add(labelEditCharInfo);
+			p_xx.Controls.Add(labelColor);
+			p_xx.Controls.Add(cmbColor9Menu);
+			p_xx.Controls.Add(comboBoxWriteMode);
+			p_xx.Controls.Add(buttonUndo);
+			p_xx.Controls.Add(buttonRedo);
 			p_xx.Location = new Point(113, 0);
 			p_xx.Name = "p_xx";
-			p_xx.Size = new Size(289, 177);
+			p_xx.Size = new Size(289, 234);
 			p_xx.TabIndex = 1;
 			// 
 			// Bevel3
@@ -520,6 +530,79 @@
 			buttonPaste.UseVisualStyleBackColor = true;
 			buttonPaste.Click += PasteFromClipboard_Click;
 			// 
+			// pictureBoxActionColor
+			// 
+			pictureBoxActionColor.Location = new Point(115, 176);
+			pictureBoxActionColor.Name = "pictureBoxActionColor";
+			pictureBoxActionColor.Size = new Size(49, 17);
+			pictureBoxActionColor.TabIndex = 0;
+			pictureBoxActionColor.TabStop = false;
+			// 
+			// labelEditCharInfo
+			// 
+			labelEditCharInfo.AutoSize = true;
+			labelEditCharInfo.Location = new Point(4, 216);
+			labelEditCharInfo.Name = "labelEditCharInfo";
+			labelEditCharInfo.Size = new Size(107, 13);
+			labelEditCharInfo.TabIndex = 1;
+			labelEditCharInfo.Text = "Char: Font 1 $00 #0";
+			// 
+			// labelColor
+			// 
+			labelColor.AutoSize = true;
+			labelColor.Location = new Point(71, 177);
+			labelColor.Name = "labelColor";
+			labelColor.Size = new Size(38, 13);
+			labelColor.TabIndex = 2;
+			labelColor.Text = "Color:";
+			// 
+			// cmbColor9Menu
+			// 
+			cmbColor9Menu.DrawMode = DrawMode.OwnerDrawFixed;
+			cmbColor9Menu.DropDownHeight = 170;
+			cmbColor9Menu.DropDownStyle = ComboBoxStyle.DropDownList;
+			cmbColor9Menu.DropDownWidth = 77;
+			cmbColor9Menu.FormattingEnabled = true;
+			cmbColor9Menu.IntegralHeight = false;
+			cmbColor9Menu.Location = new Point(114, 174);
+			cmbColor9Menu.MaxDropDownItems = 10;
+			cmbColor9Menu.Name = "cmbColor9Menu";
+			cmbColor9Menu.Size = new Size(77, 23);
+			cmbColor9Menu.TabIndex = 25;
+			cmbColor9Menu.Visible = false;
+			cmbColor9Menu.DrawItem += CharacterEditor_Color9Menu_DrawItem;
+			cmbColor9Menu.SelectedIndexChanged += CharacterEditor_Color9Menu_SelectedIndexChanged;
+			// 
+			// comboBoxWriteMode
+			// 
+			comboBoxWriteMode.DropDownStyle = ComboBoxStyle.DropDownList;
+			comboBoxWriteMode.FormattingEnabled = true;
+			comboBoxWriteMode.Items.AddRange(new object[] { "Rewrite", "Insert" });
+			comboBoxWriteMode.Location = new Point(2, 177);
+			comboBoxWriteMode.Name = "comboBoxWriteMode";
+			comboBoxWriteMode.Size = new Size(66, 21);
+			comboBoxWriteMode.TabIndex = 0;
+			// 
+			// buttonUndo
+			// 
+			buttonUndo.Image = (Image)resources.GetObject("buttonUndo.Image");
+			buttonUndo.Location = new Point(232, 177);
+			buttonUndo.Name = "buttonUndo";
+			buttonUndo.Size = new Size(22, 22);
+			buttonUndo.TabIndex = 4;
+			toolTips.SetToolTip(buttonUndo, "ExecuteUndo Font Change");
+			buttonUndo.Click += Undo_Click;
+			// 
+			// buttonRedo
+			// 
+			buttonRedo.Image = (Image)resources.GetObject("buttonRedo.Image");
+			buttonRedo.Location = new Point(253, 177);
+			buttonRedo.Name = "buttonRedo";
+			buttonRedo.Size = new Size(22, 22);
+			buttonRedo.TabIndex = 5;
+			toolTips.SetToolTip(buttonRedo, "Redo Font Change");
+			buttonRedo.Click += Redo_Click;
+			// 
 			// p_hh
 			// 
 			p_hh.BorderStyle = BorderStyle.FixedSingle;
@@ -664,6 +747,7 @@
 			// p_zz
 			// 
 			p_zz.BorderStyle = BorderStyle.FixedSingle;
+			p_zz.Controls.Add(cmbColorMode);
 			p_zz.Controls.Add(comboBoxColorSets);
 			p_zz.Controls.Add(Bevel4);
 			p_zz.Controls.Add(buttonShowColorSwitchSetup);
@@ -672,14 +756,26 @@
 			p_zz.Controls.Add(buttonRecolor);
 			p_zz.Location = new Point(409, 0);
 			p_zz.Name = "p_zz";
-			p_zz.Size = new Size(105, 177);
+			p_zz.Size = new Size(105, 234);
 			p_zz.TabIndex = 2;
+			// 
+			// cmbColorMode
+			// 
+			cmbColorMode.DropDownStyle = ComboBoxStyle.DropDownList;
+			cmbColorMode.DropDownWidth = 150;
+			cmbColorMode.FormattingEnabled = true;
+			cmbColorMode.Location = new Point(1, 33);
+			cmbColorMode.MaxDropDownItems = 6;
+			cmbColorMode.Name = "cmbColorMode";
+			cmbColorMode.Size = new Size(98, 21);
+			cmbColorMode.TabIndex = 24;
+			cmbColorMode.SelectedIndexChanged += SwitchColorMode_SelectedIndexChanged;
 			// 
 			// comboBoxColorSets
 			// 
 			comboBoxColorSets.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxColorSets.FormattingEnabled = true;
-			comboBoxColorSets.Location = new Point(7, 94);
+			comboBoxColorSets.Location = new Point(7, 154);
 			comboBoxColorSets.MaxDropDownItems = 6;
 			comboBoxColorSets.Name = "comboBoxColorSets";
 			comboBoxColorSets.Size = new Size(92, 21);
@@ -691,10 +787,10 @@
 			Bevel4.BackgroundImageLayout = ImageLayout.None;
 			Bevel4.BorderStyle = BorderStyle.FixedSingle;
 			Bevel4.Controls.Add(pictureBoxPalette);
-			Bevel4.Location = new Point(7, 39);
+			Bevel4.Location = new Point(7, 58);
 			Bevel4.Margin = new Padding(0);
 			Bevel4.Name = "Bevel4";
-			Bevel4.Size = new Size(92, 56);
+			Bevel4.Size = new Size(92, 92);
 			Bevel4.TabIndex = 0;
 			// 
 			// pictureBoxPalette
@@ -702,7 +798,7 @@
 			pictureBoxPalette.Location = new Point(0, 0);
 			pictureBoxPalette.Margin = new Padding(0);
 			pictureBoxPalette.Name = "pictureBoxPalette";
-			pictureBoxPalette.Size = new Size(90, 54);
+			pictureBoxPalette.Size = new Size(90, 90);
 			pictureBoxPalette.TabIndex = 1;
 			pictureBoxPalette.TabStop = false;
 			toolTips.SetToolTip(pictureBoxPalette, "Shift+Click to restore default");
@@ -712,7 +808,7 @@
 			// 
 			buttonShowColorSwitchSetup.Enabled = false;
 			buttonShowColorSwitchSetup.Image = (Image)resources.GetObject("buttonShowColorSwitchSetup.Image");
-			buttonShowColorSwitchSetup.Location = new Point(72, 119);
+			buttonShowColorSwitchSetup.Location = new Point(72, 179);
 			buttonShowColorSwitchSetup.Name = "buttonShowColorSwitchSetup";
 			buttonShowColorSwitchSetup.Size = new Size(22, 22);
 			buttonShowColorSwitchSetup.TabIndex = 2;
@@ -722,7 +818,7 @@
 			// 
 			buttonSwitchGraphicsMode.Location = new Point(1, 6);
 			buttonSwitchGraphicsMode.Name = "buttonSwitchGraphicsMode";
-			buttonSwitchGraphicsMode.Size = new Size(82, 25);
+			buttonSwitchGraphicsMode.Size = new Size(98, 25);
 			buttonSwitchGraphicsMode.TabIndex = 0;
 			buttonSwitchGraphicsMode.Text = "Change GFX";
 			toolTips.SetToolTip(buttonSwitchGraphicsMode, "Mode 2 / 4");
@@ -731,7 +827,7 @@
 			// 
 			// buttonExportFont
 			// 
-			buttonExportFont.Location = new Point(8, 144);
+			buttonExportFont.Location = new Point(8, 204);
 			buttonExportFont.Name = "buttonExportFont";
 			buttonExportFont.Size = new Size(89, 25);
 			buttonExportFont.TabIndex = 1;
@@ -742,7 +838,7 @@
 			// buttonRecolor
 			// 
 			buttonRecolor.Enabled = false;
-			buttonRecolor.Location = new Point(8, 117);
+			buttonRecolor.Location = new Point(8, 177);
 			buttonRecolor.Name = "buttonRecolor";
 			buttonRecolor.Size = new Size(64, 25);
 			buttonRecolor.TabIndex = 2;
@@ -752,9 +848,9 @@
 			// 
 			// buttonLoadView
 			// 
-			buttonLoadView.Location = new Point(864, 416);
+			buttonLoadView.Location = new Point(799, 437);
 			buttonLoadView.Name = "buttonLoadView";
-			buttonLoadView.Size = new Size(89, 25);
+			buttonLoadView.Size = new Size(86, 23);
 			buttonLoadView.TabIndex = 3;
 			buttonLoadView.Text = "Load View";
 			buttonLoadView.UseVisualStyleBackColor = true;
@@ -762,9 +858,9 @@
 			// 
 			// buttonClearView
 			// 
-			buttonClearView.Location = new Point(768, 416);
+			buttonClearView.Location = new Point(706, 437);
 			buttonClearView.Name = "buttonClearView";
-			buttonClearView.Size = new Size(89, 25);
+			buttonClearView.Size = new Size(86, 23);
 			buttonClearView.TabIndex = 4;
 			buttonClearView.Text = "Clear View";
 			buttonClearView.UseVisualStyleBackColor = true;
@@ -772,9 +868,9 @@
 			// 
 			// buttonSaveView
 			// 
-			buttonSaveView.Location = new Point(960, 416);
+			buttonSaveView.Location = new Point(892, 437);
 			buttonSaveView.Name = "buttonSaveView";
-			buttonSaveView.Size = new Size(89, 25);
+			buttonSaveView.Size = new Size(86, 23);
 			buttonSaveView.TabIndex = 5;
 			buttonSaveView.Text = "Save View";
 			buttonSaveView.UseVisualStyleBackColor = true;
@@ -800,15 +896,9 @@
 			p_status.Controls.Add(buttonFontShiftLeftRotate);
 			p_status.Controls.Add(buttonFontShiftLeftInsert);
 			p_status.Controls.Add(checkBoxFontBank);
-			p_status.Controls.Add(pictureBoxActionColor);
-			p_status.Controls.Add(labelEditCharInfo);
-			p_status.Controls.Add(labelColor);
 			p_status.Controls.Add(checkBoxShowDuplicates);
 			p_status.Controls.Add(buttonMegaCopy);
-			p_status.Controls.Add(buttonUndo);
-			p_status.Controls.Add(buttonRedo);
-			p_status.Controls.Add(comboBoxWriteMode);
-			p_status.Location = new Point(-1, 179);
+			p_status.Location = new Point(-1, 238);
 			p_status.Name = "p_status";
 			p_status.Size = new Size(515, 50);
 			p_status.TabIndex = 6;
@@ -1093,39 +1183,14 @@
 			imageListFont1234.Images.SetKeyName(0, "12.bmp");
 			imageListFont1234.Images.SetKeyName(1, "34.bmp");
 			// 
-			// pictureBoxActionColor
-			// 
-			pictureBoxActionColor.Location = new Point(230, 5);
-			pictureBoxActionColor.Name = "pictureBoxActionColor";
-			pictureBoxActionColor.Size = new Size(49, 17);
-			pictureBoxActionColor.TabIndex = 0;
-			pictureBoxActionColor.TabStop = false;
-			// 
-			// labelEditCharInfo
-			// 
-			labelEditCharInfo.AutoSize = true;
-			labelEditCharInfo.Location = new Point(8, 7);
-			labelEditCharInfo.Name = "labelEditCharInfo";
-			labelEditCharInfo.Size = new Size(107, 13);
-			labelEditCharInfo.TabIndex = 1;
-			labelEditCharInfo.Text = "Char: Font 1 $00 #0";
-			// 
-			// labelColor
-			// 
-			labelColor.AutoSize = true;
-			labelColor.Location = new Point(195, 7);
-			labelColor.Name = "labelColor";
-			labelColor.Size = new Size(38, 13);
-			labelColor.TabIndex = 2;
-			labelColor.Text = "Color:";
-			// 
 			// checkBoxShowDuplicates
 			// 
-			checkBoxShowDuplicates.Location = new Point(341, 7);
+			checkBoxShowDuplicates.AutoSize = true;
+			checkBoxShowDuplicates.Location = new Point(8, 6);
 			checkBoxShowDuplicates.Name = "checkBoxShowDuplicates";
-			checkBoxShowDuplicates.Size = new Size(49, 17);
+			checkBoxShowDuplicates.Size = new Size(112, 17);
 			checkBoxShowDuplicates.TabIndex = 11;
-			checkBoxShowDuplicates.Text = "DUP";
+			checkBoxShowDuplicates.Text = "Show Duplicates";
 			toolTips.SetToolTip(checkBoxShowDuplicates, "Show duplicate characters within font");
 			checkBoxShowDuplicates.UseVisualStyleBackColor = true;
 			checkBoxShowDuplicates.Click += ShowDuplicates_Click;
@@ -1134,7 +1199,7 @@
 			// 
 			buttonMegaCopy.Appearance = Appearance.Button;
 			buttonMegaCopy.CheckAlign = ContentAlignment.MiddleCenter;
-			buttonMegaCopy.Location = new Point(394, 3);
+			buttonMegaCopy.Location = new Point(393, 2);
 			buttonMegaCopy.Name = "buttonMegaCopy";
 			buttonMegaCopy.Size = new Size(74, 21);
 			buttonMegaCopy.TabIndex = 3;
@@ -1142,36 +1207,6 @@
 			buttonMegaCopy.TextAlign = ContentAlignment.MiddleCenter;
 			toolTips.SetToolTip(buttonMegaCopy, "Toggle MegaCopy Mode");
 			buttonMegaCopy.Click += MegaCopy_Click;
-			// 
-			// buttonUndo
-			// 
-			buttonUndo.Image = (Image)resources.GetObject("buttonUndo.Image");
-			buttonUndo.Location = new Point(284, 2);
-			buttonUndo.Name = "buttonUndo";
-			buttonUndo.Size = new Size(22, 22);
-			buttonUndo.TabIndex = 4;
-			toolTips.SetToolTip(buttonUndo, "ExecuteUndo Font Change");
-			buttonUndo.Click += Undo_Click;
-			// 
-			// buttonRedo
-			// 
-			buttonRedo.Image = (Image)resources.GetObject("buttonRedo.Image");
-			buttonRedo.Location = new Point(312, 2);
-			buttonRedo.Name = "buttonRedo";
-			buttonRedo.Size = new Size(22, 22);
-			buttonRedo.TabIndex = 5;
-			toolTips.SetToolTip(buttonRedo, "Redo Font Change");
-			buttonRedo.Click += Redo_Click;
-			// 
-			// comboBoxWriteMode
-			// 
-			comboBoxWriteMode.DropDownStyle = ComboBoxStyle.DropDownList;
-			comboBoxWriteMode.FormattingEnabled = true;
-			comboBoxWriteMode.Items.AddRange(new object[] { "Rewrite", "Insert" });
-			comboBoxWriteMode.Location = new Point(126, 3);
-			comboBoxWriteMode.Name = "comboBoxWriteMode";
-			comboBoxWriteMode.Size = new Size(66, 21);
-			comboBoxWriteMode.TabIndex = 0;
 			// 
 			// panelColorSwitcher
 			// 
@@ -1226,9 +1261,9 @@
 			// buttonEnterText
 			// 
 			buttonEnterText.Enabled = false;
-			buttonEnterText.Location = new Point(520, 416);
+			buttonEnterText.Location = new Point(520, 464);
 			buttonEnterText.Name = "buttonEnterText";
-			buttonEnterText.Size = new Size(69, 25);
+			buttonEnterText.Size = new Size(86, 23);
 			buttonEnterText.TabIndex = 9;
 			buttonEnterText.Text = "Enter text";
 			toolTips.SetToolTip(buttonEnterText, "Text to clipboard, hold SHIFT while clicking to inverse");
@@ -1238,7 +1273,7 @@
 			// checkBox40Bytes
 			// 
 			checkBox40Bytes.AutoSize = true;
-			checkBox40Bytes.Location = new Point(696, 422);
+			checkBox40Bytes.Location = new Point(980, 422);
 			checkBox40Bytes.Name = "checkBox40Bytes";
 			checkBox40Bytes.Size = new Size(68, 17);
 			checkBox40Bytes.TabIndex = 10;
@@ -1267,7 +1302,7 @@
 			// pictureBoxFontSelectorRubberBand
 			// 
 			pictureBoxFontSelectorRubberBand.BackColor = Color.Transparent;
-			pictureBoxFontSelectorRubberBand.Location = new Point(167, 296);
+			pictureBoxFontSelectorRubberBand.Location = new Point(167, 373);
 			pictureBoxFontSelectorRubberBand.Margin = new Padding(0);
 			pictureBoxFontSelectorRubberBand.Name = "pictureBoxFontSelectorRubberBand";
 			pictureBoxFontSelectorRubberBand.Size = new Size(20, 20);
@@ -1299,7 +1334,7 @@
 			// 
 			pictureBoxFontSelectorPasteCursor.BackColor = Color.Transparent;
 			pictureBoxFontSelectorPasteCursor.BorderStyle = BorderStyle.FixedSingle;
-			pictureBoxFontSelectorPasteCursor.Location = new Point(167, 329);
+			pictureBoxFontSelectorPasteCursor.Location = new Point(167, 406);
 			pictureBoxFontSelectorPasteCursor.Margin = new Padding(0);
 			pictureBoxFontSelectorPasteCursor.Name = "pictureBoxFontSelectorPasteCursor";
 			pictureBoxFontSelectorPasteCursor.Size = new Size(20, 20);
@@ -1329,9 +1364,9 @@
 			// 
 			// buttonFontAnalysis
 			// 
-			buttonFontAnalysis.Location = new Point(520, 464);
+			buttonFontAnalysis.Location = new Point(520, 518);
 			buttonFontAnalysis.Name = "buttonFontAnalysis";
-			buttonFontAnalysis.Size = new Size(75, 23);
+			buttonFontAnalysis.Size = new Size(85, 23);
 			buttonFontAnalysis.TabIndex = 22;
 			buttonFontAnalysis.Text = "Analyse";
 			toolTips.SetToolTip(buttonFontAnalysis, "Find out which font elements are not used");
@@ -1342,7 +1377,7 @@
 			// 
 			comboBoxPages.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxPages.FormattingEnabled = true;
-			comboBoxPages.Location = new Point(719, 443);
+			comboBoxPages.Location = new Point(629, 492);
 			comboBoxPages.Name = "comboBoxPages";
 			comboBoxPages.Size = new Size(121, 21);
 			comboBoxPages.TabIndex = 16;
@@ -1350,7 +1385,7 @@
 			// 
 			// buttonAddPage
 			// 
-			buttonAddPage.Location = new Point(841, 443);
+			buttonAddPage.Location = new Point(751, 492);
 			buttonAddPage.Name = "buttonAddPage";
 			buttonAddPage.Size = new Size(25, 21);
 			buttonAddPage.TabIndex = 17;
@@ -1360,7 +1395,7 @@
 			// 
 			// buttonDeletePage
 			// 
-			buttonDeletePage.Location = new Point(869, 443);
+			buttonDeletePage.Location = new Point(779, 492);
 			buttonDeletePage.Name = "buttonDeletePage";
 			buttonDeletePage.Size = new Size(25, 21);
 			buttonDeletePage.TabIndex = 18;
@@ -1370,7 +1405,7 @@
 			// 
 			// buttonEditPage
 			// 
-			buttonEditPage.Location = new Point(896, 443);
+			buttonEditPage.Location = new Point(806, 492);
 			buttonEditPage.Name = "buttonEditPage";
 			buttonEditPage.Size = new Size(38, 21);
 			buttonEditPage.TabIndex = 19;
@@ -1378,23 +1413,13 @@
 			buttonEditPage.UseVisualStyleBackColor = true;
 			buttonEditPage.Click += ViewEditor_EditPage_Click;
 			// 
-			// labelCurrentPageIndex
-			// 
-			labelCurrentPageIndex.Location = new Point(687, 447);
-			labelCurrentPageIndex.Name = "labelCurrentPageIndex";
-			labelCurrentPageIndex.Size = new Size(30, 15);
-			labelCurrentPageIndex.TabIndex = 20;
-			labelCurrentPageIndex.Text = "#0";
-			labelCurrentPageIndex.TextAlign = ContentAlignment.TopRight;
-			labelCurrentPageIndex.UseMnemonic = false;
-			// 
 			// buttonExportView
 			// 
-			buttonExportView.Location = new Point(595, 416);
+			buttonExportView.Location = new Point(520, 437);
 			buttonExportView.Name = "buttonExportView";
-			buttonExportView.Size = new Size(86, 25);
+			buttonExportView.Size = new Size(86, 23);
 			buttonExportView.TabIndex = 21;
-			buttonExportView.Text = "Export view";
+			buttonExportView.Text = "Export View";
 			buttonExportView.UseVisualStyleBackColor = true;
 			buttonExportView.Click += ViewEditor_ExportView_Click;
 			// 
@@ -1404,7 +1429,7 @@
 			lblInMegaCopyMode.AutoSize = true;
 			lblInMegaCopyMode.BackColor = SystemColors.ActiveCaption;
 			lblInMegaCopyMode.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
-			lblInMegaCopyMode.Location = new Point(860, 466);
+			lblInMegaCopyMode.Location = new Point(860, 520);
 			lblInMegaCopyMode.Name = "lblInMegaCopyMode";
 			lblInMegaCopyMode.Size = new Size(188, 25);
 			lblInMegaCopyMode.TabIndex = 23;
@@ -1414,36 +1439,53 @@
 			// 
 			// buttonViewActions
 			// 
-			buttonViewActions.Location = new Point(601, 464);
+			buttonViewActions.Location = new Point(520, 491);
 			buttonViewActions.Name = "buttonViewActions";
-			buttonViewActions.Size = new Size(88, 23);
+			buttonViewActions.Size = new Size(86, 23);
 			buttonViewActions.TabIndex = 24;
 			buttonViewActions.Text = "View Actions";
 			buttonViewActions.UseVisualStyleBackColor = true;
 			buttonViewActions.Click += ViewEditor_ViewActions_Click;
 			// 
-			// lblMode
+			// buttonImportView
 			// 
-			lblMode.AutoSize = true;
-			lblMode.Font = new Font("Segoe UI", 10F, FontStyle.Bold);
-			lblMode.Location = new Point(495, 10);
-			lblMode.Name = "lblMode";
-			lblMode.Size = new Size(17, 19);
-			lblMode.TabIndex = 25;
-			lblMode.Text = "2";
+			buttonImportView.Location = new Point(613, 437);
+			buttonImportView.Name = "buttonImportView";
+			buttonImportView.Size = new Size(86, 23);
+			buttonImportView.TabIndex = 25;
+			buttonImportView.Text = "Import View";
+			buttonImportView.UseVisualStyleBackColor = true;
+			buttonImportView.Click += ViewEditor_ImportView_Click;
+			// 
+			// label1
+			// 
+			label1.AutoSize = true;
+			label1.Location = new Point(629, 470);
+			label1.Name = "label1";
+			label1.Size = new Size(40, 13);
+			label1.TabIndex = 26;
+			label1.Text = "Pages:";
+			// 
+			// panel1
+			// 
+			panel1.BorderStyle = BorderStyle.FixedSingle;
+			panel1.Location = new Point(623, 466);
+			panel1.Name = "panel1";
+			panel1.Size = new Size(231, 75);
+			panel1.TabIndex = 28;
 			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
-			ClientSize = new Size(1048, 491);
-			Controls.Add(lblMode);
+			ClientSize = new Size(1048, 545);
+			Controls.Add(label1);
+			Controls.Add(buttonImportView);
 			Controls.Add(buttonViewActions);
 			Controls.Add(lblInMegaCopyMode);
 			Controls.Add(buttonFontAnalysis);
 			Controls.Add(buttonExportView);
-			Controls.Add(labelCurrentPageIndex);
 			Controls.Add(buttonEditPage);
 			Controls.Add(buttonDeletePage);
 			Controls.Add(buttonAddPage);
@@ -1469,6 +1511,7 @@
 			Controls.Add(p_status);
 			Controls.Add(buttonEnterText);
 			Controls.Add(checkBox40Bytes);
+			Controls.Add(panel1);
 			FormBorderStyle = FormBorderStyle.FixedSingle;
 			Icon = (Icon)resources.GetObject("$this.Icon");
 			KeyPreview = true;
@@ -1486,18 +1529,19 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelectorMegaCopyImage).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorMegaCopyImage).EndInit();
 			p_xx.ResumeLayout(false);
+			p_xx.PerformLayout();
 			Bevel3.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)pictureBoxCharacterEditor).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxClipboardPreview).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxCharacterEditorColor1).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxCharacterEditorColor2).EndInit();
+			((System.ComponentModel.ISupportInitialize)pictureBoxActionColor).EndInit();
 			p_hh.ResumeLayout(false);
 			p_zz.ResumeLayout(false);
 			Bevel4.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)pictureBoxPalette).EndInit();
 			p_status.ResumeLayout(false);
 			p_status.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)pictureBoxActionColor).EndInit();
 			panelColorSwitcher.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorSourceColor).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorTargetColor).EndInit();
@@ -1593,7 +1637,6 @@
 		private Button buttonAddPage;
 		private Button buttonDeletePage;
 		private Button buttonEditPage;
-		private Label labelCurrentPageIndex;
 		private CheckBox checkBoxFontBank;
 		private ImageList imageListFont1234;
 		private Button buttonClearFont1;
@@ -1623,6 +1666,10 @@
 		private Button buttonFontAnalysis;
 		private Label lblInMegaCopyMode;
 		private Button buttonViewActions;
-		private Label lblMode;
+		private ComboBox cmbColorMode;
+		private ComboBox cmbColor9Menu;
+		private Button buttonImportView;
+		private Label label1;
+		private Panel panel1;
 	}
 }

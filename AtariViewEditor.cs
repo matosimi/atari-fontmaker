@@ -20,6 +20,7 @@ namespace FontMaker
 		/// 0 = mode 2 B & W
 		/// 1 = mode 4 Color
 		/// 2 = mode 5 Color
+		/// 3 = mode 10 9 colors
 		/// </summary>
 		public string ColoredGfx { get; set; } = string.Empty;
 
@@ -558,8 +559,8 @@ namespace FontMaker
 				var jsonText = string.IsNullOrWhiteSpace(filename) ? Helpers.GetResource<string>("default.atrview") : File.ReadAllText(filename, Encoding.UTF8);
 				var jsonObj = jsonText.FromJson<AtrViewInfoJson>();
 
-				int.TryParse(jsonObj.Version, out var version);
-				int.TryParse(jsonObj.ColoredGfx, out var coloredGfx);
+				_ = int.TryParse(jsonObj.Version, out var version);
+				_ = int.TryParse(jsonObj.ColoredGfx, out var coloredGfx);
 
 				if (version >= 1911)
 				{
@@ -606,7 +607,7 @@ namespace FontMaker
 
 					// Load the AtariPalette selection
 					InColorSetSetup = true;
-					SetOfSelectedColors = Convert.FromHexString(colors);
+					SetOfSelectedColors = Convert.FromHexString(FixColorHexString(colors));
 					SetPrimaryColorSetData();
 					BuildBrushCache();
 					InColorSetSetup = false;
@@ -666,14 +667,9 @@ namespace FontMaker
 					}
 
 					// If the GFX mode does not match then hit the GFX button until we are at the correct mode
-					while (
-						(coloredGfx == 0 && InColorMode) ||
-						(coloredGfx == 1 && (!InColorMode || InMode5)) ||
-						(coloredGfx == 2 && (!InColorMode || !InMode5))
-						)
-					{ 
-						SwitchGfxMode();
-					}
+					// InColorMode = bool: true then in color mode
+					// WhichColorMode = int: 4/5/10
+					SetupColorMode(coloredGfx);
 				}
 
 				CheckDuplicate();
@@ -709,7 +705,11 @@ namespace FontMaker
 			// Version
 			jo.Version = "2023";
 			// Which GFX mode is selected
-			jo.ColoredGfx = InColorMode ? (InMode5 ? "2" : "1" ) : "0";
+			// B/W => 0
+			// Mode 4 => 1
+			// Mode 5 => 2
+			// Mode 10 = 3
+			jo.ColoredGfx = WhatColorModeToSave().ToString();
 
 			// Characters in the current view
 			for (var i = 0; i < AtariView.VIEW_HEIGHT; i++)
@@ -922,8 +922,10 @@ namespace FontMaker
 					// ignored
 				}
 
-				InColorMode = c == 0;
-				SwitchGfxMode();
+
+				SetupColorMode(c);
+				//InColorMode = c == 0;
+				//SwitchGfxMode();
 
 				if (ext == ".vf2")
 				{
