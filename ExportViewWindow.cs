@@ -15,6 +15,7 @@ namespace FontMaker
 		private bool RememberSelection { get; set; }
 
 		public bool InColorMode { get; set; }
+		public int WhichColorMode { get; set; }
 
 		public enum FormatTypes
 		{

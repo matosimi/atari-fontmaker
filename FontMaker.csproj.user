@@ -19,6 +19,9 @@
     <Compile Update="FontMakerForm.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="ImportViewWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="PageEditor.cs">
       <SubType>Form</SubType>
     </Compile>

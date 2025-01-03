@@ -22,6 +22,13 @@ namespace FontMaker
 		public int ExportViewRegionH { get; set; }
 		public bool ExportViewTranspose { get; set; }
 
+		public bool ImportViewRemember { get; set; }
+		public int ImportLineWidth { get; set; }
+		public int ImportSkipX { get; set; }
+		public int ImportSkipY { get; set; }
+		public int ImportWidth { get; set; }
+		public int ImportHeight { get; set; }
+
 	}
 	public static class Configuration
 	{
@@ -96,6 +103,10 @@ namespace FontMaker
 			if (Values.ExportViewRegionY is < 0 or >= 26) Values.ExportViewRegionY = 0;
 			if (Values.ExportViewRegionX + Values.ExportViewRegionW >= 40) Values.ExportViewRegionW = 1;
 			if (Values.ExportViewRegionY + Values.ExportViewRegionH >= 26) Values.ExportViewRegionH = 1;
+
+			if (Values.ImportLineWidth is < 1) Values.ImportLineWidth = 1;
+			if (Values.ImportWidth is < 1) Values.ImportWidth = 1;
+			if (Values.ImportHeight is < 1) Values.ImportHeight = 1;
 		}
 	}
 
@@ -122,6 +133,15 @@ namespace FontMaker
 				new Rectangle(Configuration.Values.ExportViewRegionX, Configuration.Values.ExportViewRegionY, Configuration.Values.ExportViewRegionW, Configuration.Values.ExportViewRegionH),
 				Configuration.Values.ExportViewTranspose
 			);
+
+			ImportViewWindowForm.LoadConfiguration(
+				Configuration.Values.ImportViewRemember,
+				Configuration.Values.ImportLineWidth,
+				Configuration.Values.ImportSkipX,
+				Configuration.Values.ImportSkipY,
+				Configuration.Values.ImportWidth,
+				Configuration.Values.ImportHeight
+			);
 		}
 
 		public void SaveConfiguration()
@@ -141,6 +161,16 @@ namespace FontMaker
 			Configuration.Values.ExportViewRegionY = exportRegion.Y;
 			Configuration.Values.ExportViewRegionW = exportRegion.Width;
 			Configuration.Values.ExportViewRegionH = exportRegion.Height;
+
+			(
+					Configuration.Values.ImportViewRemember, 
+					Configuration.Values.ImportLineWidth, 
+					Configuration.Values.ImportSkipX, 
+					Configuration.Values.ImportSkipY,
+					Configuration.Values.ImportWidth,
+					Configuration.Values.ImportHeight
+					)
+				= ImportViewWindowForm.SaveConfiguration();
 
 			Configuration.Save();
 		}

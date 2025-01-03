@@ -1,4 +1,6 @@
-﻿namespace FontMaker
+﻿using System.Drawing;
+
+namespace FontMaker
 {
 	public static class AtariFont
 	{
@@ -183,23 +185,26 @@
 			}
 		}
 
-		// http://graphics.stanford.edu/~seander/bithacks.html#BitReverseTable
-		public static void MirrorHorizontalMono(int characterIndex, bool onBank2)
+		public static void MirrorHorizontal(int characterIndex, bool onBank2, bool inColor, int whichColorMode)
 		{
+			var howManyShifts = HowManyPixels(inColor, whichColorMode);
 			var hp = GetCharacterOffset(characterIndex, onBank2);
 			for (var i = 0; i < 8; ++i)
 			{
 				var v = FontBytes[hp];
-				FontBytes[hp++] = (byte)(((v * 0x0802LU & 0x22110LU) | (v * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16);
-			}
-		}
-		public static void MirrorHorizontalColor(int characterIndex, bool onBank2)
-		{
-			var hp = GetCharacterOffset(characterIndex, onBank2);
-			for (var i = 0; i < 8; ++i)
-			{
-				var v = FontBytes[hp];
-				FontBytes[hp++] = (byte)(((v & 3) << 6) | ((v & 12) << 2) | ((v & 48) >> 2) | ((v & 192) >> 6));
+				switch (howManyShifts)
+				{
+					case 1:
+						// http://graphics.stanford.edu/~seander/bithacks.html#BitReverseTable
+						FontBytes[hp++] = (byte)(((v * 0x0802LU & 0x22110LU) | (v * 0x8020LU & 0x88440LU)) * 0x10101LU >> 16);
+						break;
+					case 2:
+						FontBytes[hp++] = (byte)(((v & 3) << 6) | ((v & 12) << 2) | ((v & 48) >> 2) | ((v & 192) >> 6));
+						break;
+					case 4:
+						FontBytes[hp++] = (byte)(((v & 15) << 4) | ((v & 240) >> 4));
+						break;
+				}
 			}
 		}
 		public static void MirrorVertical(int characterIndex, bool onBank2)
@@ -236,22 +241,32 @@
 			FontBytes[hp] = bottomByte;
 		}
 
-		public static void ShiftLeft(int characterIndex, bool onBank2, bool inColor)
+		public static int HowManyPixels(bool inColor, int whichColorMode)
 		{
+			if (inColor)
+			{
+				switch (whichColorMode)
+				{
+					case 4:
+					case 5:
+					default: return 2;
+					case 10: return 4;
+				}
+			}
+
+			return 1;
+		}
+
+		public static void ShiftLeft(int characterIndex, bool onBank2, bool inColor, int whichColorMode)
+		{
+			var howManyShifts = HowManyPixels(inColor, whichColorMode);
+
 			var hp = GetCharacterOffset(characterIndex, onBank2);
 			for (var i = 0; i < 8; ++i)
 			{
 				var v = FontBytes[hp];
-				if ((v & 128) > 0)
-				{
-					v = (byte)((v << 1) | 1);
-				}
-				else
-				{
-					v = (byte)(v << 1);
-				}
 
-				if (inColor)
+				for (var n = 0; n < howManyShifts; ++n)
 				{
 					if ((v & 128) > 0)
 					{
@@ -266,22 +281,15 @@
 				FontBytes[hp++] = v;
 			}
 		}
-		public static void ShiftRight(int characterIndex, bool onBank2, bool inColor)
+		public static void ShiftRight(int characterIndex, bool onBank2, bool inColor, int whichColorMode)
 		{
+			var howManyShifts = HowManyPixels(inColor, whichColorMode);
+
 			var hp = GetCharacterOffset(characterIndex, onBank2);
 			for (var i = 0; i < 8; ++i)
 			{
 				var v = FontBytes[hp];
-				if ((v & 1) > 0)
-				{
-					v = (byte)((v >> 1) | 128);
-				}
-				else
-				{
-					v = (byte)(v >> 1);
-				}
-
-				if (inColor)
+				for (var n = 0; n < howManyShifts; ++n)
 				{
 					if ((v & 1) > 0)
 					{
@@ -329,7 +337,7 @@
 			return op;
 		}
 
-		public static byte[] DecodeColor(byte ln)
+		public static byte[] DecodeColor2Bit(byte ln)
 		{
 			var op = new byte[4];
 
@@ -337,6 +345,19 @@
 			{
 				op[c] = (byte)(ln % 4);
 				ln = (byte)(ln >> 2);
+			}
+
+			return op;
+		}
+
+		public static byte[] DecodeColor4Bit(byte ln)
+		{
+			var op = new byte[2];
+
+			for (var c = 1; c >= 0; c--)
+			{
+				op[c] = (byte)(ln % 16);
+				ln = (byte)(ln >> 4);
 			}
 
 			return op;
@@ -359,7 +380,7 @@
 			return o;
 		}
 
-		public static byte EncodeColor(byte[] cd)
+		public static byte EncodeColor2Bit(byte[] cd)
 		{
 			byte v = 64;
 			byte c = 0;
@@ -376,6 +397,43 @@
 			return o;
 		}
 
+		public static byte EncodeColor4Bit(byte[] cd)
+		{
+			byte v = 16;
+			byte c = 0;
+			byte o = 0;
+
+			do
+			{
+				o = (byte)(o + v * cd[c]);
+				c++;
+				v = (byte)(v >> 4);
+			}
+			while (v != 0);
+
+			return o;
+		}
+
+		public static byte[,] Get4BitColorCharacter(int character, bool onBank2)
+		{
+			var res = new byte[8, 8];
+			var charPtr = GetCharacterOffset(character, onBank2);
+
+			for (var i = 0; i < 8; i++)
+			{
+				var clData = DecodeColor4Bit(FontBytes[charPtr]);
+
+				for (var j = 0; j < 2; j++)
+				{
+					res[j, i] = clData[j];
+				}
+
+				charPtr++;
+			}
+
+			return res;
+		}
+
 		public static byte[,] Get5ColorCharacter(int character, bool onBank2)
 		{
 			var res = new byte[8, 8];
@@ -383,7 +441,7 @@
 
 			for (var i = 0; i < 8; i++)
 			{
-				var clData = DecodeColor(FontBytes[charPtr]);
+				var clData = DecodeColor2Bit(FontBytes[charPtr]);
 
 				for (var j = 0; j < 4; j++)
 				{
@@ -426,7 +484,23 @@
 					fourPixels[x] = character5Color[x, y];
 				}
 
-				FontBytes[fontByteIndex + y] = EncodeColor(fourPixels);
+				FontBytes[fontByteIndex + y] = EncodeColor2Bit(fourPixels);
+			}
+		}
+
+		public static void Set4BitCharacter(byte[,] character4Bit, int character, bool onBank2)
+		{
+			var twoPixels = new byte[2];
+			var fontByteIndex = GetCharacterOffset(character, onBank2);
+
+			for (var y = 0; y < 8; y++)
+			{
+				for (var x = 0; x < 2; x++)
+				{
+					twoPixels[x] = character4Bit[x, y];
+				}
+
+				FontBytes[fontByteIndex + y] = EncodeColor4Bit(twoPixels);
 			}
 		}
 
