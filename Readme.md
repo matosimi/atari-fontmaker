@@ -1,23 +1,23 @@
 # Atari FontMaker #
-#### by matosimi and RetroCoder ####
+#### by matosimi and RetroCoder
 
-![1](https://user-images.githubusercontent.com/2360950/231547441-307ec9f6-3c92-47cf-99f0-5dd4a1a1919a.JPG)
+![1](images/1.JPG)
 
-## What is it? ##
-Atari FontMaker is MS Windows tool used for creating and editing Atari XL/XE fonts and font-based graphics. The tool was originally written in Delphi but has been ported to C# and its source code repository can be found here: https://github.com/matosimi/atari-fontmaker.
+## What is it?
+Atari FontMaker is a Windows tool used for creating and editing Atari 8-bit/5200 fonts and font-based graphics. The tool was originally written in Delphi but has been ported to C# and its source code repository can be found here: https://github.com/matosimi/atari-fontmaker.
 The original Delphi sources are available here: https://sourceforge.net/projects/atari-fontmaker/ and full history of the project is available here: http://matosimi.websupport.sk/atari/atari-fontmaker/.
 
 First version dates back to 2003, since then lot of functionalities were added and lot of refactoring applied, especially in version 1.6 when the code was converted from Delphi to C#.
 
-## Instructions / Features ##
-![Arrow2](https://user-images.githubusercontent.com/2360950/231560691-11934107-ae45-4c72-901f-1decc4c24a09.jpg)
+## Instructions / Features
+![Arrow2](images/2.JPG)
 
-**I/O Functions** are there to load and safe font files. You can load and edit four fonts at the same time.  Filenames are displayed in the window caption. Buttons [Save 1/2/3/4] are there to quickly save the font without a dialog window popping up. Buttons [as...] display a *Save as* dialog.
+**I/O Functions** are there to load and safe font files. You can load and edit four fonts at the same time. Filenames are displayed in the window caption. Buttons [Save 1/2/3/4] are there to quickly save the font without a dialog window popping up. Buttons [as...] display a *Save as* dialog.
 
 **Font window** displays two fonts at a time, 32 characters per line. You can switch between the 4 available font slots by clicking the [1-2] or [3-4] button to the right and above the font window. Select a character by clicking on it, the currently selected character is marked by a square cursor and it also displayed in the *Character edit window*. Information about current character is displayed above the *Font window* area:
-![3](https://user-images.githubusercontent.com/2360950/231563856-772c7584-3cd8-40a8-a0f0-e00af85475f2.jpg)
+![3](images/3.JPG)
 
-Displays which font the selected character belongs to and its Hexadecimal and Decimal representation
+This displays which font the selected character belongs to, and its Hexadecimal and Decimal representation.
 
 **Character operations** are groups of small buttons on both sides of the character edit window. You can quickly shift, rotate, mirror, invert or clear a character by pressing the appropriate button. Some functions have keyboard shortcuts that are listed in next section, these are also shown as tooltips when you hover the mouse cursor over each button. There are also some additional functional buttons:
 
@@ -26,9 +26,9 @@ Displays which font the selected character belongs to and its Hexadecimal and De
 - CPY – (copy) copy current character to clipboard
 - PST – (paste) paste character from clipboard to current selected character
 
-**Mode 2/4 toggle** [Change GFX] button switches between hi-res 2-color graphics mode (8×8 pixels per character) and low-res 4-color graphics mode (4×8 pixels per character). This change is global so all windows that display font characters are affected by this change.
+**Change GFX** button switches between hi-res 2-color graphics mode (8×8 pixels per character) and low-res 4/5/9-color graphics mode (4×8 or 2x8 pixels per character). This change is global so all windows that display font characters are affected by this change.
 
-**Character edit** window displays the currently selected character magnified. You can edit character pixels by single clicking on the character window, or you can click+hold and move the cursor to continuously draw character pixels.
+**Character edit window** displays the currently selected character magnified. You can edit character pixels by single clicking on the character window, or you can **click+hold** and move the cursor to continuously draw character pixels.
 
 Tip: You can disable continuous pixel drawing by holding CTRL key while editing.
 
@@ -36,38 +36,38 @@ Tip: You can disable continuous pixel drawing by holding CTRL key while editing.
 - Right mouse click – draws background color
 
 There are two draw modes, that can be switched here:
-![4](https://user-images.githubusercontent.com/2360950/231643970-05265b39-3143-4a64-a6bb-2a09d365d159.JPG)
+![4](images/4.JPG)
 
 - *Rewrite* (default) inverts pixels that are being clicked on
 - *Insert* rewrites pixels that are being clicked on with currently selected color
 
-In Mode 4, currently selected color is shown below the character edit window. You can change the actual color:
+For color modes, the currently selected color is shown below the character edit window. You can change the current color
 
-- by pressing keys 1,2,3
+- by pressing keys 1,2,3 (mode 4/5), 4,5,6,7,8,0 (mode 10)
 - by clicking on one of boxes placed on both sides of the top edge of character edit window
 - by holding down the Shift key and using the mouse wheel to change the color
-![5](https://user-images.githubusercontent.com/2360950/231648298-61c8644b-3965-4b85-8799-36166d7e2f82.jpg)
+![5](images/5.JPG)
 
 Every change to characters is logged into an undo buffer, so you can undo (and redo) any change you performed by clicking on the appropriate buttons:
-![6](https://user-images.githubusercontent.com/2360950/231649814-db97824a-313d-4110-b1e2-a204d5709655.JPG)
+![6](images/6.JPG)
 
 Undo buffer size is 2048, so it should be enough to cover complete charset edit.
 
-**Color selector** window contains 6 colors that are used in Mode 2 (LUM, BAK) and Mode 4 (BAK,PF0,PF1,PF2,PF3). You can change these colors by clicking on appropriate color and picking new color from Atari color selector:
-![7](https://user-images.githubusercontent.com/2360950/231650358-61748bca-56fb-4499-891b-66b9aae47e8e.JPG)
+**Color selector** window contains 6 (or 9) colors that are used in Mode 2 (LUM, BAK), Mode 4/5 (BAK,PF0,PF1,PF2,PF3) or in Mode 10 (9 colors). You can change these colors by clicking on appropriate color and picking new color from Atari color selector:
+![7](images/7.JPG)
 
 Tip: You can restore default colors by clicking on color selector window while holding SHIFT key.
-![8](https://user-images.githubusercontent.com/2360950/231650855-87d62b5c-3c93-4fa3-b504-c47dfcd5a4e8.JPG)
+![8](images/8.JPG)
 
 **Recolor** feature is useful when you need to swap two colors within a single character. Recolor button has settings button on its side, which displays recolor options:
-![9](https://user-images.githubusercontent.com/2360950/231651397-5157bccc-3c99-420e-b2b6-602fbcbb1ae8.JPG)
+![9](images/9.JPG)
 
 In the recolor options window you define which color is supposed to be swapped with which other color. The swapping itself it triggered by clicking on the *[Recolor]* button.
 
 Tip: Recolor button can have focus, so its function can be executed by pressing Enter key. In order to quickly recolor multiple characters you can select the first one, click *[Recolor]*, then move to another by pressing the *[.]* key followed by the *[Enter]* key. i.e. . Enter . Enter …and so on. This will recolor consecutive characters quickly.
 
 **Export font** button is useful when you need text representation of the font data as an include to your Basic, Action! or Assembly source, there are several formats to choose from:
-![10](https://user-images.githubusercontent.com/2360950/231652449-7d1f910f-32e5-4d81-ad90-3f635eb0a999.JPG)
+![10](images/10.JPG)
 
 The fonts can also be exported as black+white or 5-color bitmaps.
 
@@ -81,17 +81,17 @@ Tip: Raw (*.dat) format can be saved in 32byte line format or 40byte line format
 
 **View Pager** can be used to manage multiple *View windows*. Clicking on the [+] button duplicates the current view and adds a new page. You can use the drop-down list in the pager area to select a page, or use the mouse wheel when hovering over the drop-down list to quickly select a new page.  The [Edit] button allows you to rename the pages and organise the order of them.
 
-![11](https://user-images.githubusercontent.com/2360950/231686566-1f66e927-1c9e-4117-93ac-7dfe74b58daf.JPG)
+![11](images/11.JPG)
 
 Tip: Drawing an animation over a couple of pages and quickly flipping through them is a quick way to check things out.
 
 **Mega Copy mode**
-Mega Copy mode has been added in version 1.5, it allows you to copy multiple characters from the font window to the view window and vice versa.
+Mega Copy mode has been added in version 1.5, it allows you to copy multiple characters from the font window to the view window and vice versa. It also allows for copy/paste operations in the *view window*.
 
 You can enter Mega Copy mode by clicking on the [Mega Copy] button, the character edit window is switched out for a preview window, and all character editing functions are disabled:
-![12](https://user-images.githubusercontent.com/2360950/231687996-20d9e28c-6063-411f-ad14-4ab2967db6a0.JPG)
+![12](images/12.JPG)
 
-When in Mega Copy mode you can click and drag a selection frame in the font or view window to select multiple characters at a time; watch the following video to get idea how it works and what could be achieved:
+When in **Mega Copy** mode you can click and drag a selection frame in the font or view window to select multiple characters at a time; watch the following video to get idea how it works and what could be achieved:
 
 <iframe width="956" height="538" src="https://www.youtube.com/embed/bSo6yRGIE-Y" title="Atari FontMaker - Mega Copy mode" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
 
@@ -138,21 +138,33 @@ One special feature is the ability to paste the copy area back into the selected
 	- If all the characters in the selected area are unique (and come from the same font)
 	- then pressing the [Paste in location X] button will paste the working buffer into the original font. i.e. the letters "fox " now become " fox " where the "f" has turned into a " f" and only a portion of the "f" is still in the "f" character, the rest can be found in the "o" character.
 
-**DUP** Just to the left of the Mega Copy button is the *DUP* checkbox. Turning it on will cycle through all characters in a font that are identical (duplicates off) to the currently selected character. Very useful to see if you have some duplicates in your character design.
+**Show Duplicates** Just to the left of the Mega Copy button is the *Show Duplicates* checkbox. Turning it on will cycle through all characters in a font that are identical to (duplicates off) the currently selected character. Very useful to see if you have some duplicates in your character design.
 
 **Export View**
 The view window is a useful canvas area where you can test your creations and see if your fonts work out.
 You can export the view window data in various formats.  Clicking the *[Export View]* button opens up the following window:
-![13](https://user-images.githubusercontent.com/2360950/231695349-77543f86-3863-4482-9355-ce3e51f1b946.JPG)
+![13](images/13.JPG)
 
 At the top you can select the export format: Binary Data, Assembler, Action!, Atari Basic, FastBasic or MADS dta. Some of these options allow for the data type to be switched between decimal and hex formatting.
 
 The power of the exporter comes from selecting export region.  By default the whole view is selected, Top-left to bottom-right (40x26). By clicking and dragging with the left-mouse button held down you can select an export area. If the export format is text then it will be shown in the right hand side window, which you can copy and paste into your source code, or export to disc with the *[Export...]* button.
 
+**Import View**
+The [Import View] button can be used to convert binary data into view data.
+The assumption is that you have loaded a font and now would like to view a screen using that font (or multiple fonts).
+
+The process would be to load the data via the [Load Data ...] button.
+Set the data width, which would normally be a 32, 40, 48 or some other width set by a custom display list.
+
+Next step is to select the number of bytes to skip and the area of the data to show.
+The preview window is updated with each change of a parameter.
+
+Pressing [Import] will transfer the data into the current View.
+
 **Analysis Window**
 Once you've designed your characters and combined them into tiles or used them in the view pages you might want to know if there are any unused characters left, or if you have not used one on a view page yet.
 This is where the analysis window comes in handy. Click the [Analyse] button to show an all up view of all 4 fonts.  Those characters that have **not** been used in a view page will be marked with a red overlay.
-You can chage the overlay color and opacity to make sure the highlight does not clash with your color usage.
+You can change the overlay color and opacity to make sure the highlight does not clash with your color usage.
 Moving the mouse over the characters will display some quick usage information. Basically how many of them have been used, both from the base and the inverse parts of the font.
 To find out where you have used the character left-click it and a box with more details will show up.  The first line gives information on the character. The subsequent lines list on which pages the character was used.
 Clicking the character will also select it in the character editor.
@@ -257,6 +269,14 @@ Press the arrow buttons to move the whole view area in the required direction.
 Or select an area and use the area shift buttons on the right to move its contents.
 
 ## Changes/History ##
+V1.16.14.0
+- Added Mode 10 (9 colors @ 2x8 pixels)
+- Added Mode 5 (double height mode 4)
+- Added data import tool
+    - Allows the user to load a data file and then specify a line with, X/Y skip and data width and height
+    - The loaded data can then be imported into a view
+- Switched to .NET 9
+    
 V1.6.12.1
 - Fixed the loading of .fn2 (dual) fonts
 - Once loaded the font data will be auto split into "filename-fn2-X.fnt", where X is the font nr.

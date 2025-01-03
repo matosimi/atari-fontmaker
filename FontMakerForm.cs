@@ -174,6 +174,9 @@ namespace FontMaker
 
 			CurrentDataFolder = AppContext.BaseDirectory;
 
+			// Position fix
+			panelColorSwitcherMode10.Location = panelColorSwitcher.Location;
+
 			UndoBuffer.Setup();
 			AtariView.Setup();
 			LoadPalette();
@@ -293,8 +296,13 @@ namespace FontMaker
 
 			listBoxRecolorSource.SelectedIndex = 0;
 			listBoxRecolorTarget.SelectedIndex = 0;
+			listBoxRecolorSourceMode10.SelectedIndex = 0;
+			listBoxRecolorTargetMode10.SelectedIndex = 0;
+
 			RedrawRecolorSource();
 			RedrawRecolorTarget();
+			RedrawRecolorMode10Source();
+			RedrawRecolorMode10Target();
 
 			UndoBuffer.Add2UndoInitial(); // initial undo buffer entry
 			UpdateUndoButtons(false);
@@ -452,6 +460,36 @@ namespace FontMaker
 				SetColor(4);
 				return;
 			}
+			if (e.KeyCode == Keys.D4)
+			{
+				SetColor(5);
+				return;
+			}
+			if (e.KeyCode == Keys.D5)
+			{
+				SetColor(6);
+				return;
+			}
+			if (e.KeyCode == Keys.D6)
+			{
+				SetColor(7);
+				return;
+			}
+			if (e.KeyCode == Keys.D7)
+			{
+				SetColor(8);
+				return;
+			}
+			if (e.KeyCode == Keys.D8)
+			{
+				SetColor(9);
+				return;
+			}
+			if (e.KeyCode == Keys.D0)
+			{
+				SetColor(1);
+				return;
+			}
 
 			if (e.KeyCode == Keys.I)
 			{
@@ -499,13 +537,31 @@ namespace FontMaker
 			{
 				if (Control.ModifierKeys == Keys.Shift)
 				{
-					if (e.Delta > 0)
+					// Change the current color when the Shift key is held down and the mouse wheel is moved
+					switch (WhichColorMode)
 					{
-						ActionCharacterEditorColor1MouseDown();
-					}
-					else
-					{
-						ActionCharacterEditorColor2MouseDown();
+						case 4:
+						case 5:
+						default:
+						{
+							if (e.Delta > 0)
+							{
+								ActionCharacterEditorColor1MouseDown();
+							}
+							else
+							{
+								ActionCharacterEditorColor2MouseDown();
+							}
+							break;
+						}
+						case 10:
+						{
+							var nextColor = (cmbColor9Menu.SelectedIndex + (e.Delta > 0 ? 1 : -1));
+							if (nextColor < 0) nextColor = cmbColor9Menu.Items.Count - 1;
+							if (nextColor >= cmbColor9Menu.Items.Count) nextColor = 0;
+							cmbColor9Menu.SelectedIndex = nextColor;
+							break;
+						}
 					}
 				}
 				else
@@ -726,12 +782,42 @@ namespace FontMaker
 
 		public void Recolor_Click(object _, EventArgs __)
 		{
-			ColorSwitch(listBoxRecolorSource.SelectedIndex, listBoxRecolorTarget.SelectedIndex);
+			switch (WhichColorMode)
+			{
+				case 4:
+				case 5:
+				default:
+					ColorSwitch2Bit(listBoxRecolorSource.SelectedIndex, listBoxRecolorTarget.SelectedIndex);
+					break;
+				case 10:
+					ColorSwitch4Bit(listBoxRecolorSourceMode10.SelectedIndex, listBoxRecolorTargetMode10.SelectedIndex);
+					break;
+			}
 		}
 
 		public void ShowColorSwitchSetup_Click(object _, EventArgs __)
 		{
-			panelColorSwitcher.Visible = !panelColorSwitcher.Visible;
+			ShowColorSwitcher = !ShowColorSwitcher;
+
+			if (ShowColorSwitcher)
+			{
+				switch (WhichColorMode)
+				{
+					case 4:
+					case 5:
+					default:
+						panelColorSwitcher.Visible = true;
+						break;
+					case 10:
+						panelColorSwitcherMode10.Visible = true;
+						break;
+				}
+			}
+			else
+			{
+				panelColorSwitcher.Visible = false;
+				panelColorSwitcherMode10.Visible = false;
+			}
 		}
 
 		public void ExportFont_Click(object _, EventArgs __)
@@ -739,6 +825,7 @@ namespace FontMaker
 			ExportFontWindowForm.ShowDialog();
 		}
 
+		#region Recolor interactions
 		public void RecolorSource_Click(object _, EventArgs __)
 		{
 			RedrawRecolorSource();
@@ -748,6 +835,18 @@ namespace FontMaker
 		{
 			RedrawRecolorTarget();
 		}
+
+		private void RecolorSourceMode10_Click(object sender, EventArgs e)
+		{
+			RedrawRecolorMode10Source();
+
+		}
+		private void RecolorTargetMode10_Click(object sender, EventArgs e)
+		{
+			RedrawRecolorMode10Target();
+		}
+
+		#endregion
 
 		private void comboBoxColorSets_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -1006,7 +1105,7 @@ namespace FontMaker
 			pictureBoxClipboardPreview.Visible = on;
 
 			// Hide recolor if in mega copy mode
-			if (on && panelColorSwitcher.Visible)
+			if (on && ShowColorSwitcher)
 			{
 				ShowColorSwitchSetup_Click(0, EventArgs.Empty);
 			}

@@ -1,5 +1,7 @@
 ﻿#pragma warning disable WFO1000
 
+using System.Drawing;
+
 namespace FontMaker
 {
 	// Section C - Color management
@@ -21,6 +23,11 @@ namespace FontMaker
 			new ColorModesDef() { Key = 5, Value = "Mode 5 (5 cols)" },
 			new ColorModesDef() { Key = 10, Value = "Mode 10 (9 cols)" },
 		];
+
+		/// <summary>
+		/// Are we showing one of the color switchers
+		/// </summary>
+		public bool ShowColorSwitcher { get; set; }
 
 		public List<string> ColorSets { get; set; } = [];
 
@@ -139,35 +146,6 @@ namespace FontMaker
 		/// </summary>
 		private void SwitchGfxMode()
 		{
-			// Switch to tall color mode and return
-			// Mode #4 -> #5
-			/*
-			if (InColorMode && !InMode5)
-			{
-				InMode5 = true;
-				RedrawLineTypes();
-				RedrawView();
-				RedrawChar();
-
-				if (!buttonMegaCopy.Checked)
-				{
-					RevalidateCharButtons();
-				}
-				else
-				{
-					// Make sure the copy area is redrawn
-					RevalidateClipboard();
-				}
-				return;
-			} 
-
-			if (InMode5)
-			{
-				InMode5 = false;
-				RedrawLineTypes();
-			}
-			*/
-
 			// Toggle between B/W and color mode
 			InColorMode = !InColorMode;
 
@@ -198,7 +176,7 @@ namespace FontMaker
 				RevalidateClipboard();
 			}
 
-			if (!InColorMode && panelColorSwitcher.Visible)
+			if (!InColorMode && ShowColorSwitcher)
 			{
 				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
 			}
@@ -220,6 +198,7 @@ namespace FontMaker
 			CheckDuplicate();
 		}
 
+		#region Recolor actions
 		public void RedrawRecolorSource()
 		{
 			var img = Helpers.GetImage(pictureBoxRecolorSourceColor);
@@ -243,6 +222,32 @@ namespace FontMaker
 
 			pictureBoxRecolorTargetColor.Refresh();
 		}
+
+
+		public void RedrawRecolorMode10Source()
+		{
+			var idx = listBoxRecolorSourceMode10.SelectedIndex;
+			var img = Helpers.GetImage(pictureBoxRecolorSourceColorMode10);
+			using var gr = Graphics.FromImage(img);
+			var brush = BrushCache[listBoxRecolorSourceMode10.SelectedIndex + 1];
+			gr.FillRectangle(brush, 0, 0, 49, 17);
+			gr.DrawString($"Color {idx}", this.Font, brush.Color.G > 128 ? BlackBrush : WhiteBrush, 1, 2);
+
+			pictureBoxRecolorSourceColorMode10.Refresh();
+		}
+
+		public void RedrawRecolorMode10Target()
+		{
+			var idx = listBoxRecolorTargetMode10.SelectedIndex;
+			var img = Helpers.GetImage(pictureBoxRecolorTargetColorMode10);
+			using var gr = Graphics.FromImage(img);
+			var brush = BrushCache[idx + 1];
+			gr.FillRectangle(brush, 0, 0, 49, 17);
+			gr.DrawString($"Color {idx}", this.Font, brush.Color.G > 128 ? BlackBrush : WhiteBrush, 1, 2);
+
+			pictureBoxRecolorTargetColorMode10.Refresh();
+		}
+		#endregion
 
 		public void RedrawPal()
 		{
@@ -444,7 +449,7 @@ namespace FontMaker
 		}
 
 
-		public void ColorSwitch(int idx1, int idx2)
+		public void ColorSwitch2Bit(int idx1, int idx2)
 		{
 			var src = AtariFont.Get5ColorCharacter(SelectedCharacterIndex, checkBoxFontBank.Checked);
 
@@ -464,6 +469,32 @@ namespace FontMaker
 			}
 
 			AtariFont.Set5ColorCharacter(src, SelectedCharacterIndex, checkBoxFontBank.Checked);
+
+			DoChar();
+			RedrawChar();
+			RedrawView();
+		}
+
+		public void ColorSwitch4Bit(int idx1, int idx2)
+		{
+			var src = AtariFont.Get4BitColorCharacter(SelectedCharacterIndex, checkBoxFontBank.Checked);
+
+			for (var y = 0; y < 8; y++)
+			{
+				for (var x = 0; x < 4; x++)
+				{
+					if (src[x, y] == (byte)idx1)
+					{
+						src[x, y] = (byte)idx2;
+					}
+					else if (src[x, y] == idx2)
+					{
+						src[x, y] = (byte)idx1;
+					}
+				}
+			}
+
+			AtariFont.Set4BitCharacter(src, SelectedCharacterIndex, checkBoxFontBank.Checked);
 
 			DoChar();
 			RedrawChar();
@@ -615,6 +646,12 @@ namespace FontMaker
 			RedrawChar();
 
 			ShowColorSelectors();
+			if (ShowColorSwitcher)
+			{
+				// Make sure that the correct color switcher is shown
+				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
+				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
+			}
 		}
 
 		/// <summary>

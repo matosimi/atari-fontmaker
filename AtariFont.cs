@@ -488,6 +488,22 @@ namespace FontMaker
 			}
 		}
 
+		public static void Set4BitCharacter(byte[,] character4Bit, int character, bool onBank2)
+		{
+			var twoPixels = new byte[2];
+			var fontByteIndex = GetCharacterOffset(character, onBank2);
+
+			for (var y = 0; y < 8; y++)
+			{
+				for (var x = 0; x < 2; x++)
+				{
+					twoPixels[x] = character4Bit[x, y];
+				}
+
+				FontBytes[fontByteIndex + y] = EncodeColor4Bit(twoPixels);
+			}
+		}
+
 		public static void ShiftFontLeft(int characterIndex, bool onBank2, bool makeHole)
 		{
 			// Find out which font nr we are dealing with

@@ -231,7 +231,7 @@ namespace FontMaker
 				CopyPasteRange.Width = 0;
 				CopyPasteRange.Height = 0;
 
-				labelEditCharInfo.Text = $@"Char: Font {fontNr} ${fontChar:X2} #{fontChar}";
+				labelEditCharInfo.Text = $"Font {fontNr}\n${fontChar:X2} #{fontChar}";
 				RedrawChar();
 				CheckDuplicate();
 			}

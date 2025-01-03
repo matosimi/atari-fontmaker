@@ -1119,15 +1119,30 @@ namespace FontMaker
 
 		public void SetColor(int colorNum)
 		{
-			if (ActiveColorNr != colorNum)
+			switch (WhichColorMode)
 			{
-				if ((int)(pictureBoxCharacterEditorColor1.Tag) == colorNum)
+				case 4:
+				case 5:
+				default:
 				{
-					ActionCharacterEditorColor1MouseDown();
+					if (ActiveColorNr != colorNum && colorNum is >= 2 and <= 4)
+					{
+						if ((int)(pictureBoxCharacterEditorColor1.Tag) == colorNum)
+						{
+							ActionCharacterEditorColor1MouseDown();
+						}
+						else
+						{
+							ActionCharacterEditorColor2MouseDown();
+						}
+					}
+
+					break;
 				}
-				else
+				case 10:
 				{
-					ActionCharacterEditorColor2MouseDown();
+					cmbColor9Menu.SelectedIndex = colorNum - 1;
+					break;
 				}
 			}
 		}
