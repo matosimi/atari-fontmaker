@@ -716,8 +716,7 @@ namespace FontMaker
 
 			try
 			{
-				using var writer = new BinaryWriter(File.OpenWrite(fileName));
-				writer.Write(viewBytes);
+				File.WriteAllBytes(fileName, viewBytes);
 			}
 			catch (Exception ex)
 			{
