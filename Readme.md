@@ -269,6 +269,15 @@ Press the arrow buttons to move the whole view area in the required direction.
 Or select an area and use the area shift buttons on the right to move its contents.
 
 ## Changes/History ##
+V1.16.14.4
+- Fixed a bug in the view exporter. Small areas would be exported incorrectly.
+- Fixed mode 10 color mapping. Inverse colors are mapped correctly now.
+- Added a bunch of view actions.
+    - You can now clear the whole view or the selected area.
+    - You can fill the whole view or the selected area with a character. The character can be selected from the font area.
+- Added a binary font exporter. This will export the font data in a binary format. The font data is exported as 1,2 or 4 banks of 128 characters each.
+- Added multiple font export options. You can export fonts: 1,2,3,4 ,1+2, 3+4, 1+2+3+4   
+
 V1.16.14.0
 - Added Mode 10 (9 colors @ 2x8 pixels)
 - Added Mode 5 (double height mode 4)

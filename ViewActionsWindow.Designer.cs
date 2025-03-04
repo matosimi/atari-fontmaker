@@ -64,13 +64,24 @@
 			buttonReplaceXwithYInArea = new Button();
 			label11 = new Label();
 			label12 = new Label();
+			label7 = new Label();
+			buttonClearView = new Button();
+			buttonClearArea = new Button();
+			pictureBoxFill = new PictureBox();
+			label15 = new Label();
+			buttonFillView = new Button();
+			buttonFillArea = new Button();
+			label13 = new Label();
+			labelFiller = new Label();
+			label16 = new Label();
 			((System.ComponentModel.ISupportInitialize)pictureBoxX).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxY).BeginInit();
+			((System.ComponentModel.ISupportInitialize)pictureBoxFill).BeginInit();
 			SuspendLayout();
 			// 
 			// btnClose
 			// 
-			btnClose.Location = new Point(3, 263);
+			btnClose.Location = new Point(5, 361);
 			btnClose.Name = "btnClose";
 			btnClose.Size = new Size(215, 23);
 			btnClose.TabIndex = 0;
@@ -434,11 +445,116 @@
 			label12.TabIndex = 54;
 			label12.Text = "Selected Area:";
 			// 
+			// label7
+			// 
+			label7.BorderStyle = BorderStyle.FixedSingle;
+			label7.Location = new Point(1, 260);
+			label7.Name = "label7";
+			label7.Size = new Size(222, 2);
+			label7.TabIndex = 55;
+			// 
+			// buttonClearView
+			// 
+			buttonClearView.Location = new Point(5, 266);
+			buttonClearView.Name = "buttonClearView";
+			buttonClearView.Size = new Size(108, 29);
+			buttonClearView.TabIndex = 57;
+			buttonClearView.Text = "Clear View";
+			buttonClearView.UseVisualStyleBackColor = true;
+			buttonClearView.Click += buttonClearView_Click;
+			// 
+			// buttonClearArea
+			// 
+			buttonClearArea.Location = new Point(115, 266);
+			buttonClearArea.Name = "buttonClearArea";
+			buttonClearArea.Size = new Size(108, 29);
+			buttonClearArea.TabIndex = 58;
+			buttonClearArea.Text = "Clear Area";
+			buttonClearArea.UseVisualStyleBackColor = true;
+			buttonClearArea.Click += buttonClearArea_Click;
+			// 
+			// pictureBoxFill
+			// 
+			pictureBoxFill.BackColor = Color.Transparent;
+			pictureBoxFill.BorderStyle = BorderStyle.FixedSingle;
+			pictureBoxFill.Location = new Point(88, 328);
+			pictureBoxFill.Margin = new Padding(0);
+			pictureBoxFill.Name = "pictureBoxFill";
+			pictureBoxFill.Size = new Size(18, 18);
+			pictureBoxFill.TabIndex = 59;
+			pictureBoxFill.TabStop = false;
+			pictureBoxFill.Click += pictureBoxFill_Click;
+			// 
+			// label15
+			// 
+			label15.BorderStyle = BorderStyle.FixedSingle;
+			label15.Location = new Point(1, 299);
+			label15.Name = "label15";
+			label15.Size = new Size(222, 2);
+			label15.TabIndex = 61;
+			// 
+			// buttonFillView
+			// 
+			buttonFillView.Location = new Point(5, 322);
+			buttonFillView.Name = "buttonFillView";
+			buttonFillView.Size = new Size(80, 29);
+			buttonFillView.TabIndex = 63;
+			buttonFillView.Text = "Fill View";
+			buttonFillView.UseVisualStyleBackColor = true;
+			buttonFillView.Click += buttonFillView_Click;
+			// 
+			// buttonFillArea
+			// 
+			buttonFillArea.Location = new Point(143, 322);
+			buttonFillArea.Name = "buttonFillArea";
+			buttonFillArea.Size = new Size(80, 29);
+			buttonFillArea.TabIndex = 64;
+			buttonFillArea.Text = "Fill Area";
+			buttonFillArea.UseVisualStyleBackColor = true;
+			buttonFillArea.Click += buttonFillArea_Click;
+			// 
+			// label13
+			// 
+			label13.AutoSize = true;
+			label13.Font = new Font("Segoe UI", 8.25F, FontStyle.Bold);
+			label13.Location = new Point(3, 306);
+			label13.Margin = new Padding(0);
+			label13.Name = "label13";
+			label13.Size = new Size(198, 13);
+			label13.TabIndex = 65;
+			label13.Text = "Fill View/Area with the selected char:";
+			// 
+			// labelFiller
+			// 
+			labelFiller.Location = new Point(106, 330);
+			labelFiller.Name = "labelFiller";
+			labelFiller.Size = new Size(34, 13);
+			labelFiller.TabIndex = 66;
+			labelFiller.Text = "#0";
+			// 
+			// label16
+			// 
+			label16.BorderStyle = BorderStyle.FixedSingle;
+			label16.Location = new Point(1, 356);
+			label16.Name = "label16";
+			label16.Size = new Size(222, 2);
+			label16.TabIndex = 67;
+			// 
 			// ViewActionsWindow
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
-			ClientSize = new Size(224, 288);
+			ClientSize = new Size(224, 386);
+			Controls.Add(label16);
+			Controls.Add(labelFiller);
+			Controls.Add(label13);
+			Controls.Add(buttonFillArea);
+			Controls.Add(buttonFillView);
+			Controls.Add(label15);
+			Controls.Add(pictureBoxFill);
+			Controls.Add(buttonClearArea);
+			Controls.Add(buttonClearView);
+			Controls.Add(label7);
 			Controls.Add(label12);
 			Controls.Add(label11);
 			Controls.Add(buttonReplaceXwithYInArea);
@@ -481,6 +597,7 @@
 			FormClosing += ViewActionsWindow_FormClosing;
 			((System.ComponentModel.ISupportInitialize)pictureBoxX).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxY).EndInit();
+			((System.ComponentModel.ISupportInitialize)pictureBoxFill).EndInit();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -521,5 +638,15 @@
 		private Button buttonReplaceXwithYInArea;
 		private Label label11;
 		private Label label12;
+		private Label label7;
+		private Button buttonClearView;
+		private Button buttonClearArea;
+		private PictureBox pictureBoxFill;
+		private Label label15;
+		private Button buttonFillView;
+		private Button buttonFillArea;
+		private Label label13;
+		private Label labelFiller;
+		private Label label16;
 	}
 }

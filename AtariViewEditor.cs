@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
@@ -1443,6 +1444,19 @@ namespace FontMaker
 						if (AtariView.ViewBytes[x, y] == charX)
 							AtariView.ViewBytes[x, y] = charY;
 					}
+				}
+			}
+
+			RedrawView();
+		}
+
+		public void FillArea(Rectangle area, byte fillerChar = 0)
+		{
+			for (var y = area.Top; y <= area.Bottom; y++)
+			{
+				for (var x = area.Left; x <= area.Right; x++)
+				{
+					AtariView.ViewBytes[x, y] = fillerChar;
 				}
 			}
 

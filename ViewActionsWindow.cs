@@ -22,6 +22,8 @@ namespace FontMaker
 		private byte ReplaceWithThisChar { get; set; }
 		private bool CanReplaceInArea { get; set; }
 
+		private byte FillWithThisChar { get; set; }
+
 		public ViewActionsWindow(FontMakerForm? mainForm)
 		{
 			MainForm = mainForm;
@@ -122,6 +124,8 @@ namespace FontMaker
 			buttonAreaShiftRight.Enabled = isMegaCopy && haveRegion;
 			buttonAreaShiftUp.Enabled = isMegaCopy && haveRegion;
 			buttonAreaShiftDown.Enabled = isMegaCopy && haveRegion;
+			buttonClearArea.Enabled = isMegaCopy && haveRegion;
+			buttonFillArea.Enabled = isMegaCopy && haveRegion;
 
 			CanReplaceInArea = isMegaCopy && haveRegion;
 
@@ -173,6 +177,40 @@ namespace FontMaker
 			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Right, FullScreen);
 		}
 
+		private void buttonClearView_Click(object sender, EventArgs e)
+		{
+			MainForm?.FillArea(FullScreen, 0);
+		}
 
+		private void buttonClearArea_Click(object sender, EventArgs e)
+		{
+			MainForm?.FillArea(ActionArea, 0);
+		}
+
+		private void pictureBoxFill_Click(object sender, EventArgs e)
+		{
+			FillWithThisChar = MainForm?.RenderCharIntoPictureBox(pictureBoxFill) ?? 0;
+			labelFiller.Text = $"#{FillWithThisChar}";
+
+			EnableFillerButton();
+		}
+		private void EnableFillerButton()
+		{
+			var isEnabled = FillWithThisChar != ReplaceWithThisChar;
+			var haveOneFont = checkFont1.Checked || checkFont2.Checked || checkFont3.Checked || checkFont4.Checked;
+
+			buttonReplaceXwithYInView.Enabled = isEnabled && haveOneFont;
+			buttonReplaceXwithYInArea.Enabled = CanReplaceInArea && isEnabled && haveOneFont;
+		}
+
+		private void buttonFillView_Click(object sender, EventArgs e)
+		{
+			MainForm?.FillArea(FullScreen, FillWithThisChar);
+		}
+
+		private void buttonFillArea_Click(object sender, EventArgs e)
+		{
+			MainForm?.FillArea(ActionArea, FillWithThisChar);
+		}
 	}
 }

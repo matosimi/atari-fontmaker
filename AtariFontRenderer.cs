@@ -1,4 +1,5 @@
-﻿using System.Drawing.Imaging;
+﻿using System.Collections.ObjectModel;
+using System.Drawing.Imaging;
 
 namespace FontMaker
 {
@@ -19,7 +20,8 @@ namespace FontMaker
 		// 15(F) maps to color 7
 		private static readonly int[] Mode10Colors = new int[16];
 
-		private static int[] _mode10ColorMappings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 4, 5, 6, 7];
+		private static readonly int[] Mode10ColorMappings = [0, 1, 2, 3, 4, 5, 6, 7, 8, 8, 8, 8, 4, 5, 6, 7];
+		private static readonly int[] Mode10InverseColorMappings = [7, 6, 5, 4, 8, 8, 8, 8, 7, 6, 5, 4, 3, 2, 1, 0];
 
 		public static int WhichColorMode { get; set; } = 4;     // 4/5/10
 
@@ -56,7 +58,7 @@ namespace FontMaker
 
 			for (var i = 0; i < 16; i++)
 			{
-				Mode10Colors[i] = CachedColors[_mode10ColorMappings[i] + 1];
+				Mode10Colors[i] = CachedColors[Mode10ColorMappings[i] + 1];
 			}
 		}
 
@@ -494,7 +496,8 @@ namespace FontMaker
 										#region Font 1 in color
 
 										var colorIndex = (f1 & mask) >> (4 - x * 4);
-										invCol = normCol = Mode10Colors[colorIndex];
+										normCol = Mode10Colors[Mode10ColorMappings[colorIndex]];
+										invCol = Mode10Colors[Mode10InverseColorMappings[colorIndex]];
 
 										*ptrFont0Color = normCol;
 										++ptrFont0Color;
@@ -573,7 +576,8 @@ namespace FontMaker
 										#region Font 2 in color
 
 										colorIndex = (f2 & mask) >> (4 - x * 4);
-										invCol = normCol = Mode10Colors[colorIndex];
+										normCol = Mode10Colors[Mode10ColorMappings[colorIndex]];
+										invCol = Mode10Colors[Mode10InverseColorMappings[colorIndex]];
 
 										*ptrFont1Color = normCol;
 										++ptrFont1Color;
@@ -652,7 +656,8 @@ namespace FontMaker
 										#region Font 3 in color
 
 										colorIndex = (f3 & mask) >> (4 - x * 4);
-										invCol = normCol = Mode10Colors[colorIndex];
+										normCol = Mode10Colors[Mode10ColorMappings[colorIndex]];
+										invCol = Mode10Colors[Mode10InverseColorMappings[colorIndex]];
 
 										*ptrFont2Color = normCol;
 										++ptrFont2Color;
@@ -731,7 +736,8 @@ namespace FontMaker
 										#region Font 4 in color
 
 										colorIndex = (f4 & mask) >> (4 - x * 4);
-										invCol = normCol = Mode10Colors[colorIndex];
+										normCol = Mode10Colors[Mode10ColorMappings[colorIndex]];
+										invCol = Mode10Colors[Mode10InverseColorMappings[colorIndex]];
 
 										*ptrFont3Color = normCol;
 										++ptrFont3Color;
@@ -1075,7 +1081,8 @@ namespace FontMaker
 								#region Font in color
 
 								var colorIndex = (fontByte & mask) >> (4 - x * 4);
-								invCol = normCol = Mode10Colors[colorIndex];
+								normCol = Mode10Colors[Mode10ColorMappings[colorIndex]];
+								invCol = Mode10Colors[Mode10InverseColorMappings[colorIndex]];
 
 								*ptrColor = normCol;
 								++ptrColor;
