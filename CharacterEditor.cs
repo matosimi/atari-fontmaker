@@ -29,13 +29,19 @@ namespace FontMaker
 
 	public partial class FontMakerForm
 	{
+		public const int EDITOR_WIDTH = 8;
+		public const int EDITOR_HEIGHT = 8;
+
+		public const int EDITOR_PIXEL_WIDTH = EDITOR_WIDTH * 20;
+		public const int EDITOR_PIXEL_HEIGHT = EDITOR_HEIGHT * 20;
+
 		/// <summary>
 		/// Internal copy of the JSON used for copy + paste
 		/// </summary>
 		private string _localCopyOfClipboardData = string.Empty;
 
 		private readonly byte[] _tempPixelBuffer = new byte[40 * 8]; // Init to the max value that it can be and reuse it everywhere
-		private byte[,] _pixelBuffer = new byte[8, 8];
+		private byte[,] _pixelBuffer = new byte[EDITOR_WIDTH, EDITOR_HEIGHT];
 
 		/// <summary>
 		/// Character pixel being edited: X-coordinate
@@ -65,7 +71,7 @@ namespace FontMaker
 
 		public void ActionCharacterEditorMouseDown(MouseEventArgs e)
 		{
-			if (e.X < 0 || e.Y < 0 || e.X >= (pictureBoxCharacterEditor.Width / (InMode5 ? 2 : 1)) || e.Y >= pictureBoxCharacterEditor.Height)
+			if (e.X < 0 || e.Y < 0 || e.X >= (EDITOR_PIXEL_WIDTH / (InMode5 ? 2 : 1)) || e.Y >= EDITOR_PIXEL_HEIGHT)
 				return;
 
 			var img = Helpers.GetImage(pictureBoxCharacterEditor);
@@ -253,6 +259,8 @@ namespace FontMaker
 		{
 			if (ContinueCharacterDrawInMove)
 			{
+				if (e.X < 0 || e.Y < 0 || e.X >= EDITOR_PIXEL_WIDTH || e.Y >= EDITOR_PIXEL_HEIGHT)
+					return;
 				var je = false;
 				int nx;
 				var ny = e.Y / 20;
@@ -261,9 +269,7 @@ namespace FontMaker
 				{
 					switch (WhichColorMode)
 					{
-						default:
-						case 4:
-						case 5:
+						default: // 4,5
 						{
 							nx = e.X / CharXWidth;
 							break;
@@ -281,7 +287,7 @@ namespace FontMaker
 					nx = e.X / 20;
 				}
 
-				if (e.X < 0 || e.X > pictureBoxCharacterEditor.Width || e.Y < 0 || e.Y > pictureBoxCharacterEditor.Height)
+				if (e.X < 0 || e.X > EDITOR_PIXEL_WIDTH || e.Y < 0 || e.Y > EDITOR_PIXEL_HEIGHT)
 				{
 					je = true;
 				}

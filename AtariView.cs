@@ -6,6 +6,9 @@
 		public const int VIEW_HEIGHT = 26;
 		public const int VIEW_HEIGHT_TALL = 13;
 
+		public const int VIEW_PIXEL_WIDTH = VIEW_WIDTH * 8 * 2;     // Each char is 8x8 and the x2 is for the double scale factor
+		public const int VIEW_PIXEL_HEIGHT = VIEW_HEIGHT * 8 * 2;
+
 		#region Data
 
 		/// <summary>

@@ -9,6 +9,8 @@ namespace FontMaker
 	// All functions that interact with the four fonts can be found here
 	public partial class FontMakerForm
 	{
+		public const int FONT_SELECTOR_WIDTH = 512;
+		public const int FONT_SELECTOR_HEIGHT = 256;
 
 		/// <summary>
 		/// Redraws whole font area: font banks and the pictureBoxFontSelector view into the bank (either page 0 or page 1)
@@ -129,7 +131,7 @@ namespace FontMaker
 
 		public bool IsMousePositionValidForPasting(int x, int y)
 		{
-			if ((x >= pictureBoxFontSelector.Width - (CopyPasteRange.Width) * 16) || (y >= pictureBoxFontSelector.Height - (CopyPasteRange.Height) * 16))
+			if ((x >= FONT_SELECTOR_WIDTH - (CopyPasteRange.Width) * 16) || (y >= FONT_SELECTOR_HEIGHT - (CopyPasteRange.Height) * 16))
 			{
 				return false;
 			}
@@ -144,7 +146,7 @@ namespace FontMaker
 			int fontChar;
 			int fontNr;
 
-			if (e.X < 0 || e.X >= pictureBoxFontSelector.Width || e.Y < 0 || e.Y >= pictureBoxFontSelector.Height)
+			if (e.X < 0 || e.X >= FONT_SELECTOR_WIDTH || e.Y < 0 || e.Y >= FONT_SELECTOR_HEIGHT)
 			{
 				return;
 			}
@@ -239,7 +241,7 @@ namespace FontMaker
 
 		public void ActionFontSelectorMouseUp(MouseEventArgs e)
 		{
-			if ((e.X >= pictureBoxFontSelector.Width) || (e.Y >= pictureBoxFontSelector.Height))
+			if (e.X < 0 || e.X >= FONT_SELECTOR_WIDTH || e.Y < 0 || e.Y >= FONT_SELECTOR_HEIGHT)
 			{
 				return;
 			}
@@ -286,7 +288,7 @@ namespace FontMaker
 				{
 					case MegaCopyStatusFlags.Selecting:
 						{
-							if (e.X < 0 || e.X >= pictureBoxFontSelector.Width || e.Y < 0 || e.Y >= pictureBoxFontSelector.Height)
+							if (e.X < 0 || e.X >= FONT_SELECTOR_WIDTH || e.Y < 0 || e.Y >= FONT_SELECTOR_HEIGHT)
 							{
 								return;
 							}

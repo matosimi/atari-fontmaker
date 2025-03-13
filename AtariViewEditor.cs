@@ -1,5 +1,4 @@
 ﻿using Microsoft.VisualBasic;
-using System;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
@@ -118,13 +117,19 @@ namespace FontMaker
 
 		public void ActionAtariViewEditorMouseDown(MouseEventArgs e)
 		{
-			if ((e.X >= pictureBoxAtariView.Width) || (e.Y >= pictureBoxAtariView.Height) || e.X < 0 || e.Y < 0)
+			if ((e.X >= AtariView.VIEW_PIXEL_WIDTH) || (e.Y >= AtariView.VIEW_PIXEL_HEIGHT) || e.X < 0 || e.Y < 0)
 			{
 				return;
 			}
 
 			var rx = e.X / 16;
 			var ry = e.Y / CellHeight;
+
+			if (rx < 0 || rx >= AtariView.VIEW_WIDTH || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
+			{
+				// Note: This should not happen but when running on Mac things get funky
+				return;
+			}
 
 			if (buttonMegaCopy.Checked)
 			{
@@ -176,9 +181,9 @@ namespace FontMaker
 				if (Control.ModifierKeys == Keys.Control)
 				{
 					ContinueViewDrawInMove = false;
-				} // Ctrl+click nezapina toggle
+				} // Ctrl+click toggle
 
-				if (ry >= pictureBoxAtariView.Height / CellHeight)
+				if (ry >= AtariView.VIEW_PIXEL_HEIGHT / CellHeight)
 				{
 					return;
 				}
@@ -230,13 +235,19 @@ namespace FontMaker
 		{
 			ContinueViewDrawInMove = false;
 
-			if ((e.X >= pictureBoxAtariView.Width) || (e.Y >= pictureBoxAtariView.Height))
+			if ((e.X >= AtariView.VIEW_PIXEL_WIDTH) || (e.Y >= AtariView.VIEW_PIXEL_HEIGHT))
 			{
 				return;
 			}
 
 			var rx = e.X / 16;
 			var ry = e.Y / CellHeight;
+
+			if (rx < 0 || rx >= AtariView.VIEW_WIDTH || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
+			{
+				// Note: This should not happen but when running on Mac things get funky
+				return;
+			}
 
 			if (buttonMegaCopy.Checked)
 			{
@@ -283,13 +294,19 @@ namespace FontMaker
 				{
 					case MegaCopyStatusFlags.Selecting:
 					{
-						if ((e.X >= pictureBoxAtariView.Width) || (e.Y >= pictureBoxAtariView.Height))
+						if ((e.X >= AtariView.VIEW_PIXEL_WIDTH) || (e.Y >= AtariView.VIEW_PIXEL_HEIGHT))
 						{
 							return;
 						}
 
 						rx = e.X / 16;
 						ry = e.Y / CellHeight;
+
+						if (rx < 0 || rx >= AtariView.VIEW_WIDTH || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
+						{
+							// Note: This should not happen but when running on Mac things get funky
+							return;
+						}
 
 						int origWidth = pictureBoxViewEditorRubberBand.Width;
 						int origHeight = pictureBoxViewEditorRubberBand.Height;
@@ -340,8 +357,8 @@ namespace FontMaker
 			}
 			else
 			{
-				if (ContinueViewDrawInMove && e.X >= 0 && e.X < pictureBoxAtariView.Width &&
-				    e.Y >= 0 && e.Y < pictureBoxAtariView.Height &&
+				if (ContinueViewDrawInMove && e.X >= 0 && e.X < AtariView.VIEW_PIXEL_WIDTH &&
+				    e.Y >= 0 && e.Y < AtariView.VIEW_PIXEL_HEIGHT &&
 				    (e.X / 16 != LastViewCharacterX || e.Y / CellHeight != LastViewCharacterY))
 				{
 					ActionAtariViewEditorMouseDown(new MouseEventArgs(MouseButtons.Left, 1, e.X, e.Y, 0));
@@ -357,20 +374,28 @@ namespace FontMaker
 			}
 
 			// Char under cursor:
-			if ((e.X >= pictureBoxAtariView.Width) || (e.Y >= pictureBoxAtariView.Height) || e.X < 0 || e.Y < 0)
+			if ((e.X >= AtariView.VIEW_PIXEL_WIDTH) || (e.Y >= AtariView.VIEW_PIXEL_HEIGHT) || e.X < 0 || e.Y < 0)
 			{
 				return;
 			}
 
 			rx = e.X / 16;
 			ry = e.Y / CellHeight;
+			
+			if (rx < 0 || rx >= AtariView.VIEW_WIDTH || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
+			{
+				// Note: This should not happen but when running on Mac things get funky
+				return;
+			}
 			var fontchar = AtariView.ViewBytes[rx, ry];
 			labelViewCharInfo.Text = $@"Char: Font {AtariView.UseFontOnLine[ry]} ${fontchar:X2} #{fontchar} @ {rx},{ry}";
 		}
 
 		public bool MouseValidView(int x, int y)
 		{
-			return (x < pictureBoxAtariView.Width - (CopyPasteRange.Width) * 16) && (y < pictureBoxAtariView.Height - (CopyPasteRange.Height) * CellHeight);
+			// When running on the Mac it breaks the actual pictureBoxAtariView.Width and Height
+			// So the real bounds are hard coded here
+			return (x < AtariView.VIEW_PIXEL_WIDTH - (CopyPasteRange.Width) * 16) && (y < AtariView.VIEW_PIXEL_HEIGHT - (CopyPasteRange.Height) * CellHeight);
 		}
 
 		/// <summary>
@@ -774,6 +799,12 @@ namespace FontMaker
 		public void ActionCharacterSetSelector(MouseEventArgs e)
 		{
 			var ry = e.Y / CellHeight;
+
+			if (ry < 0 || ry >= AtariView.VIEW_HEIGHT)
+			{
+				// Note: This should not happen but when running on Mac things get funky
+				return;
+			}
 
 			if (Control.ModifierKeys == Keys.Control)
 			{
