@@ -632,7 +632,7 @@ namespace FontMaker
 			return true;
 		}
 
-		// updates undo/redo button state based on info if character has been edited and whats the buffer index
+		// updates undo/redo button state based on info if character has been edited and what the buffer index is
 		public void UpdateUndoButtons(bool edited)
 		{
 			var (redoEnabled, undoEnabled) = UndoBuffer.GetRedoUndoButtonState(edited);
@@ -825,18 +825,7 @@ namespace FontMaker
 			{
 				if (targetIsView)
 				{
-					var charsBytes = Convert.FromHexString(characterBytes);
-					for (var y = 0; y < height; y++)
-					{
-						for (var x = 0; x < width; x++)
-						{
-							var i = y + CopyPasteTargetLocation.Y;
-							var j = x + CopyPasteTargetLocation.X;
-							AtariView.ViewBytes[j, i] = charsBytes[y * width + x];
-						}
-					}
-
-					RedrawView();
+					PasteClipboardIntoView(characterBytes, width, height);
 				}
 				else
 				{

@@ -28,7 +28,8 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PageEditor));
+			components = new System.ComponentModel.Container();
+			var resources = new System.ComponentModel.ComponentResourceManager(typeof(PageEditor));
 			btnCancel = new Button();
 			label1 = new Label();
 			txtPageName = new TextBox();
@@ -36,6 +37,7 @@
 			lbPages = new ListBox();
 			btnUp = new Button();
 			btnDown = new Button();
+			toolTips = new ToolTip(components);
 			SuspendLayout();
 			// 
 			// btnCancel
@@ -53,7 +55,7 @@
 			label1.AutoSize = true;
 			label1.Location = new Point(5, 16);
 			label1.Name = "label1";
-			label1.Size = new Size(66, 13);
+			label1.Size = new Size(67, 13);
 			label1.TabIndex = 1;
 			label1.Text = "Page Name:";
 			// 
@@ -61,8 +63,9 @@
 			// 
 			txtPageName.Location = new Point(76, 12);
 			txtPageName.Name = "txtPageName";
-			txtPageName.Size = new Size(180, 20);
+			txtPageName.Size = new Size(180, 22);
 			txtPageName.TabIndex = 1;
+			toolTips.SetToolTip(txtPageName, "Edit the page name");
 			txtPageName.TextChanged += txtPageName_TextChanged;
 			txtPageName.Enter += txtPageName_Enter;
 			txtPageName.KeyDown += txtPageName_KeyDown;
@@ -75,6 +78,7 @@
 			btnUpdate.Size = new Size(75, 23);
 			btnUpdate.TabIndex = 3;
 			btnUpdate.Text = "Update";
+			toolTips.SetToolTip(btnUpdate, "Save the current page settings");
 			btnUpdate.UseVisualStyleBackColor = true;
 			btnUpdate.Click += btnUpdate_Click;
 			// 
@@ -98,6 +102,7 @@
 			btnUp.Size = new Size(21, 23);
 			btnUp.TabIndex = 3;
 			btnUp.TabStop = false;
+			toolTips.SetToolTip(btnUp, "Move the page up in the sequence");
 			btnUp.UseVisualStyleBackColor = true;
 			btnUp.Click += btnUp_Click;
 			// 
@@ -109,6 +114,7 @@
 			btnDown.Size = new Size(21, 23);
 			btnDown.TabIndex = 4;
 			btnDown.TabStop = false;
+			toolTips.SetToolTip(btnDown, "Move the page down in the sequence");
 			btnDown.UseVisualStyleBackColor = true;
 			btnDown.Click += btnDown_Click;
 			// 
@@ -144,5 +150,6 @@
 		private ListBox lbPages;
 		private Button btnUp;
 		private Button btnDown;
+		private ToolTip toolTips;
 	}
 }

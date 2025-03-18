@@ -6,6 +6,9 @@ namespace FontMaker
 {
 	public partial class ExportViewWindow : Form
 	{
+		private const int BITMAP_WIDTH = 320;
+		private const int BITMAP_HEIGHT = 208;
+
 		private int PreviousExportType { get; set; } = -1;
 		private int PreviousDataType { get; set; } = -1;
 
@@ -96,7 +99,6 @@ namespace FontMaker
 
 			UpdateRegionEdits();
 
-			//pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left - 2, pictureBoxAtariViewSmall.Top - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
 			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
 			pictureBoxViewEditorRubberBand.Visible = true;
 		}
@@ -416,7 +418,7 @@ namespace FontMaker
 
 		private void pictureBoxAtariViewSmall_MouseDown(object sender, MouseEventArgs e)
 		{
-			if (e.X >= pictureBoxAtariViewSmall.Width || e.Y >= pictureBoxAtariViewSmall.Height || e.X < 0 || e.Y < 0)
+			if (e.X >= BITMAP_WIDTH || e.Y >= BITMAP_HEIGHT || e.X < 0 || e.Y < 0)
 			{
 				return;
 			}
@@ -446,7 +448,7 @@ namespace FontMaker
 
 		private void pictureBoxAtariViewSmall_MouseUp(object sender, MouseEventArgs e)
 		{
-			if ((e.X >= pictureBoxAtariViewSmall.Width) || (e.Y >= pictureBoxAtariViewSmall.Height))
+			if (e.X >= BITMAP_WIDTH || e.Y >= BITMAP_HEIGHT || e.X < 0 || e.Y < 0)
 			{
 				return;
 			}
@@ -492,7 +494,7 @@ namespace FontMaker
 			{
 				case SelectionStatusFlags.Selecting:
 					{
-						if (e.X >= pictureBoxAtariViewSmall.Width || e.Y >= pictureBoxAtariViewSmall.Height)
+						if (e.X >= BITMAP_WIDTH || e.Y >= BITMAP_HEIGHT || e.X < 0 || e.Y < 0)
 						{
 							return;
 						}

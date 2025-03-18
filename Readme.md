@@ -237,15 +237,21 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 ## Keyboard controls ##
 
 - **, .** – previous/next character
-- **Mousewheel** – previous/next character
-- CTRL+**Mousewheel** – previous/next character row
-- **1 2 3** – select color
+- **Mousewheel** – previous/next character (left/right)
+- CTRL+**Mousewheel** – previous/next character row (up/down)
+- **0 1 2 3 4 5 6 7 8** – select color
+- **CTRL + 0 - 9 ** – select a page in the view window 1 = 1st page, 9 = 9th page, 0 = 10th page
 - **R Shift+R** – rotate character left and right
 - **M Shift+M** – mirror horizontal and vertical
 - **I** – invert character
+- **Ctrl+M** - switch between MegaCopy and normal mode
 - **Ctrl+C Ctrl+V** – copy and paste
-- **Ctrl+Z Ctrl+Y** – undo and redo
+- **Ctrl+Z Ctrl+Y** – undo and redo font changes
+- **Ctrl+Shift+Z Ctrl+Shift+Y** – undo and redo view changes, each page has its own undo/redo buffer
+- **Ctrl+Tab** - flip to the next page
+- **Ctrl+Shift+Tab** flip to the previous page
 - **ESC** - close a dialog or exit from paste mode
+- **B** - Switch font bank (1+2) or (3+4)b
 
 ## View Actions (new since V1.6.11.0)
 Press the [View Actions] button to open a new window.  It contains actions that can be applied to the contents in the View.
@@ -269,6 +275,24 @@ Press the arrow buttons to move the whole view area in the required direction.
 Or select an area and use the area shift buttons on the right to move its contents.
 
 ## Changes/History ##
+V1.16.15.0
+- Added tooltips to the page editor
+- Added undo/redo functionality to the view editor
+    - CTRL + Shift + Z = Undo
+    - CTRL + Shift + Y = Redo
+    - Each page maintains its own undo/redo buffer.
+- Added out of bounds checks to the various bitmaps. This should prevent the app from crashing when the view area is larger than the screen area.
+- Added keyboard shortcuts:
+    - CTRL + Tab = Flip to the next page
+    - CTRL + Shift + Tab = Flip to the previous page
+    - CTRL + M - switch in and out of MegaCopy mode
+    - CTRL + 0-9 = select a page in the view window (the first 10 pages can be selected quickly)
+    - B - switch between font banks (1+2) or (3+4)
+- Added a method to influence cut & paste in the view window.
+    When something is pasted into the view window you can now skip all #0 (or the selected) characters.
+    This is useful if you have irregular shaped object and you want to paste them over something else.
+    All characters or the selected number will be skipped and the pasted object will be placed over the existing characters. 
+
 V1.16.14.4
 - Fixed a bug in the view exporter. Small areas would be exported incorrectly.
 - Fixed mode 10 color mapping. Inverse colors are mapped correctly now.

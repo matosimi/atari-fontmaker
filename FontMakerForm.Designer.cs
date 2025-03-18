@@ -133,6 +133,10 @@
 			pictureBoxViewEditorPasteCursor = new PictureBox();
 			toolTips = new ToolTip(components);
 			buttonFontAnalysis = new Button();
+			buttonViewUndo = new Button();
+			buttonViewRedo = new Button();
+			checkBoxSkipChar0 = new CheckBox();
+			trackBarSkipCharX = new TrackBar();
 			comboBoxPages = new ComboBox();
 			buttonAddPage = new Button();
 			buttonDeletePage = new Button();
@@ -149,6 +153,8 @@
 			pictureBoxRecolorTargetColorMode10 = new PictureBox();
 			listBoxRecolorSourceMode10 = new ListBox();
 			listBoxRecolorTargetMode10 = new ListBox();
+			labelSelectedArea = new Label();
+			label5 = new Label();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -176,6 +182,7 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelectorPasteCursor).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorPasteCursor).BeginInit();
+			((System.ComponentModel.ISupportInitialize)trackBarSkipCharX).BeginInit();
 			panel1.SuspendLayout();
 			panelColorSwitcherMode10.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorSourceColorMode10).BeginInit();
@@ -1416,6 +1423,49 @@
 			buttonFontAnalysis.UseVisualStyleBackColor = true;
 			buttonFontAnalysis.Click += ViewEditor_FontAnalysis_Click;
 			// 
+			// buttonViewUndo
+			// 
+			buttonViewUndo.Image = (Image)resources.GetObject("buttonViewUndo.Image");
+			buttonViewUndo.Location = new Point(820, 482);
+			buttonViewUndo.Name = "buttonViewUndo";
+			buttonViewUndo.Size = new Size(22, 22);
+			buttonViewUndo.TabIndex = 28;
+			toolTips.SetToolTip(buttonViewUndo, "ExecuteUndo Font Change");
+			buttonViewUndo.Click += ViewUndo_Click;
+			// 
+			// buttonViewRedo
+			// 
+			buttonViewRedo.Image = (Image)resources.GetObject("buttonViewRedo.Image");
+			buttonViewRedo.Location = new Point(843, 482);
+			buttonViewRedo.Name = "buttonViewRedo";
+			buttonViewRedo.Size = new Size(22, 22);
+			buttonViewRedo.TabIndex = 29;
+			toolTips.SetToolTip(buttonViewRedo, "Redo Font Change");
+			buttonViewRedo.Click += ViewRedo_Click;
+			// 
+			// checkBoxSkipChar0
+			// 
+			checkBoxSkipChar0.AutoSize = true;
+			checkBoxSkipChar0.Location = new Point(898, 466);
+			checkBoxSkipChar0.Name = "checkBoxSkipChar0";
+			checkBoxSkipChar0.Size = new Size(137, 17);
+			checkBoxSkipChar0.TabIndex = 30;
+			checkBoxSkipChar0.Text = "Skip char #0 on paste";
+			toolTips.SetToolTip(checkBoxSkipChar0, "When pasting text into the view all 0 chars are left untouched.");
+			checkBoxSkipChar0.UseVisualStyleBackColor = true;
+			// 
+			// trackBarSkipCharX
+			// 
+			trackBarSkipCharX.AutoSize = false;
+			trackBarSkipCharX.Location = new Point(892, 483);
+			trackBarSkipCharX.Maximum = 255;
+			trackBarSkipCharX.Name = "trackBarSkipCharX";
+			trackBarSkipCharX.Size = new Size(284, 34);
+			trackBarSkipCharX.TabIndex = 31;
+			trackBarSkipCharX.TickFrequency = 10;
+			toolTips.SetToolTip(trackBarSkipCharX, "Which character # is to be skipped?");
+			trackBarSkipCharX.Scroll += trackBarSkipCharX_Scroll;
+			// 
 			// comboBoxPages
 			// 
 			comboBoxPages.DropDownStyle = ComboBoxStyle.DropDownList;
@@ -1448,9 +1498,9 @@
 			// 
 			// buttonEditPage
 			// 
-			buttonEditPage.Location = new Point(186, 33);
+			buttonEditPage.Location = new Point(131, 6);
 			buttonEditPage.Name = "buttonEditPage";
-			buttonEditPage.Size = new Size(38, 21);
+			buttonEditPage.Size = new Size(53, 21);
 			buttonEditPage.TabIndex = 19;
 			buttonEditPage.Text = "Edit";
 			buttonEditPage.UseVisualStyleBackColor = true;
@@ -1472,7 +1522,7 @@
 			lblInMegaCopyMode.AutoSize = true;
 			lblInMegaCopyMode.BackColor = SystemColors.ActiveCaption;
 			lblInMegaCopyMode.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
-			lblInMegaCopyMode.Location = new Point(860, 520);
+			lblInMegaCopyMode.Location = new Point(858, 520);
 			lblInMegaCopyMode.Name = "lblInMegaCopyMode";
 			lblInMegaCopyMode.Size = new Size(188, 25);
 			lblInMegaCopyMode.TabIndex = 23;
@@ -1511,7 +1561,7 @@
 			panel1.Controls.Add(buttonEditPage);
 			panel1.Location = new Point(613, 466);
 			panel1.Name = "panel1";
-			panel1.Size = new Size(231, 75);
+			panel1.Size = new Size(191, 75);
 			panel1.TabIndex = 28;
 			// 
 			// label1
@@ -1582,12 +1632,36 @@
 			listBoxRecolorTargetMode10.TabIndex = 1;
 			listBoxRecolorTargetMode10.Click += RecolorTargetMode10_Click;
 			// 
+			// labelSelectedArea
+			// 
+			labelSelectedArea.AutoSize = true;
+			labelSelectedArea.Location = new Point(695, 419);
+			labelSelectedArea.Name = "labelSelectedArea";
+			labelSelectedArea.Size = new Size(33, 13);
+			labelSelectedArea.TabIndex = 29;
+			labelSelectedArea.Text = "Area:";
+			// 
+			// label5
+			// 
+			label5.AutoSize = true;
+			label5.Location = new Point(810, 466);
+			label5.Name = "label5";
+			label5.Size = new Size(67, 13);
+			label5.TabIndex = 28;
+			label5.Text = "Undo/Redo";
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
-			ClientSize = new Size(1048, 545);
+			ClientSize = new Size(1046, 545);
+			Controls.Add(trackBarSkipCharX);
+			Controls.Add(checkBoxSkipChar0);
+			Controls.Add(buttonViewUndo);
+			Controls.Add(label5);
+			Controls.Add(buttonViewRedo);
+			Controls.Add(labelSelectedArea);
 			Controls.Add(panelColorSwitcherMode10);
 			Controls.Add(buttonImportView);
 			Controls.Add(buttonViewActions);
@@ -1653,6 +1727,7 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelectorPasteCursor).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorPasteCursor).EndInit();
+			((System.ComponentModel.ISupportInitialize)trackBarSkipCharX).EndInit();
 			panel1.ResumeLayout(false);
 			panel1.PerformLayout();
 			panelColorSwitcherMode10.ResumeLayout(false);
@@ -1789,5 +1864,11 @@
 		private Label label4;
 		private Label label1;
 		private Label labelCurrentPageInfo;
+		private Label labelSelectedArea;
+		private Label label5;
+		private Button buttonViewUndo;
+		private Button buttonViewRedo;
+		private CheckBox checkBoxSkipChar0;
+		private TrackBar trackBarSkipCharX;
 	}
 }

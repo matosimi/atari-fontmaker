@@ -131,14 +131,7 @@ namespace FontMaker
 
 		public bool IsMousePositionValidForPasting(int x, int y)
 		{
-			if ((x >= FONT_SELECTOR_WIDTH - (CopyPasteRange.Width) * 16) || (y >= FONT_SELECTOR_HEIGHT - (CopyPasteRange.Height) * 16))
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+			return (x < FONT_SELECTOR_WIDTH - (CopyPasteRange.Width) * 16) && (y < FONT_SELECTOR_HEIGHT - (CopyPasteRange.Height) * 16);
 		}
 
 		public void ActionFontSelectorMouseDown(MouseEventArgs e)

@@ -9,6 +9,9 @@ namespace FontMaker
 	/// </summary>
 	public partial class FontAnalysisWindow : Form
 	{
+		private const int PicureBoxWidth = 512;
+		private const int PictureBoxHeight = 512;
+
 		#region Load/Save ranges and values
 		public static int AnalysisMinColorIndex = 0;
 		public static int AnalysisMaxColorIndex = 4;
@@ -458,13 +461,18 @@ namespace FontMaker
 
 		private void ShowQuickCharacterInfo(int x, int y)
 		{
+			if (x < 0 || y < 0 || x >= PicureBoxWidth || y >= PictureBoxHeight)
+			{
+				return;
+			}
+
 			var rx = x / 16;
 			var ry = y / 16;
 			var fontNr = ry / 8;
 			var fontChar = (rx + ry * 32) % 256;
 			var baseFontChar = fontChar % 128;
 			var invFontChar = baseFontChar + 128;
-			// var nrUsed = FullFontCharCounter[fontChar + fontNr * 256];
+
 			var nrUsed = _combinedCharCounter[baseFontChar + fontNr * 128];
 
 			pictureBoxCursor.SetBounds(pictureBoxFonts.Left + x - x % 16 - 2, pictureBoxFonts.Top + y - y % 16 - 2, 20, 20);
@@ -477,6 +485,10 @@ namespace FontMaker
 
 		private void ShowDetailedCharacterInfo(int x, int y)
 		{
+			if (x < 0 || y < 0 || x >= PicureBoxWidth || y >= PictureBoxHeight)
+			{
+				return;
+			}
 			var rx = x / 16;
 			var ry = y / 16;
 			var fontNr = ry / 8;
@@ -515,22 +527,13 @@ namespace FontMaker
 			textBoxDuplicates.Visible = showDuplicates;
 		}
 
-		private void pictureBoxFonts_MouseMove(object sender, MouseEventArgs e)
+		private void pictureBoxFonts_MouseMove(object? _, MouseEventArgs e)
 		{
-			if (e.X >= pictureBoxFonts.Width || e.Y >= pictureBoxFonts.Height)
-			{
-				return;
-			}
-
 			ShowQuickCharacterInfo(e.X, e.Y);
 		}
 
-		private void pictureBoxFonts_MouseDown(object sender, MouseEventArgs e)
+		private void pictureBoxFonts_MouseDown(object? _, MouseEventArgs e)
 		{
-			if (e.X >= pictureBoxFonts.Width || e.Y >= pictureBoxFonts.Height)
-			{
-				return;
-			}
 			if (e.Button == MouseButtons.Right)
 			{
 				HideUsageInfo();
@@ -573,7 +576,7 @@ namespace FontMaker
 			UpdateAfterGuiChange();
 		}
 
-		private void pictureBoxCursor_MouseDown(object sender, MouseEventArgs e)
+		private void pictureBoxCursor_MouseDown(object? sender, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Right)
 			{
@@ -589,7 +592,7 @@ namespace FontMaker
 			textBoxUsageInfo.Visible = false;
 		}
 
-		private void pictureBoxInfoCursor_MouseDown(object sender, MouseEventArgs e)
+		private void pictureBoxInfoCursor_MouseDown(object? _, MouseEventArgs e)
 		{
 			if (e.Button == MouseButtons.Right)
 			{
@@ -599,7 +602,7 @@ namespace FontMaker
 
 		#region Mouse Wheel
 
-		private void Form_MouseWheel(object sender, MouseEventArgs e)
+		private void Form_MouseWheel(object? _, MouseEventArgs e)
 		{
 			var step = e.Delta > 0 ? -1 : 1;
 			if (Control.ModifierKeys == Keys.Control)
@@ -620,13 +623,14 @@ namespace FontMaker
 		#endregion
 
 
-		private void textBoxUsageInfo_MouseDown(object sender, MouseEventArgs e)
+		private void textBoxUsageInfo_MouseDown(object? _, MouseEventArgs e)
 		{
 			var charIndex = textBoxUsageInfo.GetCharIndexFromPosition(e.Location);
 			var lineNr = textBoxUsageInfo.GetLineFromCharIndex(charIndex);
 
-			if (lineNr > 0)
+			if (lineNr > 0 && lineNr <= _analysisDetailsPerLine.Count)
 			{
+
 				var locationInfo = _analysisDetailsPerLine[lineNr - 1];
 				Program.MainForm.PickPage(locationInfo.PageIndex);
 			}
@@ -640,12 +644,12 @@ namespace FontMaker
 				textBoxDuplicates.Visible = false;
 		}
 
-		private void textBoxDuplicates_MouseUp(object sender, MouseEventArgs e)
+		private void textBoxDuplicates_MouseUp(object? _, MouseEventArgs e)
 		{
 			var charIndex = textBoxDuplicates.GetCharIndexFromPosition(e.Location);
 			var lineNr = textBoxDuplicates.GetLineFromCharIndex(charIndex);
 
-			if (lineNr > 0)
+			if (lineNr > 0 && lineNr <= _duplicateDetailsPerLine.Count)
 			{
 				var nextCharacterIndex = _duplicateDetailsPerLine[lineNr - 1];
 				var bx = nextCharacterIndex % 32;

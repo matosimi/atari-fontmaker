@@ -3,16 +3,12 @@
 namespace FontMaker;
 public partial class ImportViewWindow : Form
 {
-
-
-
 	public bool InColorMode { get; set; }
 	public int WhichColorMode { get; set; }
 
 	private byte[]? FileData { get; set; }
 
-	private byte[,]? ViewBytes { get; set; }
-
+	private byte[,]? ImportedViewBytes { get; set; }
 
 	private bool RememberSelection { get; set; }
 	private int PreviousLineWidth { get; set; } = 1;
@@ -96,7 +92,11 @@ public partial class ImportViewWindow : Form
 			try
 			{
 				FileData = File.ReadAllBytes(dialogOpenFile.FileName);
-
+				if (FileData == null || FileData.Length == 0)
+				{
+					MessageBox.Show($@"Failed to load '{dialogOpenFile.FileName}'. File is empty.");
+					FileData = null;
+				}
 				UpdateData();
 			}
 			catch (Exception ex)
@@ -104,7 +104,6 @@ public partial class ImportViewWindow : Form
 				MessageBox.Show($@"Failed to load '{dialogOpenFile.FileName}'. Reason:{ex.Message}");
 				FileData = null;
 				UpdateData();
-				return;
 			}
 		}
 	}
@@ -113,17 +112,16 @@ public partial class ImportViewWindow : Form
 	{
 		labelFileSize.Text = FileData == null ? "(Load some data)" : $"{FileData.Length} bytes";
 
-
 		numericSkipX.Enabled = FileData != null;
 		numericSkipY.Enabled = FileData != null;
 		numericWidth.Enabled = FileData != null;
 		numericHeight.Enabled = FileData != null;
 		numericLineWidth.Enabled = FileData != null;
 
-		UpdateConstraints(null, null);
+		UpdateConstraints(null, EventArgs.Empty);
 	}
 
-	private void UpdateConstraints(object _, EventArgs __)
+	private void UpdateConstraints(object? _, EventArgs __)
 	{
 		var widthOk = numericSkipX.Value + numericWidth.Value <= (int)numericLineWidth.Value;
 		numericSkipX.ForeColor = widthOk ? Color.Black : Color.Red;
@@ -149,7 +147,7 @@ public partial class ImportViewWindow : Form
 	private void GenerateData()
 	{
 		// Copy the data from FileData into ViewBytes
-		ViewBytes = new byte[AtariView.VIEW_WIDTH, AtariView.VIEW_HEIGHT];
+		ImportedViewBytes = new byte[AtariView.VIEW_WIDTH, AtariView.VIEW_HEIGHT];
 
 		var lineWidth = (int)numericLineWidth.Value;
 		var skipX = (int)numericSkipX.Value;
@@ -162,7 +160,7 @@ public partial class ImportViewWindow : Form
 		{
 			for (var x = 0; x < width; ++x)
 			{
-				ViewBytes[x, y] = FileData[srcIndex + skipX + x];
+				ImportedViewBytes[x, y] = FileData[srcIndex + skipX + x];
 			}
 
 			srcIndex += lineWidth;
@@ -171,7 +169,7 @@ public partial class ImportViewWindow : Form
 
 	private void RenderTestData()
 	{
-		if (ViewBytes == null)
+		if (ImportedViewBytes == null)
 			return;
 
 		var colorOffset = InColorMode ? 512 : 0;
@@ -194,8 +192,8 @@ public partial class ImportViewWindow : Form
 			{
 				for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
 				{
-					var rx = ViewBytes[x, y] % 32;
-					var ry = ViewBytes[x, y] / 32;
+					var rx = ImportedViewBytes[x, y] % 32;
+					var ry = ImportedViewBytes[x, y] / 32;
 
 					destRect.X = x * 8;
 					destRect.Y = y * 8;
@@ -226,14 +224,14 @@ public partial class ImportViewWindow : Form
 
 	private void Button_Import_Click(object sender, EventArgs e)
 	{
-		if (ViewBytes != null)
+		if (ImportedViewBytes != null)
 		{
 
 			for (var y = 0; y < AtariView.VIEW_HEIGHT; ++y)
 			{
 				for (var x = 0; x < AtariView.VIEW_WIDTH; ++x)
 				{
-					AtariView.ViewBytes[x, y] = ViewBytes[x, y];
+					AtariView.ViewBytes[x, y] = ImportedViewBytes[x, y];
 				}
 			}
 		}

@@ -187,6 +187,8 @@ namespace FontMaker
 
 			BuildColorSelector();
 
+			UpdateViewActions();
+
 			string? ext;
 			if (Environment.GetCommandLineArgs().Length - 1 == 1)
 			{
@@ -415,18 +417,144 @@ namespace FontMaker
 
 		private void Form_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Control)
+			{
+				// Handle all the CTRL+... shortcuts here
+
+				// CTRL+M = Switch Mega Copy mode on/off
+				if (e.KeyCode == Keys.M)
+				{
+					buttonMegaCopy.Checked = !buttonMegaCopy.Checked;
+					MegaCopy_Click(0, EventArgs.Empty);
+					return;
+				}
+
+				// CTRL+Tab | CTRL+Shift+Tab = Switch between color modes
+				if (e.KeyCode == Keys.Tab)
+				{
+					// CTRL+TAB = Switch between color modes
+					ActionNextPage(e.Shift ? -1 : 1);
+					return;
+				}
+
+				// Ctrl + C = Copy to clipboard
+				if (e.KeyCode == Keys.C)
+				{
+					ExecuteCopyToClipboard(false);
+					return;
+				}
+
+				// Ctrl + V = Paste from clipboard
+				if (e.KeyCode == Keys.V)
+				{
+					ExecutePasteFromClipboard();
+					return;
+				}
+
+				// Ctrl + Z = Undo font change
+				if (e.Shift == false && e.KeyCode == Keys.Z)
+				{
+					var (_, undoEnabled) = UndoBuffer.GetRedoUndoButtonState(CharacterEdited());
+					if (undoEnabled)
+						Undo_Click(0, EventArgs.Empty);
+					return;
+				}
+				// Ctrl + Y = Redo font change
+				if (e.Shift == false && e.KeyCode == Keys.Y)
+				{
+					var (redoEnabled, _) = UndoBuffer.GetRedoUndoButtonState(CharacterEdited());
+					if (redoEnabled)
+						Redo_Click(0, EventArgs.Empty);
+					return;
+				}
+
+				// View editor undo/redo
+				// Ctrl + Z = Undo view change
+				if (e.Shift && e.KeyCode == Keys.Z)
+				{
+					ExecuteViewUndo();
+					return;
+				}
+				// Ctrl + Y = Redo view change
+				if (e.Shift && e.KeyCode == Keys.Y)
+				{
+					ExecuteViewRedo();
+					return;
+				}
+
+				// Switch to page X
+				// CTRL + 1-9 = Switch to page 1-9
+				if (e.KeyCode == Keys.D1)
+				{
+					SavePageSwitch(0);
+					return;
+				}
+				if (e.KeyCode == Keys.D2)
+				{
+					SavePageSwitch(1);
+					return;
+				}
+				if (e.KeyCode == Keys.D3)
+				{
+					SavePageSwitch(2);
+					return;
+				}
+				if (e.KeyCode == Keys.D4)
+				{
+					SavePageSwitch(3);
+					return;
+				}
+				if (e.KeyCode == Keys.D5)
+				{
+					SavePageSwitch(4);
+					return;
+				}
+				if (e.KeyCode == Keys.D6)
+				{
+					SavePageSwitch(5);
+					return;
+				}
+				if (e.KeyCode == Keys.D7)
+				{
+					SavePageSwitch(6);
+					return;
+				}
+				if (e.KeyCode == Keys.D8)
+				{
+					SavePageSwitch(7);
+					return;
+				}
+				if (e.KeyCode == Keys.D9)
+				{
+					SavePageSwitch(8);
+					return;
+				}
+				if (e.KeyCode == Keys.D0)
+				{
+					SavePageSwitch(9);
+					return;
+				}
+
+
+				return;
+			}
+			// ----------------------------------
+			// The next handlers will only work in normal mode
+			// If CTRL is pressed, then the above handlers will be used
+
+			// Move character selection with , and .
 			if (e.KeyCode == Keys.Oemcomma)
 			{
 				ExecuteSelectPreviousCharacter();
 				return;
 			}
-
 			if (e.KeyCode == Keys.OemPeriod)
 			{
 				ExecuteSelectNextCharacter();
 				return;
 			}
 
+			// R and Shift+R rotate left and right
 			if (e.KeyCode == Keys.R)
 			{
 				if (e.Shift)
@@ -436,6 +564,7 @@ namespace FontMaker
 				return;
 			}
 
+			// M and Shift+M mirror horizontal and vertical
 			if (e.KeyCode == Keys.M)
 			{
 				if (e.Shift)
@@ -445,6 +574,15 @@ namespace FontMaker
 				return;
 			}
 
+			// B = Switch font bank
+			if (e.KeyCode == Keys.B)
+			{
+				checkBoxFontBank.Checked = !checkBoxFontBank.Checked;
+				SwitchFontBank();
+				return;
+			}
+
+			// Quick color selection with 0-8
 			if (e.KeyCode == Keys.D1)
 			{
 				SetColor(2);
@@ -491,41 +629,20 @@ namespace FontMaker
 				return;
 			}
 
+			// I - Invert character
 			if (e.KeyCode == Keys.I)
 			{
 				ExecuteInvertCharacter();
 				return;
 			}
 
+			// Esc - cancel selection
 			if (e.KeyCode == Keys.Escape)
 			{
 				ExecuteEscapeKeyPressed();
 				return;
 			}
 
-			if (e.Control && e.KeyCode == Keys.C)
-			{
-				ExecuteCopyToClipboard(false);
-				return;
-			}
-
-			if (e.Control && e.KeyCode == Keys.V)
-			{
-				ExecutePasteFromClipboard();
-				return;
-			}
-
-			if (e.Control && e.KeyCode == Keys.Z)
-			{
-				Undo_Click(0, EventArgs.Empty);
-				return;
-			}
-			// Ctrl + Y = Redo font change
-			if (e.Control && e.KeyCode == Keys.Y)
-			{
-				Redo_Click(0, EventArgs.Empty);
-				return;
-			}
 		}
 		#endregion
 
@@ -961,7 +1078,7 @@ namespace FontMaker
 
 		public void ViewEditor_MegaCopyImage_MouseDown(object sender, MouseEventArgs e)
 		{
-			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorMegaCopyImage.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorMegaCopyImage.Top - pictureBoxAtariView.Top, 0));
+			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorMegaCopyImage.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorMegaCopyImage.Top - pictureBoxAtariView.Top, -1000));
 		}
 		public void ViewEditor_MegaCopyImage_MouseMove(object sender, MouseEventArgs e)
 		{
@@ -985,7 +1102,7 @@ namespace FontMaker
 
 		public void ViewEditor_RubberBand_MouseDown(object sender, MouseEventArgs e)
 		{
-			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorRubberBand.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorRubberBand.Top - pictureBoxAtariView.Top, 0));
+			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorRubberBand.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorRubberBand.Top - pictureBoxAtariView.Top, -1000));
 		}
 		public void ViewEditor_RubberBand_MouseMove(object sender, MouseEventArgs e)
 		{
@@ -1022,7 +1139,7 @@ namespace FontMaker
 
 		public void ViewEditor_PasteCursor_MouseDown(object sender, MouseEventArgs e)
 		{
-			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, pictureBoxViewEditorPasteCursor.Left + e.X - pictureBoxAtariView.Left, pictureBoxViewEditorPasteCursor.Top + e.Y - pictureBoxAtariView.Top, 0));
+			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, pictureBoxViewEditorPasteCursor.Left + e.X - pictureBoxAtariView.Left, pictureBoxViewEditorPasteCursor.Top + e.Y - pictureBoxAtariView.Top, -1000));
 		}
 		public void ViewEditor_PasteCursor_MouseLeave(object sender, EventArgs e)
 		{
@@ -1055,6 +1172,21 @@ namespace FontMaker
 
 			TransferPagesToViewActions();
 			//TransferPageSelectionToViewActions();
+		}
+
+		private void ViewUndo_Click(object sender, EventArgs e)
+		{
+			ExecuteViewUndo();
+		}
+
+		private void ViewRedo_Click(object sender, EventArgs e)
+		{
+			ExecuteViewRedo();
+		}
+
+		private void trackBarSkipCharX_Scroll(object sender, EventArgs e)
+		{
+			checkBoxSkipChar0.Text = $"Skip char #{trackBarSkipCharX.Value} on paste";
 		}
 
 		#endregion
@@ -1429,6 +1561,7 @@ namespace FontMaker
 		}
 
 		#endregion
+
 
 	}
 }
