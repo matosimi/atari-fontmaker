@@ -810,6 +810,7 @@
 			cmbColorMode.Size = new Size(98, 21);
 			cmbColorMode.TabIndex = 24;
 			cmbColorMode.SelectedIndexChanged += SwitchColorMode_SelectedIndexChanged;
+			cmbColorMode.KeyPress += cmbColorMode_KeyPress;
 			// 
 			// comboBoxColorSets
 			// 

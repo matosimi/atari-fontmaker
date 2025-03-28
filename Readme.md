@@ -279,6 +279,7 @@ Or select an area and use the area shift buttons on the right to move its conten
 V1.16.15.1
 - Added C format font and view export options.
     Data will be exported as: { 0,1,2,3 ... } or { 0x00,0x01,0x02,0x03 ... }   
+- Fixed CTRL+M switching between various color modes.
 
 V1.16.15.0
 - Added tooltips to the page editor

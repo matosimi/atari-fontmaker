@@ -890,6 +890,17 @@ namespace FontMaker
 		}
 
 		/// <summary>
+		/// Tell the control that the keypress has already been handled.
+		/// This prevents CTRL+M switching between various modes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void cmbColorMode_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			e.Handled = true;
+		}
+
+		/// <summary>
 		/// Show the Atari color AtariPalette and let the user select a new color
 		/// </summary>
 		public void Palette_MouseDown(object _, MouseEventArgs e)
