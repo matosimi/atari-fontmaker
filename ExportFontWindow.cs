@@ -14,8 +14,9 @@ namespace FontMaker
 			AtariBasic,
 			FastBasic,
 			MADSdta,
+			CDataArray,
 			BinaryData,
-			BasicListingFile, // 7
+			BasicListingFile, // 9
 		};
 
 		public ExportFontWindow()
@@ -121,6 +122,17 @@ namespace FontMaker
 							ComboBoxDataType.SelectedIndex = 0;
 						}
 						break;
+
+					case FormatTypes.CDataArray:
+					{
+						ButtonCopyClipboard.Enabled = true;
+
+						ComboBoxDataType.Text = @"Select an item";
+						ComboBoxDataType.Items.Add("Byte in decimal");
+						ComboBoxDataType.Items.Add("Byte in hexadecimal");
+						ComboBoxDataType.SelectedIndex = 0;
+						break;
+					}
 
 					case FormatTypes.BinaryData:
 					{
@@ -477,6 +489,11 @@ namespace FontMaker
 				sb.Append("\tdta ");
 			}
 
+			if (exportType == FormatTypes.CDataArray)
+			{
+				sb.Append("{ ");
+			}
+
 			var fontStartByte = 0;
 			var fontEndByte = 0;
 			
@@ -507,7 +524,10 @@ namespace FontMaker
 			{
 				if (dataType == 1)
 				{
-					sb.Append($"${AtariFont.FontBytes[index]:X2}");
+					if (exportType == FormatTypes.CDataArray)
+						sb.Append($"0x{AtariFont.FontBytes[index]:X2}");
+					else
+						sb.Append($"${AtariFont.FontBytes[index]:X2}");
 				}
 				else
 				{
@@ -522,7 +542,7 @@ namespace FontMaker
 					charCounter = 0;
 					line++;
 
-					if (exportType == FormatTypes.FastBasic)
+					if (exportType is FormatTypes.FastBasic or FormatTypes.CDataArray)
 					{
 						sb.Append(',');
 					}
@@ -558,7 +578,7 @@ namespace FontMaker
 						case FormatTypes.Action:
 							sb.Append(' ');
 							break;
-						case FormatTypes.Assembler or FormatTypes.AtariBasic or FormatTypes.FastBasic or FormatTypes.MADSdta:
+						case FormatTypes.Assembler or FormatTypes.AtariBasic or FormatTypes.FastBasic or FormatTypes.MADSdta or FormatTypes.CDataArray:
 							sb.Append(',');
 							break;
 					}
@@ -568,6 +588,11 @@ namespace FontMaker
 			if (exportType == FormatTypes.Action)
 			{
 				sb.Append("\n]\nMODULE\n");
+			}
+
+			if (exportType == FormatTypes.CDataArray)
+			{
+				sb.Append(" }");
 			}
 
 			return sb.ToString();

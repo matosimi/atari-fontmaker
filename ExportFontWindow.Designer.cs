@@ -72,7 +72,7 @@
 			// 
 			ComboBoxExportType.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxExportType.FormattingEnabled = true;
-			ComboBoxExportType.Items.AddRange(new object[] { "Image BMP Mono", "Image BMP Color", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "Binary Data", "Basic listing file" });
+			ComboBoxExportType.Items.AddRange(new object[] { "Image BMP Mono", "Image BMP Color", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "C data {}", "Binary Data", "Basic listing file" });
 			ComboBoxExportType.Location = new Point(104, 43);
 			ComboBoxExportType.Name = "ComboBoxExportType";
 			ComboBoxExportType.Size = new Size(145, 21);

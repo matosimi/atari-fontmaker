@@ -275,6 +275,11 @@ Press the arrow buttons to move the whole view area in the required direction.
 Or select an area and use the area shift buttons on the right to move its contents.
 
 ## Changes/History ##
+
+V1.16.15.1
+- Added C format font and view export options.
+    Data will be exported as: { 0,1,2,3 ... } or { 0x00,0x01,0x02,0x03 ... }   
+
 V1.16.15.0
 - Added tooltips to the page editor
 - Added undo/redo functionality to the view editor
