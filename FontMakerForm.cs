@@ -1180,6 +1180,7 @@ namespace FontMaker
 			UpdateViewActions();
 
 			ViewActionsWindowForm?.Show();
+			ViewActionsWindowForm?.Focus();
 
 			TransferPagesToViewActions();
 			//TransferPageSelectionToViewActions();
