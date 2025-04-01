@@ -1694,6 +1694,7 @@
 			FormBorderStyle = FormBorderStyle.FixedSingle;
 			Icon = (Icon)resources.GetObject("$this.Icon");
 			KeyPreview = true;
+			MaximizeBox = false;
 			Name = "FontMakerForm";
 			Text = "TheApp";
 			FormClosing += Form_CloseQuery;
