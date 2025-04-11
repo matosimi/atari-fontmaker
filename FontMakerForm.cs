@@ -50,12 +50,13 @@ namespace FontMaker
 
 		internal MegaCopyStatusFlags megaCopyStatus { get; set; } = MegaCopyStatusFlags.None;
 
-		private static readonly SolidBrush BlackBrush = new(Color.Black);
-		private static readonly SolidBrush WhiteBrush = new(Color.White);
-		private static readonly SolidBrush CyanBrush = new(Color.Cyan);
-		private static readonly SolidBrush RedBrush = new(Color.Red);
-		private static readonly SolidBrush YellowBrush = new(Color.Yellow);
-		private static readonly SolidBrush GreenBrush = new(Color.Green);
+		public static readonly SolidBrush BlackBrush = new(Color.Black);
+		public static readonly SolidBrush WhiteBrush = new(Color.White);
+		public static readonly SolidBrush CyanBrush = new(Color.Cyan);
+		public static readonly SolidBrush RedBrush = new(Color.Red);
+		public static readonly SolidBrush YellowBrush = new(Color.Yellow);
+		public static readonly SolidBrush GreenBrush = new(Color.Green);
+		public static readonly SolidBrush TransparentBrush = new(Color.Transparent);
 
 		private readonly List<Button> ActionListNormalModeOnly = new();
 
@@ -69,11 +70,13 @@ namespace FontMaker
 
 		public ViewActionsWindow? ViewActionsWindowForm { get; set; } = null;
 
+		public TileSetEditorWindow? TileSetEditorForm { get; set; } = null;
+
 		/// <summary>
 		/// The Atari color palette. Loaded from "altirraPAL.pal"
 		/// </summary>
 		internal Color[] AtariPalette { get; set; } = new Color[256];
-		internal bool InColorMode { get; set; } = false;
+		public bool InColorMode { get; set; } = false;
 		private bool _inMode5 = false;
 		internal bool InMode5
 		{
@@ -158,6 +161,7 @@ namespace FontMaker
 			ActionListNormalModeOnly.Add(buttonFontDeleteCharShiftLeft);
 
 			ViewActionsWindowForm = new ViewActionsWindow(this);
+			TileSetEditorForm = new TileSetEditorWindow(this);
 
 			this.Load += FormCreate!;
 		}
@@ -179,6 +183,7 @@ namespace FontMaker
 
 			UndoBuffer.Setup();
 			AtariView.Setup();
+			TileSet.Setup();
 			LoadPalette();
 
 			LoadConfiguration();
@@ -324,7 +329,7 @@ namespace FontMaker
 			{
 				gr.FillRectangle(RedBrush, new Rectangle(0, 0, img.Width, img.Height));
 			}
-			GraphicsPath graphicsPath = new GraphicsPath();
+			var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 2));
 			graphicsPath.AddRectangle(new Rectangle(18, 0, 2, 20));
 			graphicsPath.AddRectangle(new Rectangle(0, 18, 20, 2));
@@ -650,6 +655,12 @@ namespace FontMaker
 
 		private void Form_MouseWheel(object sender, MouseEventArgs e)
 		{
+			if (Control.ModifierKeys == Keys.Alt && buttonMegaCopy.Checked)
+			{
+				// In MegaCopy mode with ALT held down switch to the next/previous tile
+				TileSetEditorForm?.Form_MouseWheel(sender, e);
+			}
+
 			if (!buttonMegaCopy.Checked)
 			{
 				if (Control.ModifierKeys == Keys.Shift)
@@ -683,6 +694,7 @@ namespace FontMaker
 				}
 				else
 				{
+					// Change the selected character when the mouse wheel is moved
 					var step = e.Delta > 0 ? -1 : 1;
 					if (Control.ModifierKeys == Keys.Control)
 					{
@@ -1575,5 +1587,10 @@ namespace FontMaker
 		#endregion
 
 
+		private void buttonTileSetEditor_Click(object sender, EventArgs e)
+		{
+			TileSetEditorForm?.Show();
+			TileSetEditorForm?.Focus();
+		}
 	}
 }

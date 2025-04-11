@@ -631,6 +631,7 @@ namespace FontMaker
 				RedrawLineTypes();
 				ShowCorrectFontBank();
 				ShowColorSelectors();
+				TileSetEditorForm?.SwitchColorMode();
 				return;
 			}
 
@@ -652,6 +653,7 @@ namespace FontMaker
 				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
 				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
 			}
+			TileSetEditorForm?.SwitchColorMode();
 		}
 
 		/// <summary>

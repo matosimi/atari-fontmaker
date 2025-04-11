@@ -25,6 +25,9 @@
     <Compile Update="PageEditor.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="TileSetEditorWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="ViewActionsWindow.cs">
       <SubType>Form</SubType>
     </Compile>

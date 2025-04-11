@@ -155,6 +155,7 @@
 			listBoxRecolorTargetMode10 = new ListBox();
 			labelSelectedArea = new Label();
 			label5 = new Label();
+			buttonTileSetEditor = new Button();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -191,6 +192,7 @@
 			// 
 			// pictureBoxAtariView
 			// 
+			pictureBoxAtariView.BackColor = Color.Transparent;
 			pictureBoxAtariView.Location = new Point(536, 0);
 			pictureBoxAtariView.Name = "pictureBoxAtariView";
 			pictureBoxAtariView.Size = new Size(640, 416);
@@ -247,6 +249,7 @@
 			// 
 			// pictureBoxFontSelectorMegaCopyImage
 			// 
+			pictureBoxFontSelectorMegaCopyImage.BackColor = SystemColors.Menu;
 			pictureBoxFontSelectorMegaCopyImage.Location = new Point(26, 333);
 			pictureBoxFontSelectorMegaCopyImage.Name = "pictureBoxFontSelectorMegaCopyImage";
 			pictureBoxFontSelectorMegaCopyImage.Size = new Size(105, 105);
@@ -554,7 +557,7 @@
 			buttonCopy.Size = new Size(49, 20);
 			buttonCopy.TabIndex = 6;
 			buttonCopy.Text = "CPY";
-			toolTips.SetToolTip(buttonCopy, "Copy To Clipboard");
+			toolTips.SetToolTip(buttonCopy, "Copy To Clipboard (Ctrl + C)");
 			buttonCopy.UseVisualStyleBackColor = true;
 			buttonCopy.Click += CopyToClipboard_Click;
 			// 
@@ -566,7 +569,7 @@
 			buttonPaste.Size = new Size(49, 20);
 			buttonPaste.TabIndex = 13;
 			buttonPaste.Text = "PST";
-			toolTips.SetToolTip(buttonPaste, "Paste From Clipboard");
+			toolTips.SetToolTip(buttonPaste, "Paste From Clipboard (Ctrl + V)");
 			buttonPaste.UseVisualStyleBackColor = true;
 			buttonPaste.Click += PasteFromClipboard_Click;
 			// 
@@ -1449,9 +1452,9 @@
 			checkBoxSkipChar0.AutoSize = true;
 			checkBoxSkipChar0.Location = new Point(898, 466);
 			checkBoxSkipChar0.Name = "checkBoxSkipChar0";
-			checkBoxSkipChar0.Size = new Size(137, 17);
+			checkBoxSkipChar0.Size = new Size(133, 17);
 			checkBoxSkipChar0.TabIndex = 30;
-			checkBoxSkipChar0.Text = "Skip char #0 on paste";
+			checkBoxSkipChar0.Text = "Skip char #0 on copy";
 			toolTips.SetToolTip(checkBoxSkipChar0, "When pasting text into the view all 0 chars are left untouched.");
 			checkBoxSkipChar0.UseVisualStyleBackColor = true;
 			// 
@@ -1651,12 +1654,23 @@
 			label5.TabIndex = 28;
 			label5.Text = "Undo/Redo";
 			// 
+			// buttonTileSetEditor
+			// 
+			buttonTileSetEditor.Location = new Point(3, 181);
+			buttonTileSetEditor.Name = "buttonTileSetEditor";
+			buttonTileSetEditor.Size = new Size(104, 51);
+			buttonTileSetEditor.TabIndex = 32;
+			buttonTileSetEditor.Text = "Tile Set Editor";
+			buttonTileSetEditor.UseVisualStyleBackColor = true;
+			buttonTileSetEditor.Click += buttonTileSetEditor_Click;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1046, 545);
+			Controls.Add(buttonTileSetEditor);
 			Controls.Add(trackBarSkipCharX);
 			Controls.Add(checkBoxSkipChar0);
 			Controls.Add(buttonViewUndo);
@@ -1872,5 +1886,6 @@
 		private Button buttonViewRedo;
 		private CheckBox checkBoxSkipChar0;
 		private TrackBar trackBarSkipCharX;
+		private Button buttonTileSetEditor;
 	}
 }

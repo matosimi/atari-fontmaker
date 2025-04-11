@@ -61,6 +61,14 @@ public class AtrViewInfoJson
 	/// - selected font
 	/// </summary>
 	public List<SavedPageData>? Pages { get; set; }
+
+	/// <summary>
+	/// For each tile we have:
+	/// - index where to store it
+	/// - characters (5x5)
+	/// - selected font
+	/// </summary>
+	public List<SavedTileData>? Tiles { get; set; }
 }
 
 
@@ -590,6 +598,9 @@ public partial class FontMakerForm
 	/// <param name="forceLoadFont"></param>
 	public void LoadViewFile(string? filename, bool forceLoadFont = false)
 	{
+		var hasLoadError = false;
+		List<string> loadMessages = [];
+
 		ClearPageList();
 
 		var filenames = new string[4];
@@ -706,6 +717,18 @@ public partial class FontMakerForm
 					SwopPageAction(0);
 				}
 
+				TileSet.Setup();
+				if (jsonObj.Tiles?.Count > 0)
+				{
+					foreach (var tileData in jsonObj.Tiles)
+					{
+						if (!TileSet.Load(tileData))
+						{
+							loadMessages.Add("Failed to load a tile.");
+						}
+					}
+				}
+
 				// If the GFX mode does not match then hit the GFX button until we are at the correct mode
 				// InColorMode = bool: true then in color mode
 				// WhichColorMode = int: 4/5/10
@@ -780,7 +803,7 @@ public partial class FontMakerForm
 		jo.FortyBytes = GetActualViewWidth() == 40 ? "1" : "0";
 
 		// Save the page information
-		jo.Pages = new List<SavedPageData>();
+		jo.Pages = [];
 		foreach (var srcPage in Pages)
 		{
 			var page = new SavedPageData()
@@ -802,8 +825,19 @@ public partial class FontMakerForm
 			jo.Pages.Add(page);
 		}
 
-		var txt = jo.ToJson();
+		// Save the TileSet information
+		jo.Tiles = [];
+		for (var index = 0; index < TileSet.Tiles.Length; index++)
+		{
+			var data = TileSet.Save(index);
+			if (data != null)
+			{
+				jo.Tiles.Add(data);
+			}
+		}
 
+		// Finished creating the object. Serialize it!
+		var txt = jo.ToJson();
 		File.WriteAllText(filename, txt, Encoding.UTF8);
 	}
 
@@ -1296,7 +1330,6 @@ public partial class FontMakerForm
 			gr.FillRectangle(YellowBrush, new Rectangle(0, 0, img.Width, img.Height));
 			pictureBoxViewEditorPasteCursor.Region?.Dispose();
 			pictureBoxViewEditorPasteCursor.Size = new Size(img.Width, img.Height);
-
 		}
 
 		using var graphicsPath = new GraphicsPath();
@@ -1546,8 +1579,11 @@ public partial class FontMakerForm
 		RedrawView();
 	}
 
-	public void PasteClipboardIntoView(string clipBuffer, int width, int height)
+	public void PasteClipboardIntoView(string? clipBuffer, string? nulls, int width, int height)
 	{
+		if (clipBuffer == null)
+			return;
+		nulls ??= new string('0', width * height);
 		PushState();
 
 		var charsBytes = Convert.FromHexString(clipBuffer);
@@ -1557,6 +1593,8 @@ public partial class FontMakerForm
 			{
 				var i = y + CopyPasteTargetLocation.Y;
 				var j = x + CopyPasteTargetLocation.X;
+				if (nulls[y*width + x] == '1')
+					continue;
 				if (checkBoxSkipChar0.Checked && charsBytes[y * width + x] == trackBarSkipCharX.Value)
 					continue;
 				AtariView.ViewBytes[j, i] = charsBytes[y * width + x];
