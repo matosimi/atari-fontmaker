@@ -146,9 +146,8 @@
 			buttonViewActions = new Button();
 			buttonImportView = new Button();
 			panel1 = new Panel();
-			numericHeight = new NumericUpDown();
-			numericWidth = new NumericUpDown();
-			label7 = new Label();
+			labelPageSize = new Label();
+			buttonConfigurePage = new Button();
 			label6 = new Label();
 			label1 = new Label();
 			labelCurrentPageInfo = new Label();
@@ -161,6 +160,8 @@
 			label5 = new Label();
 			buttonTileSetEditor = new Button();
 			checkBoxStayInPasteMode = new CheckBox();
+			hScrollBar = new HScrollBar();
+			vScrollBar = new VScrollBar();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -190,8 +191,6 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorPasteCursor).BeginInit();
 			((System.ComponentModel.ISupportInitialize)trackBarSkipCharX).BeginInit();
 			panel1.SuspendLayout();
-			((System.ComponentModel.ISupportInitialize)numericHeight).BeginInit();
-			((System.ComponentModel.ISupportInitialize)numericWidth).BeginInit();
 			panelColorSwitcherMode10.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorSourceColorMode10).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorTargetColorMode10).BeginInit();
@@ -282,7 +281,7 @@
 			// labelViewCharInfo
 			// 
 			labelViewCharInfo.AutoSize = true;
-			labelViewCharInfo.Location = new Point(523, 419);
+			labelViewCharInfo.Location = new Point(523, 436);
 			labelViewCharInfo.Name = "labelViewCharInfo";
 			labelViewCharInfo.Size = new Size(104, 13);
 			labelViewCharInfo.TabIndex = 6;
@@ -899,7 +898,7 @@
 			// 
 			// buttonLoadView
 			// 
-			buttonLoadView.Location = new Point(799, 437);
+			buttonLoadView.Location = new Point(799, 454);
 			buttonLoadView.Name = "buttonLoadView";
 			buttonLoadView.Size = new Size(86, 23);
 			buttonLoadView.TabIndex = 3;
@@ -909,7 +908,7 @@
 			// 
 			// buttonClearView
 			// 
-			buttonClearView.Location = new Point(706, 437);
+			buttonClearView.Location = new Point(706, 454);
 			buttonClearView.Name = "buttonClearView";
 			buttonClearView.Size = new Size(86, 23);
 			buttonClearView.TabIndex = 4;
@@ -919,7 +918,7 @@
 			// 
 			// buttonSaveView
 			// 
-			buttonSaveView.Location = new Point(892, 437);
+			buttonSaveView.Location = new Point(892, 454);
 			buttonSaveView.Name = "buttonSaveView";
 			buttonSaveView.Size = new Size(86, 23);
 			buttonSaveView.TabIndex = 5;
@@ -1322,7 +1321,7 @@
 			// buttonEnterText
 			// 
 			buttonEnterText.Enabled = false;
-			buttonEnterText.Location = new Point(520, 464);
+			buttonEnterText.Location = new Point(520, 481);
 			buttonEnterText.Name = "buttonEnterText";
 			buttonEnterText.Size = new Size(86, 23);
 			buttonEnterText.TabIndex = 9;
@@ -1334,7 +1333,7 @@
 			// checkBox40Bytes
 			// 
 			checkBox40Bytes.AutoSize = true;
-			checkBox40Bytes.Location = new Point(980, 422);
+			checkBox40Bytes.Location = new Point(980, 439);
 			checkBox40Bytes.Name = "checkBox40Bytes";
 			checkBox40Bytes.Size = new Size(68, 17);
 			checkBox40Bytes.TabIndex = 10;
@@ -1425,7 +1424,7 @@
 			// 
 			// buttonFontAnalysis
 			// 
-			buttonFontAnalysis.Location = new Point(520, 518);
+			buttonFontAnalysis.Location = new Point(520, 535);
 			buttonFontAnalysis.Name = "buttonFontAnalysis";
 			buttonFontAnalysis.Size = new Size(85, 23);
 			buttonFontAnalysis.TabIndex = 22;
@@ -1437,7 +1436,7 @@
 			// buttonViewUndo
 			// 
 			buttonViewUndo.Image = (Image)resources.GetObject("buttonViewUndo.Image");
-			buttonViewUndo.Location = new Point(820, 482);
+			buttonViewUndo.Location = new Point(820, 499);
 			buttonViewUndo.Name = "buttonViewUndo";
 			buttonViewUndo.Size = new Size(22, 22);
 			buttonViewUndo.TabIndex = 28;
@@ -1447,7 +1446,7 @@
 			// buttonViewRedo
 			// 
 			buttonViewRedo.Image = (Image)resources.GetObject("buttonViewRedo.Image");
-			buttonViewRedo.Location = new Point(843, 482);
+			buttonViewRedo.Location = new Point(843, 499);
 			buttonViewRedo.Name = "buttonViewRedo";
 			buttonViewRedo.Size = new Size(22, 22);
 			buttonViewRedo.TabIndex = 29;
@@ -1457,7 +1456,7 @@
 			// checkBoxSkipChar0
 			// 
 			checkBoxSkipChar0.AutoSize = true;
-			checkBoxSkipChar0.Location = new Point(898, 466);
+			checkBoxSkipChar0.Location = new Point(898, 483);
 			checkBoxSkipChar0.Name = "checkBoxSkipChar0";
 			checkBoxSkipChar0.Size = new Size(133, 17);
 			checkBoxSkipChar0.TabIndex = 30;
@@ -1468,7 +1467,7 @@
 			// trackBarSkipCharX
 			// 
 			trackBarSkipCharX.AutoSize = false;
-			trackBarSkipCharX.Location = new Point(892, 483);
+			trackBarSkipCharX.Location = new Point(892, 500);
 			trackBarSkipCharX.Maximum = 255;
 			trackBarSkipCharX.Name = "trackBarSkipCharX";
 			trackBarSkipCharX.Size = new Size(284, 34);
@@ -1481,7 +1480,7 @@
 			// 
 			comboBoxPages.DropDownStyle = ComboBoxStyle.DropDownList;
 			comboBoxPages.FormattingEnabled = true;
-			comboBoxPages.Location = new Point(9, 33);
+			comboBoxPages.Location = new Point(7, 33);
 			comboBoxPages.Name = "comboBoxPages";
 			comboBoxPages.Size = new Size(121, 21);
 			comboBoxPages.TabIndex = 16;
@@ -1509,7 +1508,7 @@
 			// 
 			// buttonEditPage
 			// 
-			buttonEditPage.Location = new Point(131, 6);
+			buttonEditPage.Location = new Point(131, 3);
 			buttonEditPage.Name = "buttonEditPage";
 			buttonEditPage.Size = new Size(53, 21);
 			buttonEditPage.TabIndex = 19;
@@ -1519,7 +1518,7 @@
 			// 
 			// buttonExportView
 			// 
-			buttonExportView.Location = new Point(520, 437);
+			buttonExportView.Location = new Point(520, 454);
 			buttonExportView.Name = "buttonExportView";
 			buttonExportView.Size = new Size(86, 23);
 			buttonExportView.TabIndex = 21;
@@ -1533,7 +1532,7 @@
 			lblInMegaCopyMode.AutoSize = true;
 			lblInMegaCopyMode.BackColor = SystemColors.ActiveCaption;
 			lblInMegaCopyMode.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
-			lblInMegaCopyMode.Location = new Point(858, 530);
+			lblInMegaCopyMode.Location = new Point(1008, 547);
 			lblInMegaCopyMode.Name = "lblInMegaCopyMode";
 			lblInMegaCopyMode.Size = new Size(188, 25);
 			lblInMegaCopyMode.TabIndex = 23;
@@ -1543,7 +1542,7 @@
 			// 
 			// buttonViewActions
 			// 
-			buttonViewActions.Location = new Point(520, 491);
+			buttonViewActions.Location = new Point(520, 508);
 			buttonViewActions.Name = "buttonViewActions";
 			buttonViewActions.Size = new Size(86, 23);
 			buttonViewActions.TabIndex = 24;
@@ -1553,7 +1552,7 @@
 			// 
 			// buttonImportView
 			// 
-			buttonImportView.Location = new Point(613, 437);
+			buttonImportView.Location = new Point(613, 454);
 			buttonImportView.Name = "buttonImportView";
 			buttonImportView.Size = new Size(86, 23);
 			buttonImportView.TabIndex = 25;
@@ -1564,9 +1563,8 @@
 			// panel1
 			// 
 			panel1.BorderStyle = BorderStyle.FixedSingle;
-			panel1.Controls.Add(numericHeight);
-			panel1.Controls.Add(numericWidth);
-			panel1.Controls.Add(label7);
+			panel1.Controls.Add(labelPageSize);
+			panel1.Controls.Add(buttonConfigurePage);
 			panel1.Controls.Add(label6);
 			panel1.Controls.Add(label1);
 			panel1.Controls.Add(labelCurrentPageInfo);
@@ -1574,61 +1572,44 @@
 			panel1.Controls.Add(buttonAddPage);
 			panel1.Controls.Add(buttonDeletePage);
 			panel1.Controls.Add(buttonEditPage);
-			panel1.Location = new Point(613, 466);
+			panel1.Location = new Point(613, 483);
 			panel1.Name = "panel1";
 			panel1.Size = new Size(191, 88);
 			panel1.TabIndex = 28;
 			// 
-			// numericHeight
+			// labelPageSize
 			// 
-			numericHeight.BorderStyle = BorderStyle.FixedSingle;
-			numericHeight.Enabled = false;
-			numericHeight.Location = new Point(136, 60);
-			numericHeight.Margin = new Padding(0);
-			numericHeight.Minimum = new decimal(new int[] { 26, 0, 0, 0 });
-			numericHeight.Name = "numericHeight";
-			numericHeight.Size = new Size(49, 22);
-			numericHeight.TabIndex = 32;
-			numericHeight.TextAlign = HorizontalAlignment.Center;
-			numericHeight.Value = new decimal(new int[] { 26, 0, 0, 0 });
+			labelPageSize.Location = new Point(41, 62);
+			labelPageSize.Name = "labelPageSize";
+			labelPageSize.Size = new Size(87, 17);
+			labelPageSize.TabIndex = 36;
+			labelPageSize.Text = "40 x 26";
 			// 
-			// numericWidth
+			// buttonConfigurePage
 			// 
-			numericWidth.BorderStyle = BorderStyle.FixedSingle;
-			numericWidth.Enabled = false;
-			numericWidth.Location = new Point(41, 60);
-			numericWidth.Margin = new Padding(0);
-			numericWidth.Maximum = new decimal(new int[] { 512, 0, 0, 0 });
-			numericWidth.Minimum = new decimal(new int[] { 32, 0, 0, 0 });
-			numericWidth.Name = "numericWidth";
-			numericWidth.Size = new Size(49, 22);
-			numericWidth.TabIndex = 31;
-			numericWidth.TextAlign = HorizontalAlignment.Center;
-			numericWidth.Value = new decimal(new int[] { 40, 0, 0, 0 });
-			// 
-			// label7
-			// 
-			label7.Location = new Point(95, 65);
-			label7.Margin = new Padding(0);
-			label7.Name = "label7";
-			label7.Size = new Size(42, 13);
-			label7.TabIndex = 34;
-			label7.Text = "Height";
+			buttonConfigurePage.BackgroundImageLayout = ImageLayout.Center;
+			buttonConfigurePage.Enabled = false;
+			buttonConfigurePage.Image = (Image)resources.GetObject("buttonConfigurePage.Image");
+			buttonConfigurePage.Location = new Point(156, 57);
+			buttonConfigurePage.Margin = new Padding(0);
+			buttonConfigurePage.Name = "buttonConfigurePage";
+			buttonConfigurePage.Size = new Size(28, 28);
+			buttonConfigurePage.TabIndex = 35;
 			// 
 			// label6
 			// 
 			label6.AutoSize = true;
-			label6.Location = new Point(3, 65);
+			label6.Location = new Point(8, 62);
 			label6.Margin = new Padding(0);
 			label6.Name = "label6";
-			label6.Size = new Size(39, 13);
+			label6.Size = new Size(30, 13);
 			label6.TabIndex = 33;
-			label6.Text = "Width";
+			label6.Text = "Size:";
 			// 
 			// label1
 			// 
 			label1.AutoSize = true;
-			label1.Location = new Point(9, 9);
+			label1.Location = new Point(7, 9);
 			label1.Name = "label1";
 			label1.Size = new Size(40, 13);
 			label1.TabIndex = 27;
@@ -1696,7 +1677,7 @@
 			// labelSelectedArea
 			// 
 			labelSelectedArea.AutoSize = true;
-			labelSelectedArea.Location = new Point(695, 419);
+			labelSelectedArea.Location = new Point(695, 436);
 			labelSelectedArea.Name = "labelSelectedArea";
 			labelSelectedArea.Size = new Size(33, 13);
 			labelSelectedArea.TabIndex = 29;
@@ -1705,7 +1686,7 @@
 			// label5
 			// 
 			label5.AutoSize = true;
-			label5.Location = new Point(810, 466);
+			label5.Location = new Point(810, 483);
 			label5.Name = "label5";
 			label5.Size = new Size(67, 13);
 			label5.TabIndex = 28;
@@ -1724,19 +1705,43 @@
 			// checkBoxStayInPasteMode
 			// 
 			checkBoxStayInPasteMode.AutoSize = true;
-			checkBoxStayInPasteMode.Location = new Point(823, 510);
+			checkBoxStayInPasteMode.Location = new Point(823, 527);
 			checkBoxStayInPasteMode.Name = "checkBoxStayInPasteMode";
 			checkBoxStayInPasteMode.Size = new Size(123, 17);
 			checkBoxStayInPasteMode.TabIndex = 33;
 			checkBoxStayInPasteMode.Text = "Stay in Paste Mode";
 			checkBoxStayInPasteMode.UseVisualStyleBackColor = true;
 			// 
+			// hScrollBar
+			// 
+			hScrollBar.LargeChange = 1;
+			hScrollBar.Location = new Point(536, 417);
+			hScrollBar.Maximum = 40;
+			hScrollBar.Minimum = 40;
+			hScrollBar.Name = "hScrollBar";
+			hScrollBar.Size = new Size(640, 17);
+			hScrollBar.TabIndex = 34;
+			hScrollBar.Value = 40;
+			// 
+			// vScrollBar
+			// 
+			vScrollBar.LargeChange = 1;
+			vScrollBar.Location = new Point(1176, 0);
+			vScrollBar.Maximum = 26;
+			vScrollBar.Minimum = 26;
+			vScrollBar.Name = "vScrollBar";
+			vScrollBar.Size = new Size(17, 434);
+			vScrollBar.TabIndex = 35;
+			vScrollBar.Value = 26;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
-			ClientSize = new Size(1046, 555);
+			ClientSize = new Size(1194, 572);
+			Controls.Add(vScrollBar);
+			Controls.Add(hScrollBar);
 			Controls.Add(checkBoxStayInPasteMode);
 			Controls.Add(buttonTileSetEditor);
 			Controls.Add(trackBarSkipCharX);
@@ -1814,8 +1819,6 @@
 			((System.ComponentModel.ISupportInitialize)trackBarSkipCharX).EndInit();
 			panel1.ResumeLayout(false);
 			panel1.PerformLayout();
-			((System.ComponentModel.ISupportInitialize)numericHeight).EndInit();
-			((System.ComponentModel.ISupportInitialize)numericWidth).EndInit();
 			panelColorSwitcherMode10.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorSourceColorMode10).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorTargetColorMode10).EndInit();
@@ -1958,9 +1961,10 @@
 		private TrackBar trackBarSkipCharX;
 		private Button buttonTileSetEditor;
 		private CheckBox checkBoxStayInPasteMode;
-		private NumericUpDown numericHeight;
-		private NumericUpDown numericWidth;
 		private Label label6;
-		private Label label7;
+		private Button buttonConfigurePage;
+		private Label labelPageSize;
+		private HScrollBar hScrollBar;
+		private VScrollBar vScrollBar;
 	}
 }

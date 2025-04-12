@@ -1039,7 +1039,21 @@ namespace FontMaker
 
 		public void ViewEditor_CheckBox40Bytes_Click(object sender, EventArgs e)
 		{
-			Width += (checkBox40Bytes.Checked ? 130 : -130);
+			if (checkBox40Bytes.Checked)
+			{
+				// 40 bytes mode
+				Width = 1210;
+				vScrollBar.Location = new Point(1176, 0);
+				hScrollBar.Width = 640;
+				//Width += (checkBox40Bytes.Checked ? (130 + 16) : (-130 - 16));
+			}
+			else
+			{
+				// 32 bytes mode
+				Width = 1210 - 8*16;
+				vScrollBar.Location = new Point(1176 - 8*16, 0);
+				hScrollBar.Width = 640 - 8 * 16;
+			}
 		}
 
 		public void ViewEditor_ClearView_Click(object sender, EventArgs e)
