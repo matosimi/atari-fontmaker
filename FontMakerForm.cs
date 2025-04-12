@@ -422,6 +422,11 @@ namespace FontMaker
 
 		private void Form_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Alt)
+			{
+				e.Handled = true;
+				return;
+			}
 			if (e.Control)
 			{
 				// Handle all the CTRL+... shortcuts here
@@ -655,7 +660,7 @@ namespace FontMaker
 
 		private void Form_MouseWheel(object sender, MouseEventArgs e)
 		{
-			if (Control.ModifierKeys == Keys.Alt && buttonMegaCopy.Checked)
+			if (Control.ModifierKeys == Keys.Alt)
 			{
 				// In MegaCopy mode with ALT held down switch to the next/previous tile
 				TileSetEditorForm?.Form_MouseWheel(sender, e);
@@ -1591,6 +1596,28 @@ namespace FontMaker
 		{
 			TileSetEditorForm?.Show();
 			TileSetEditorForm?.Focus();
+		}
+
+		public void SwitchToTileDrawing()
+		{
+			// The font and characters have been copied to the clipboard
+			// Enabled specific clipboard modification/action buttons
+			if (buttonMegaCopy.Checked == false)
+			{
+				// Switch into MegaCopy mode
+				buttonMegaCopy.Checked = true;
+				MegaCopy_Click(0, EventArgs.Empty);
+			}
+
+
+			ConfigureClipboardActionButtons();
+
+			UpdateClipboardInformation();
+			PastingToView = true;
+			RevalidateClipboard();
+			ExecutePasteFromClipboard();
+
+			pictureBoxAtariView.Focus();
 		}
 	}
 }

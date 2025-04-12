@@ -2,6 +2,7 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
+using System.Windows.Forms;
 using TinyJson;
 using static FontMaker.FontMakerForm;
 
@@ -97,7 +98,7 @@ public partial class TileSetEditorWindow : Form
 	/// or if the Control key is pressed move it up/down.
 	/// </summary>
 	/// <param name="e">Mouse event</param>
-	public void Form_MouseWheel(object _, MouseEventArgs e)
+	public void Form_MouseWheel(object sender, MouseEventArgs e)
 	{
 		var step = e.Delta > 0 ? -1 : 1;
 		if (Control.ModifierKeys == Keys.Alt)
@@ -105,7 +106,23 @@ public partial class TileSetEditorWindow : Form
 			if (step < 0) buttonPrevTile_Click(null!, EventArgs.Empty);
 			else buttonNextTile_Click(null!, EventArgs.Empty);
 
-			CopyCurrentTileToClipboard();
+			CopyCurrentTileToClipboard(true);
+		}
+		else if (e.X >= pictureBoxTileSets.Left && e.X < pictureBoxTileSets.Right && e.Y >= pictureBoxTileSets.Top && e.Y < pictureBoxTileSets.Bottom)
+		{
+			// Over the pictureBox
+
+			// Get the current horizontal scroll position
+			var currentScrollPosition = hScrollBarTiles.Value;
+
+			// Calculate the new scroll position
+			var newScrollPosition = currentScrollPosition + step;
+
+			// Ensure the new scroll position is within bounds
+			newScrollPosition = Math.Max(0, Math.Min(newScrollPosition, hScrollBarTiles.Maximum - 9));
+
+			// Set the new horizontal scroll position
+			hScrollBarTiles.Value = newScrollPosition;
 		}
 		else
 		{
@@ -621,7 +638,7 @@ public partial class TileSetEditorWindow : Form
 	#region Copy/Paste tile data
 	private void buttonTileCopy_Click(object sender, EventArgs e)
 	{
-		CopyCurrentTileToClipboard();
+		CopyCurrentTileToClipboard(false);
 	}
 
 	private void buttonTilePaste_Click(object sender, EventArgs e)
@@ -637,7 +654,7 @@ public partial class TileSetEditorWindow : Form
 		RedrawLineTypes();
 	}
 
-	private void CopyCurrentTileToClipboard()
+	private void CopyCurrentTileToClipboard(bool makeActive)
 	{
 		if (TileSet.CurrentTile == null)
 			return;
@@ -646,11 +663,40 @@ public partial class TileSetEditorWindow : Form
 		var fontBytes = string.Empty;
 		var fontNr = string.Empty; // 1234
 		var nulls = string.Empty;
+		// Optimization:
+		// if only part of the tile is used, we can save space by not copying the whole tile
+		var minX = TileData.TILE_WIDTH;
+		var minY = TileData.TILE_HEIGHT;
+		var maxX = 0;
+		var maxY = 0;
 
-		for (var i = 0; i < TileData.TILE_HEIGHT; i++)
+		for (var y = 0; y < TileData.TILE_HEIGHT; y++)
+		{
+			for (var x = 0; x < TileData.TILE_WIDTH; x++)
+			{
+				if (TileSet.CurrentTile.View[x, y] != null)
+				{
+					if (x < minX) minX = x;
+					if (y < minY) minY = y;
+					if (x > maxX) maxX = x;
+					if (y > maxY) maxY = y;
+				}
+			}
+		}
+
+		if (maxX < minX || maxY < minY)
+		{
+			// Nothing to copy
+			return;
+		}
+
+		var width = maxX - minX + 1;
+		var height = maxY - minY + 1;
+
+		for (var i = minY; i <= maxY; i++)
 		{
 			var whichFontNr = 1;
-			for (var j = 0; j < TileData.TILE_WIDTH; j++)
+			for (var j = minX; j <= maxX; j++)
 			{
 				var thisChar = TileSet.CurrentTile.View[j, i];
 
@@ -677,8 +723,8 @@ public partial class TileSetEditorWindow : Form
 
 		var jo = new ClipboardJson()
 		{
-			Width = (TileData.TILE_WIDTH).ToString(),
-			Height = (TileData.TILE_HEIGHT).ToString(),
+			Width = (width).ToString(),
+			Height = (height).ToString(),
 			Chars = characterBytes,
 			Data = fontBytes,
 			FontNr = fontNr,
@@ -687,13 +733,10 @@ public partial class TileSetEditorWindow : Form
 		var json = jo.ToJson();
 		MainForm.SafeSetClipboard(json);
 
-		// The font and characters have been copied to the clipboard
-		// Enabled specific clipboard modification/action buttons
-		MainForm.ConfigureClipboardActionButtons();
-
-		MainForm.UpdateClipboardInformation(TileData.TILE_WIDTH, TileData.TILE_HEIGHT);
-		MainForm.PastingToView = true;
-		MainForm.RevalidateClipboard();
+		if (makeActive)
+		{
+			MainForm.SwitchToTileDrawing();
+		}
 	}
 
 	private void PasteToCurrentTileFromClipboard()
@@ -897,7 +940,7 @@ public partial class TileSetEditorWindow : Form
 	/// <param name="e"></param>
 	private void buttonUse_Click(object sender, EventArgs e)
 	{
-		CopyCurrentTileToClipboard();
+		CopyCurrentTileToClipboard(true);
 	}
 
 	private void UpdateTileSetVisual()
@@ -960,7 +1003,7 @@ public partial class TileSetEditorWindow : Form
 		{
 			if (e.KeyCode == Keys.C)
 			{
-				CopyCurrentTileToClipboard();
+				CopyCurrentTileToClipboard(false);
 				return;
 			}
 
