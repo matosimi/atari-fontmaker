@@ -47,8 +47,22 @@ public class TileData
 	public const int TILE_WIDTH = 5;
 	public const int TILE_HEIGHT = 5;
 
+	public bool IsValid()
+	{
+		for (var y = 0; y < TILE_HEIGHT; y++)
+		{
+			for (var x = 0; x < TILE_WIDTH; ++x)
+			{
+				if (View[x, y] != null)
+					return true;
+			}
+		}
+
+		return false;
+	}
+
 	/// <summary>
-	/// 
+	/// The 5x5 byte? array that represents the characters (or null) of the tile
 	/// </summary>
 	public byte?[,] View { get; set; }	
 	public byte[] SelectedFont { get; set;} = new byte[TILE_HEIGHT];        // 1,2,3,4
@@ -148,6 +162,7 @@ public class TileData
 
 	public void RotateRight()
 	{
+		Push();
 		for (var y = 0; y < TILE_HEIGHT; ++y)
 		{
 			for (var x = 0; x < TILE_WIDTH; ++x)
@@ -166,6 +181,7 @@ public class TileData
 
 	public void RotateLeft()
 	{
+		Push();
 		for (var y = 0; y < TILE_HEIGHT; ++y)
 		{
 			for (var x = 0; x < TILE_WIDTH; ++x)
@@ -184,6 +200,7 @@ public class TileData
 
 	public void MirrorHorizontal()
 	{
+		Push();
 		for (var y = 0; y < TILE_HEIGHT; ++y)
 		{
 			for (var x = 0; x < TILE_WIDTH / 2; ++x)
@@ -195,6 +212,7 @@ public class TileData
 
 	public void MirrorVertical()
 	{
+		Push();
 		for (var x = 0; x < TILE_WIDTH; ++x)
 		{
 			for (var y = 0; y < TILE_HEIGHT / 2; ++y)
@@ -206,6 +224,7 @@ public class TileData
 
 	public void ShiftLeft()
 	{
+		Push();
 		for (var y = 0; y < TILE_HEIGHT; ++y)
 		{
 			// Store the leftmost byte of the current row
@@ -224,6 +243,7 @@ public class TileData
 
 	public void ShiftRight()
 	{
+		Push();
 		for (var y = 0; y < TILE_HEIGHT; ++y)
 		{
 			// Store the rightmost byte of the current row
@@ -242,6 +262,7 @@ public class TileData
 
 	public void ShiftUp()
 	{
+		Push();
 		for (var x = 0; x < TILE_WIDTH; ++x)
 		{
 			// Store the topmost byte of the current column
@@ -260,6 +281,7 @@ public class TileData
 
 	public void ShiftDown()
 	{
+		Push();
 		for (var x = 0; x < TILE_WIDTH; ++x)
 		{
 			// Store the bottommost byte of the current column
@@ -275,6 +297,77 @@ public class TileData
 			View[x, 0] = bottommost;
 		}
 	}
+
+	#region Undo/Redo
+
+	public const int UndoBufferSize = 250;
+
+	private readonly LinkedList<byte?[,]?> _undoCommands = new();
+	private readonly Stack<byte?[,]?> _redoCommands = new();
+
+	public void Push()
+	{
+		while (_undoCommands.Count >= UndoBufferSize)
+		{
+			_undoCommands.RemoveFirst();
+		}
+		_undoCommands.AddLast(View.Clone() as byte?[,]);
+		if (_redoCommands.Count > 0)
+			_redoCommands.Clear();
+	}
+
+	public void Undo()
+	{
+		if (_undoCommands.Count > 0)
+		{
+			// Save the current screen
+			_redoCommands.Push(View.Clone() as byte?[,]);
+
+			// Get the last screen and restore it
+			var data = _undoCommands.Last();
+			_undoCommands.RemoveLast();
+			if (data != null)
+				MyBlockCopy(data);
+		}
+	}
+
+	public void Redo()
+	{
+		if (_redoCommands.Count > 0)
+		{
+			// Save the current screen
+			while (_undoCommands.Count >= UndoBufferSize)
+			{
+				_undoCommands.RemoveFirst();
+			}
+			_undoCommands.AddLast(View.Clone() as byte?[,]);
+
+			// Get the last screen and restore it
+			var data = _redoCommands.Pop();
+			if (data != null)
+				MyBlockCopy(data);
+		}
+	}
+
+	private void MyBlockCopy(byte?[,]? data)
+	{
+		if (data == null)
+			return;
+		for (var y = 0; y < TILE_HEIGHT; ++y)
+		{
+			for (var x = 0; x < TILE_WIDTH; ++x)
+			{
+				View[x, y] = data[x, y];
+			}
+		}
+	}
+
+	public (bool, bool) GetRedoUndoButtonState()
+	{
+		return (_undoCommands.Count > 0 ? true : false, _redoCommands.Count > 0 ? true : false);
+	}
+
+	#endregion
 }
 
 
@@ -283,7 +376,9 @@ public class TileData
 /// </summary>
 public static class TileSet
 {
-	public static TileData[] Tiles { get; set; } = new TileData[100];
+	public const int NUM_TILES_IN_SET = 256;
+
+	public static TileData[] Tiles { get; set; } = new TileData[NUM_TILES_IN_SET];
 
 	public static TileData? CurrentTile { get; set; }
 

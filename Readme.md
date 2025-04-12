@@ -116,6 +116,8 @@ When pasting the image into the view area all #0 characters (or which every one 
 ![15](images/15.JPG)
 ![16](images/16.JPG)
 
+To repeat the paste process you can either hold down the ALT key during pasting or check the [Stay in Paste Mode] checkbox. This means that once an area/tile has been pasted into the view it can be repeated any number of times. Pressing ESC will cancel the paste process and return to the selection mode.
+
 **Expanded Mega Copy mode**
 From version 1.6.7 of the Atari Font Maker there is a new list of font manipulation commands located just above the font selection area.
 
@@ -307,9 +309,9 @@ Launch the **Tile Set Editor** by clicking the button found just below the **I/O
 You will see a window similar to this one
 ![18](images/18.JPG)
 
-The Tile Set editor lets you manage a total of 100 5x5 character tiles. A tile does not have to use all 25 characters.  It starts off in the empty state and as you draw characters into it the unused spaces will stay empty. That means when pasting a tile into the **View editor** the unused spots will be left untouched. Or expressed differently, each unused character in a tile is a hole that leaves the exiting character in the view in place.
+The Tile Set editor lets you manage a total of 256 5x5 character tiles. A tile does not have to use all 25 characters.  It starts off in the empty state and as you draw characters into it the unused spaces will stay empty. That means when pasting a tile into the **View editor** the unused spots will be left untouched. Or expressed differently, each unused character in a tile is a hole that leaves the exiting character in the view in place.
 
-At the top of the **Tile Set editor** you will find the 100 individual tiles. Left-click with the mouse to activate the tile and load it into the editor. If you left-click and hold the mouse and move left and right you can quickly switch between various tiles, which acts like an animation. Good for testing transitions.  Use the scroll bar to select the 10 tiles to view.
+At the top of the **Tile Set editor** you will find the 256 individual tiles. Left-click with the mouse to activate the tile and load it into the editor. If you left-click and hold the mouse and move left and right you can quickly switch between various tiles, which acts like an animation. Good for testing transitions.  Use the scroll bar to select the 10 tiles to view.
 
  The individual editor can be found just below the tile set list and is surrounded by three columns of command buttons. These commands handle actions like: Rotation, mirroring, shifting, copy and paste.
  You can use the Copy button (CTRL+C) to copy the current tile to the clipboard. Then you can paste it into another tile or to the view editor window.
@@ -317,9 +319,31 @@ At the top of the **Tile Set editor** you will find the 100 individual tiles. Le
  **Keyboard/Mouse shortcuts for the TileSet editor**
  CTRL+C - Copy the current tile to the clipboard
  CTRL+V - Paste the clipboard to the tile (or the view window)
-Mouse Wheel + ALT - Select the next/previous tile into the clipboard (when in MegaCopy mode)
+ CTRL+Z - Undo tile action
+ CTRL+Y - Redo tile action
+ CTRL+LEFT ARROW (cursor) - Select previous tile
+ CTRL+RIGHT ARROW (cursor) - Select next tile
+ALT + Mouse Wheel - Select the next/previous tile for drawing/pasting. This selects only valid tiles, thus skipping empty tiles.
 
 ## Changes/History
+
+V1.6.16.2
+- Added Undo/Redo buffer to the tile set editor.
+	Press the relevant buttons or CTRL+Z/CTRL+Y to action the undo/redo.
+- Added CTRL+Arrow LEFT/RIGHT to quickly switch between tiles in the tile set editor.
+	This selects the adjacent tile.
+- Added a "Stay in Paste Mode" checkbox.
+  When checked and pasting a tile/area in the view editor then the state will not be reset.
+  This means that you can select tile/area and use it like a stamp to paste it multiple times. 
+  The same can we achieved by holding down ALT when pasting; the tile will stay selected.
+  Pressing ESC will cancel the paste process and return to the selection mode.
+-The number of tiles has been increased to 256.
+
+V1.6.16.1
+When hitting the [Draw with this tile] button it will switch into MegaCopy mode, and make the new tile immediately drawable.
+You can also use ALT+Mousewheel, while in the normal edit window, to quickly switch between tiles. No need to switch back to the tile set window
+Tiles have a max of 5x5 characters but if your characters occupy a smaller area (i.e. 2x2) then the drawing cursor will be that smaller size. Effective a bounding rectangle around the used characters.
+The [Copy] button now only copies the contents and does not do the same as the [Draw with this tile] button.
 
 V1.6.16.0
 - Added a Tile Set editor which supports 100x 5x5 tiles

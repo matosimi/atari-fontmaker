@@ -13,10 +13,10 @@
 	<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
 	<ApplicationDefaultFont>Segoe UI, 8.25pt</ApplicationDefaultFont>
 	<ApplicationIcon>Resources\FontMaker.ico</ApplicationIcon>
-	<FileVersion>1.6.16.1</FileVersion>
-	<AssemblyVersion>1.6.16.1</AssemblyVersion>
+	<FileVersion>1.6.16.2</FileVersion>
+	<AssemblyVersion>1.6.16.2</AssemblyVersion>
 	<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	<Version>1.6.16.1</Version>
+	<Version>1.6.16.2</Version>
 	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 

@@ -146,6 +146,10 @@
 			buttonViewActions = new Button();
 			buttonImportView = new Button();
 			panel1 = new Panel();
+			numericHeight = new NumericUpDown();
+			numericWidth = new NumericUpDown();
+			label7 = new Label();
+			label6 = new Label();
 			label1 = new Label();
 			labelCurrentPageInfo = new Label();
 			panelColorSwitcherMode10 = new Panel();
@@ -156,6 +160,7 @@
 			labelSelectedArea = new Label();
 			label5 = new Label();
 			buttonTileSetEditor = new Button();
+			checkBoxStayInPasteMode = new CheckBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -185,6 +190,8 @@
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorPasteCursor).BeginInit();
 			((System.ComponentModel.ISupportInitialize)trackBarSkipCharX).BeginInit();
 			panel1.SuspendLayout();
+			((System.ComponentModel.ISupportInitialize)numericHeight).BeginInit();
+			((System.ComponentModel.ISupportInitialize)numericWidth).BeginInit();
 			panelColorSwitcherMode10.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorSourceColorMode10).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorTargetColorMode10).BeginInit();
@@ -206,7 +213,7 @@
 			// pictureBoxFontSelector
 			// 
 			pictureBoxFontSelector.Controls.Add(pictureBoxDuplicateIndicator);
-			pictureBoxFontSelector.Location = new Point(2, 289);
+			pictureBoxFontSelector.Location = new Point(2, 298);
 			pictureBoxFontSelector.Name = "pictureBoxFontSelector";
 			pictureBoxFontSelector.Size = new Size(512, 256);
 			pictureBoxFontSelector.TabIndex = 1;
@@ -218,7 +225,7 @@
 			// pictureBoxDuplicateIndicator
 			// 
 			pictureBoxDuplicateIndicator.BackColor = Color.Transparent;
-			pictureBoxDuplicateIndicator.Location = new Point(0, 0);
+			pictureBoxDuplicateIndicator.Location = new Point(0, 9);
 			pictureBoxDuplicateIndicator.Margin = new Padding(0);
 			pictureBoxDuplicateIndicator.Name = "pictureBoxDuplicateIndicator";
 			pictureBoxDuplicateIndicator.Size = new Size(20, 20);
@@ -250,7 +257,7 @@
 			// pictureBoxFontSelectorMegaCopyImage
 			// 
 			pictureBoxFontSelectorMegaCopyImage.BackColor = SystemColors.Menu;
-			pictureBoxFontSelectorMegaCopyImage.Location = new Point(26, 333);
+			pictureBoxFontSelectorMegaCopyImage.Location = new Point(26, 342);
 			pictureBoxFontSelectorMegaCopyImage.Name = "pictureBoxFontSelectorMegaCopyImage";
 			pictureBoxFontSelectorMegaCopyImage.Size = new Size(105, 105);
 			pictureBoxFontSelectorMegaCopyImage.TabIndex = 4;
@@ -945,7 +952,7 @@
 			p_status.Controls.Add(buttonMegaCopy);
 			p_status.Location = new Point(-1, 238);
 			p_status.Name = "p_status";
-			p_status.Size = new Size(515, 50);
+			p_status.Size = new Size(515, 54);
 			p_status.TabIndex = 6;
 			// 
 			// label2
@@ -961,7 +968,7 @@
 			// 
 			buttonFontDeleteCharShiftRight.ImageIndex = 14;
 			buttonFontDeleteCharShiftRight.ImageList = imageListFontShift;
-			buttonFontDeleteCharShiftRight.Location = new Point(52, 24);
+			buttonFontDeleteCharShiftRight.Location = new Point(52, 27);
 			buttonFontDeleteCharShiftRight.Name = "buttonFontDeleteCharShiftRight";
 			buttonFontDeleteCharShiftRight.Size = new Size(24, 24);
 			buttonFontDeleteCharShiftRight.TabIndex = 29;
@@ -995,7 +1002,7 @@
 			// 
 			buttonFontDeleteCharShiftLeft.ImageIndex = 13;
 			buttonFontDeleteCharShiftLeft.ImageList = imageListFontShift;
-			buttonFontDeleteCharShiftLeft.Location = new Point(76, 24);
+			buttonFontDeleteCharShiftLeft.Location = new Point(76, 27);
 			buttonFontDeleteCharShiftLeft.Name = "buttonFontDeleteCharShiftLeft";
 			buttonFontDeleteCharShiftLeft.Size = new Size(24, 24);
 			buttonFontDeleteCharShiftLeft.TabIndex = 28;
@@ -1009,7 +1016,7 @@
 			buttonCopyAreaRotateRight.Enabled = false;
 			buttonCopyAreaRotateRight.ImageIndex = 12;
 			buttonCopyAreaRotateRight.ImageList = imageListFontShift;
-			buttonCopyAreaRotateRight.Location = new Point(351, 24);
+			buttonCopyAreaRotateRight.Location = new Point(351, 27);
 			buttonCopyAreaRotateRight.Name = "buttonCopyAreaRotateRight";
 			buttonCopyAreaRotateRight.Size = new Size(24, 24);
 			buttonCopyAreaRotateRight.TabIndex = 27;
@@ -1023,7 +1030,7 @@
 			buttonCopyAreaRotateLeft.Enabled = false;
 			buttonCopyAreaRotateLeft.ImageIndex = 11;
 			buttonCopyAreaRotateLeft.ImageList = imageListFontShift;
-			buttonCopyAreaRotateLeft.Location = new Point(327, 24);
+			buttonCopyAreaRotateLeft.Location = new Point(327, 27);
 			buttonCopyAreaRotateLeft.Name = "buttonCopyAreaRotateLeft";
 			buttonCopyAreaRotateLeft.Size = new Size(24, 24);
 			buttonCopyAreaRotateLeft.TabIndex = 26;
@@ -1037,7 +1044,7 @@
 			buttonCopyAreaInvert.Enabled = false;
 			buttonCopyAreaInvert.ImageIndex = 10;
 			buttonCopyAreaInvert.ImageList = imageListFontShift;
-			buttonCopyAreaInvert.Location = new Point(303, 24);
+			buttonCopyAreaInvert.Location = new Point(303, 27);
 			buttonCopyAreaInvert.Name = "buttonCopyAreaInvert";
 			buttonCopyAreaInvert.Size = new Size(24, 24);
 			buttonCopyAreaInvert.TabIndex = 25;
@@ -1051,7 +1058,7 @@
 			buttonCopyAreaVMirror.Enabled = false;
 			buttonCopyAreaVMirror.ImageIndex = 9;
 			buttonCopyAreaVMirror.ImageList = imageListFontShift;
-			buttonCopyAreaVMirror.Location = new Point(279, 24);
+			buttonCopyAreaVMirror.Location = new Point(279, 27);
 			buttonCopyAreaVMirror.Name = "buttonCopyAreaVMirror";
 			buttonCopyAreaVMirror.Size = new Size(24, 24);
 			buttonCopyAreaVMirror.TabIndex = 24;
@@ -1065,7 +1072,7 @@
 			buttonCopyAreaHMirror.Enabled = false;
 			buttonCopyAreaHMirror.ImageIndex = 8;
 			buttonCopyAreaHMirror.ImageList = imageListFontShift;
-			buttonCopyAreaHMirror.Location = new Point(255, 24);
+			buttonCopyAreaHMirror.Location = new Point(255, 27);
 			buttonCopyAreaHMirror.Name = "buttonCopyAreaHMirror";
 			buttonCopyAreaHMirror.Size = new Size(24, 24);
 			buttonCopyAreaHMirror.TabIndex = 23;
@@ -1080,7 +1087,7 @@
 			comboBoxPasteIntoFontNr.Enabled = false;
 			comboBoxPasteIntoFontNr.FormattingEnabled = true;
 			comboBoxPasteIntoFontNr.Items.AddRange(new object[] { "1", "2", "3", "4" });
-			comboBoxPasteIntoFontNr.Location = new Point(483, 26);
+			comboBoxPasteIntoFontNr.Location = new Point(483, 29);
 			comboBoxPasteIntoFontNr.Name = "comboBoxPasteIntoFontNr";
 			comboBoxPasteIntoFontNr.Size = new Size(30, 21);
 			comboBoxPasteIntoFontNr.TabIndex = 22;
@@ -1090,7 +1097,7 @@
 			// buttonPasteInPlace
 			// 
 			buttonPasteInPlace.Enabled = false;
-			buttonPasteInPlace.Location = new Point(378, 24);
+			buttonPasteInPlace.Location = new Point(378, 27);
 			buttonPasteInPlace.Margin = new Padding(0);
 			buttonPasteInPlace.Name = "buttonPasteInPlace";
 			buttonPasteInPlace.RightToLeft = RightToLeft.No;
@@ -1106,7 +1113,7 @@
 			buttonCopyAreaShiftDown.Enabled = false;
 			buttonCopyAreaShiftDown.ImageIndex = 7;
 			buttonCopyAreaShiftDown.ImageList = imageListFontShift;
-			buttonCopyAreaShiftDown.Location = new Point(231, 24);
+			buttonCopyAreaShiftDown.Location = new Point(231, 27);
 			buttonCopyAreaShiftDown.Name = "buttonCopyAreaShiftDown";
 			buttonCopyAreaShiftDown.Size = new Size(24, 24);
 			buttonCopyAreaShiftDown.TabIndex = 20;
@@ -1120,7 +1127,7 @@
 			buttonCopyAreaShiftUp.Enabled = false;
 			buttonCopyAreaShiftUp.ImageIndex = 6;
 			buttonCopyAreaShiftUp.ImageList = imageListFontShift;
-			buttonCopyAreaShiftUp.Location = new Point(207, 24);
+			buttonCopyAreaShiftUp.Location = new Point(207, 27);
 			buttonCopyAreaShiftUp.Name = "buttonCopyAreaShiftUp";
 			buttonCopyAreaShiftUp.Size = new Size(24, 24);
 			buttonCopyAreaShiftUp.TabIndex = 19;
@@ -1134,7 +1141,7 @@
 			buttonCopyAreaShiftRight.Enabled = false;
 			buttonCopyAreaShiftRight.ImageIndex = 5;
 			buttonCopyAreaShiftRight.ImageList = imageListFontShift;
-			buttonCopyAreaShiftRight.Location = new Point(183, 24);
+			buttonCopyAreaShiftRight.Location = new Point(183, 27);
 			buttonCopyAreaShiftRight.Name = "buttonCopyAreaShiftRight";
 			buttonCopyAreaShiftRight.Size = new Size(24, 24);
 			buttonCopyAreaShiftRight.TabIndex = 18;
@@ -1148,7 +1155,7 @@
 			buttonCopyAreaShiftLeft.Enabled = false;
 			buttonCopyAreaShiftLeft.ImageIndex = 4;
 			buttonCopyAreaShiftLeft.ImageList = imageListFontShift;
-			buttonCopyAreaShiftLeft.Location = new Point(159, 24);
+			buttonCopyAreaShiftLeft.Location = new Point(159, 27);
 			buttonCopyAreaShiftLeft.Name = "buttonCopyAreaShiftLeft";
 			buttonCopyAreaShiftLeft.Size = new Size(24, 24);
 			buttonCopyAreaShiftLeft.TabIndex = 17;
@@ -1161,7 +1168,7 @@
 			// 
 			buttonFontShiftRightInsert.ImageIndex = 1;
 			buttonFontShiftRightInsert.ImageList = imageListFontShift;
-			buttonFontShiftRightInsert.Location = new Point(124, 24);
+			buttonFontShiftRightInsert.Location = new Point(124, 27);
 			buttonFontShiftRightInsert.Name = "buttonFontShiftRightInsert";
 			buttonFontShiftRightInsert.Size = new Size(24, 24);
 			buttonFontShiftRightInsert.TabIndex = 16;
@@ -1174,7 +1181,7 @@
 			// 
 			buttonFontShiftRightRotate.ImageIndex = 3;
 			buttonFontShiftRightRotate.ImageList = imageListFontShift;
-			buttonFontShiftRightRotate.Location = new Point(100, 24);
+			buttonFontShiftRightRotate.Location = new Point(100, 27);
 			buttonFontShiftRightRotate.Name = "buttonFontShiftRightRotate";
 			buttonFontShiftRightRotate.Size = new Size(24, 24);
 			buttonFontShiftRightRotate.TabIndex = 15;
@@ -1187,7 +1194,7 @@
 			// 
 			buttonFontShiftLeftRotate.ImageIndex = 2;
 			buttonFontShiftLeftRotate.ImageList = imageListFontShift;
-			buttonFontShiftLeftRotate.Location = new Point(28, 24);
+			buttonFontShiftLeftRotate.Location = new Point(28, 27);
 			buttonFontShiftLeftRotate.Name = "buttonFontShiftLeftRotate";
 			buttonFontShiftLeftRotate.Size = new Size(24, 24);
 			buttonFontShiftLeftRotate.TabIndex = 14;
@@ -1200,7 +1207,7 @@
 			// 
 			buttonFontShiftLeftInsert.ImageIndex = 0;
 			buttonFontShiftLeftInsert.ImageList = imageListFontShift;
-			buttonFontShiftLeftInsert.Location = new Point(4, 24);
+			buttonFontShiftLeftInsert.Location = new Point(4, 27);
 			buttonFontShiftLeftInsert.Name = "buttonFontShiftLeftInsert";
 			buttonFontShiftLeftInsert.Size = new Size(24, 24);
 			buttonFontShiftLeftInsert.TabIndex = 13;
@@ -1356,7 +1363,7 @@
 			// pictureBoxFontSelectorRubberBand
 			// 
 			pictureBoxFontSelectorRubberBand.BackColor = Color.Transparent;
-			pictureBoxFontSelectorRubberBand.Location = new Point(167, 373);
+			pictureBoxFontSelectorRubberBand.Location = new Point(167, 382);
 			pictureBoxFontSelectorRubberBand.Margin = new Padding(0);
 			pictureBoxFontSelectorRubberBand.Name = "pictureBoxFontSelectorRubberBand";
 			pictureBoxFontSelectorRubberBand.Size = new Size(20, 20);
@@ -1388,7 +1395,7 @@
 			// 
 			pictureBoxFontSelectorPasteCursor.BackColor = Color.Transparent;
 			pictureBoxFontSelectorPasteCursor.BorderStyle = BorderStyle.FixedSingle;
-			pictureBoxFontSelectorPasteCursor.Location = new Point(167, 406);
+			pictureBoxFontSelectorPasteCursor.Location = new Point(167, 415);
 			pictureBoxFontSelectorPasteCursor.Margin = new Padding(0);
 			pictureBoxFontSelectorPasteCursor.Name = "pictureBoxFontSelectorPasteCursor";
 			pictureBoxFontSelectorPasteCursor.Size = new Size(20, 20);
@@ -1526,7 +1533,7 @@
 			lblInMegaCopyMode.AutoSize = true;
 			lblInMegaCopyMode.BackColor = SystemColors.ActiveCaption;
 			lblInMegaCopyMode.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
-			lblInMegaCopyMode.Location = new Point(858, 520);
+			lblInMegaCopyMode.Location = new Point(858, 530);
 			lblInMegaCopyMode.Name = "lblInMegaCopyMode";
 			lblInMegaCopyMode.Size = new Size(188, 25);
 			lblInMegaCopyMode.TabIndex = 23;
@@ -1557,6 +1564,10 @@
 			// panel1
 			// 
 			panel1.BorderStyle = BorderStyle.FixedSingle;
+			panel1.Controls.Add(numericHeight);
+			panel1.Controls.Add(numericWidth);
+			panel1.Controls.Add(label7);
+			panel1.Controls.Add(label6);
 			panel1.Controls.Add(label1);
 			panel1.Controls.Add(labelCurrentPageInfo);
 			panel1.Controls.Add(comboBoxPages);
@@ -1565,8 +1576,54 @@
 			panel1.Controls.Add(buttonEditPage);
 			panel1.Location = new Point(613, 466);
 			panel1.Name = "panel1";
-			panel1.Size = new Size(191, 75);
+			panel1.Size = new Size(191, 88);
 			panel1.TabIndex = 28;
+			// 
+			// numericHeight
+			// 
+			numericHeight.BorderStyle = BorderStyle.FixedSingle;
+			numericHeight.Enabled = false;
+			numericHeight.Location = new Point(136, 60);
+			numericHeight.Margin = new Padding(0);
+			numericHeight.Minimum = new decimal(new int[] { 26, 0, 0, 0 });
+			numericHeight.Name = "numericHeight";
+			numericHeight.Size = new Size(49, 22);
+			numericHeight.TabIndex = 32;
+			numericHeight.TextAlign = HorizontalAlignment.Center;
+			numericHeight.Value = new decimal(new int[] { 26, 0, 0, 0 });
+			// 
+			// numericWidth
+			// 
+			numericWidth.BorderStyle = BorderStyle.FixedSingle;
+			numericWidth.Enabled = false;
+			numericWidth.Location = new Point(41, 60);
+			numericWidth.Margin = new Padding(0);
+			numericWidth.Maximum = new decimal(new int[] { 512, 0, 0, 0 });
+			numericWidth.Minimum = new decimal(new int[] { 32, 0, 0, 0 });
+			numericWidth.Name = "numericWidth";
+			numericWidth.Size = new Size(49, 22);
+			numericWidth.TabIndex = 31;
+			numericWidth.TextAlign = HorizontalAlignment.Center;
+			numericWidth.Value = new decimal(new int[] { 40, 0, 0, 0 });
+			// 
+			// label7
+			// 
+			label7.Location = new Point(95, 65);
+			label7.Margin = new Padding(0);
+			label7.Name = "label7";
+			label7.Size = new Size(42, 13);
+			label7.TabIndex = 34;
+			label7.Text = "Height";
+			// 
+			// label6
+			// 
+			label6.AutoSize = true;
+			label6.Location = new Point(3, 65);
+			label6.Margin = new Padding(0);
+			label6.Name = "label6";
+			label6.Size = new Size(39, 13);
+			label6.TabIndex = 33;
+			label6.Text = "Width";
 			// 
 			// label1
 			// 
@@ -1664,12 +1721,23 @@
 			buttonTileSetEditor.UseVisualStyleBackColor = true;
 			buttonTileSetEditor.Click += buttonTileSetEditor_Click;
 			// 
+			// checkBoxStayInPasteMode
+			// 
+			checkBoxStayInPasteMode.AutoSize = true;
+			checkBoxStayInPasteMode.Location = new Point(823, 510);
+			checkBoxStayInPasteMode.Name = "checkBoxStayInPasteMode";
+			checkBoxStayInPasteMode.Size = new Size(123, 17);
+			checkBoxStayInPasteMode.TabIndex = 33;
+			checkBoxStayInPasteMode.Text = "Stay in Paste Mode";
+			checkBoxStayInPasteMode.UseVisualStyleBackColor = true;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
-			ClientSize = new Size(1046, 545);
+			ClientSize = new Size(1046, 555);
+			Controls.Add(checkBoxStayInPasteMode);
 			Controls.Add(buttonTileSetEditor);
 			Controls.Add(trackBarSkipCharX);
 			Controls.Add(checkBoxSkipChar0);
@@ -1746,6 +1814,8 @@
 			((System.ComponentModel.ISupportInitialize)trackBarSkipCharX).EndInit();
 			panel1.ResumeLayout(false);
 			panel1.PerformLayout();
+			((System.ComponentModel.ISupportInitialize)numericHeight).EndInit();
+			((System.ComponentModel.ISupportInitialize)numericWidth).EndInit();
 			panelColorSwitcherMode10.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorSourceColorMode10).EndInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxRecolorTargetColorMode10).EndInit();
@@ -1887,5 +1957,10 @@
 		private CheckBox checkBoxSkipChar0;
 		private TrackBar trackBarSkipCharX;
 		private Button buttonTileSetEditor;
+		private CheckBox checkBoxStayInPasteMode;
+		private NumericUpDown numericHeight;
+		private NumericUpDown numericWidth;
+		private Label label6;
+		private Label label7;
 	}
 }

@@ -188,6 +188,9 @@ public partial class FontMakerForm
 						// Maintain undo buffer
 						CopyPasteTargetLocation = new Point(rx, ry);
 						ExecutePasteFromClipboard(true);
+
+						if (Control.ModifierKeys == Keys.Alt || checkBoxStayInPasteMode.Checked)
+							break;
 						ResetMegaCopyStatus();
 					}
 					break;

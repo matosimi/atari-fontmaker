@@ -2,7 +2,6 @@
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
-using System.Windows.Forms;
 using TinyJson;
 using static FontMaker.FontMakerForm;
 
@@ -13,7 +12,6 @@ public partial class TileSetEditorWindow : Form
 	public static readonly SolidBrush GrayBrush = new(Color.Gray);
 	public static readonly SolidBrush LightGrayBrush = new(Color.LightGray);
 
-	private const int TileEditorHeight = 80;
 	private const int OneCharInEditorDimension = 16;
 
 	private const int TileSetPictureWidth = 800;
@@ -56,6 +54,7 @@ public partial class TileSetEditorWindow : Form
 	private void TilesWindow_Load(object sender, EventArgs e)
 	{
 		SwitchColorMode();
+		hScrollBarTiles.Maximum = TileSet.NUM_TILES_IN_SET - 1;
 	}
 
 	/// <summary>
@@ -103,8 +102,8 @@ public partial class TileSetEditorWindow : Form
 		var step = e.Delta > 0 ? -1 : 1;
 		if (Control.ModifierKeys == Keys.Alt)
 		{
-			if (step < 0) buttonPrevTile_Click(null!, EventArgs.Empty);
-			else buttonNextTile_Click(null!, EventArgs.Empty);
+			if (step < 0) ActionPrevTile(true);
+			else ActionNextTile(true);
 
 			CopyCurrentTileToClipboard(true);
 		}
@@ -202,16 +201,16 @@ public partial class TileSetEditorWindow : Form
 		}
 		pictureBoxTileSets.Refresh();
 		var tileNr = TileSetOffset;
-		labelTile0.Text = $@"Tile: {(++tileNr)}";
-		labelTile1.Text = $@"Tile: {(++tileNr)}";
-		labelTile2.Text = $@"Tile: {(++tileNr)}";
-		labelTile3.Text = $@"Tile: {(++tileNr)}";
-		labelTile4.Text = $@"Tile: {(++tileNr)}";
-		labelTile5.Text = $@"Tile: {(++tileNr)}";
-		labelTile6.Text = $@"Tile: {(++tileNr)}";
-		labelTile7.Text = $@"Tile: {(++tileNr)}";
-		labelTile8.Text = $@"Tile: {(++tileNr)}";
-		labelTile9.Text = $@"Tile: {(++tileNr)}";
+		labelTile0.Text = $@"Tile: {(tileNr++)}";
+		labelTile1.Text = $@"Tile: {(tileNr++)}";
+		labelTile2.Text = $@"Tile: {(tileNr++)}";
+		labelTile3.Text = $@"Tile: {(tileNr++)}";
+		labelTile4.Text = $@"Tile: {(tileNr++)}";
+		labelTile5.Text = $@"Tile: {(tileNr++)}";
+		labelTile6.Text = $@"Tile: {(tileNr++)}";
+		labelTile7.Text = $@"Tile: {(tileNr++)}";
+		labelTile8.Text = $@"Tile: {(tileNr++)}";
+		labelTile9.Text = $@"Tile: {(tileNr++)}";
 	}
 
 	public void SwitchColorMode()
@@ -457,16 +456,54 @@ public partial class TileSetEditorWindow : Form
 
 	private void buttonPrevTile_Click(object sender, EventArgs e)
 	{
-		if (SelectedTileNr > 0)
+		ActionPrevTile(false);
+	}
+
+	private void buttonNextTile_Click(object sender, EventArgs e)
+	{
+		ActionNextTile(true);
+	}
+
+	private void ActionPrevTile(bool seekValidOnly)
+	{
+		if (seekValidOnly)
+		{
+			// Scan left until we find a valid tile
+			for (var idx = SelectedTileNr-1; idx >= 0; --idx)
+			{
+				if (TileSet.Tiles[idx].IsValid())
+				{
+					SelectedTileNr = idx;
+					NewTileSelected();
+					return;
+				}
+			}
+			// Nothing to change
+		}
+		else if (SelectedTileNr > 0)
 		{
 			--SelectedTileNr;
 			NewTileSelected();
 		}
 	}
 
-	private void buttonNextTile_Click(object sender, EventArgs e)
+	private void ActionNextTile(bool seekValidOnly)
 	{
-		if (SelectedTileNr < 99)
+		if (seekValidOnly)
+		{
+			// Scan left until we find a valid tile
+			for (var idx = SelectedTileNr + 1; idx < TileSet.NUM_TILES_IN_SET; ++idx)
+			{
+				if (TileSet.Tiles[idx].IsValid())
+				{
+					SelectedTileNr = idx;
+					NewTileSelected();
+					return;
+				}
+			}
+			// Nothing to change
+		}
+		else if (SelectedTileNr < TileSet.NUM_TILES_IN_SET - 1)
 		{
 			++SelectedTileNr;
 			NewTileSelected();
@@ -476,11 +513,12 @@ public partial class TileSetEditorWindow : Form
 	private void NewTileSelected()
 	{
 		TileSet.CurrentTile = TileSet.Tiles[SelectedTileNr];
-		labelTileNr.Text = (SelectedTileNr + 1).ToString();
+		labelTileNr.Text = SelectedTileNr.ToString();
 
 		RedrawLineTypes();
 		DrawCurrentTile();
 		UpdateTileSetWindow();
+		UpdateTileUndoRedoButton();
 	}
 
 	/// <summary>
@@ -552,13 +590,19 @@ public partial class TileSetEditorWindow : Form
 	/// </summary>
 	private void UpdateTileSetWindow()
 	{
-
 		if (SelectedTileNr >= TileSetOffset && SelectedTileNr < TileSetOffset + 10)
 		{
 			// Current tile is in the visible range.
 			DrawTileSetView();
 		}
 
+	}
+
+	private void UpdateTileUndoRedoButton()
+	{
+		var (undoEnabled, redoEnabled) = TileSet.CurrentTile?.GetRedoUndoButtonState() ?? (false, false);
+		buttonViewUndo.Enabled = undoEnabled;
+		buttonViewRedo.Enabled = redoEnabled;
 	}
 
 	private void hScrollBarTiles_ValueChanged(object sender, EventArgs e)
@@ -596,6 +640,8 @@ public partial class TileSetEditorWindow : Form
 		if (rx >= TileData.TILE_WIDTH || ry >= TileData.TILE_HEIGHT)
 			return;
 
+		TileSet.CurrentTile?.Push();
+
 		LastViewCharacterX = rx;
 		LastViewCharacterY = ry;
 
@@ -609,6 +655,7 @@ public partial class TileSetEditorWindow : Form
 		}
 		DrawCurrentTile();
 		UpdateTileSetWindow();
+		UpdateTileUndoRedoButton();
 	}
 
 
@@ -633,6 +680,7 @@ public partial class TileSetEditorWindow : Form
 		}
 		DrawCurrentTile();
 		UpdateTileSetWindow();
+		UpdateTileUndoRedoButton();
 	}
 
 	#region Copy/Paste tile data
@@ -648,9 +696,11 @@ public partial class TileSetEditorWindow : Form
 
 	private void ActionPaste()
 	{
+		TileSet.CurrentTile?.Push();
 		PasteToCurrentTileFromClipboard();
 		DrawCurrentTile();
 		UpdateTileSetWindow();
+		UpdateTileUndoRedoButton();
 		RedrawLineTypes();
 	}
 
@@ -898,6 +948,7 @@ public partial class TileSetEditorWindow : Form
 			TileSet.CurrentTile.Load(jsonObj.Tile);
 			DrawCurrentTile();
 			UpdateTileSetWindow();
+			UpdateTileUndoRedoButton();
 		}
 	}
 
@@ -947,6 +998,7 @@ public partial class TileSetEditorWindow : Form
 	{
 		DrawCurrentTile();
 		UpdateTileSetWindow();
+		UpdateTileUndoRedoButton();
 	}
 
 	private void buttonRotateLeft_Click(object sender, EventArgs e)
@@ -997,6 +1049,17 @@ public partial class TileSetEditorWindow : Form
 		UpdateTileSetVisual();
 	}
 
+	/// <summary>
+	/// Keyboard shortcuts:
+	/// CTRL+C = Copy tile to clipboard
+	/// CTRL+V = Paste tile from clipboard
+	/// CTRL+Z = Undo
+	/// CTRL+Y = Redo
+	/// CTRL+LEFT ARROW (cursor) = Previous tile
+	/// CTRL+RIGHT ARROW (cursor) = Next tile
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
 	private void TileSetEditorWindow_KeyDown(object sender, KeyEventArgs e)
 	{
 		if (e.Control)
@@ -1013,6 +1076,58 @@ public partial class TileSetEditorWindow : Form
 				ActionPaste();
 				return;
 			}
+
+			if (e.KeyCode == Keys.Z)
+			{
+				ActionUndo();
+				return;
+			}
+			
+			if (e.KeyCode == Keys.Y)
+			{
+				ActionRedo();
+				return;
+			}
+
+			if (e.KeyCode == Keys.Left)
+			{
+				ActionPrevTile(false);
+				return;
+			}
+
+			if (e.KeyCode == Keys.Right)
+			{
+				ActionNextTile(false);
+				return;
+			}
 		}
+	}
+
+	private void buttonViewUndo_Click(object sender, EventArgs e)
+	{
+		ActionUndo();
+	}
+
+	private void buttonViewRedo_Click(object sender, EventArgs e)
+	{
+		ActionRedo();
+	}
+
+	private void ActionUndo()
+	{
+		TileSet.CurrentTile?.Undo();
+		RedrawLineTypes();
+		DrawCurrentTile();
+		UpdateTileSetWindow();
+		UpdateTileUndoRedoButton();
+	}
+
+	private void ActionRedo()
+	{
+		TileSet.CurrentTile?.Redo();
+		RedrawLineTypes();
+		DrawCurrentTile();
+		UpdateTileSetWindow();
+		UpdateTileUndoRedoButton();
 	}
 }
