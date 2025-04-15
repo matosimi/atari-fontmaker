@@ -198,6 +198,7 @@ namespace FontMaker
 						break;
 
 					case MegaCopyStatusFlags.Pasting:
+					case MegaCopyStatusFlags.PastingFont:
 						{
 							if (!IsMousePositionValidForPasting(e.X, e.Y))
 							{
@@ -273,6 +274,12 @@ namespace FontMaker
 			}
 		}
 
+		/// <summary>
+		/// The mouse is moving inside the font selector.
+		/// If we are in MegaCopy mode then process the movement.
+		/// 
+		/// </summary>
+		/// <param name="e"></param>
 		public void ActionFontSelectorMouseMove(MouseEventArgs e)
 		{
 			if (buttonMegaCopy.Checked)
@@ -310,6 +317,7 @@ namespace FontMaker
 						break;
 
 					case MegaCopyStatusFlags.Pasting:
+					case MegaCopyStatusFlags.PastingFont:
 						{
 							if (!IsMousePositionValidForPasting(e.X, e.Y))
 							{

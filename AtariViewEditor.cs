@@ -32,6 +32,9 @@ public class AtrViewInfoJson
 	/// </summary>
 	public string Chars { get; set; } = string.Empty;
 
+	public int Width { get; set; } = 40;
+	public int Height { get; set; } = 26;
+
 	/// <summary>
 	/// Use which font on which of the 26 lines of the view "1234"
 	/// </summary>
@@ -99,7 +102,8 @@ public partial class FontMakerForm
 	}
 
 	/// <summary>
-	/// Select a character for editing
+	/// Select a character for editing.
+	/// Only called by other windows to make sure that their reference character is in the editor
 	/// </summary>
 	/// <param name="charNr">0 - 1023</param>
 	public void PickCharacter(int charNr)
@@ -176,6 +180,7 @@ public partial class FontMakerForm
 				}
 
 				case MegaCopyStatusFlags.Pasting:
+				case MegaCopyStatusFlags.PastingView:
 				{
 					if (!MouseValidView(e.X, e.Y))
 					{
@@ -359,6 +364,7 @@ public partial class FontMakerForm
 					break;
 
 				case MegaCopyStatusFlags.Pasting:
+				case MegaCopyStatusFlags.PastingView:
 				{
 					if (!MouseValidView(e.X, e.Y))
 					{
@@ -1366,13 +1372,6 @@ public partial class FontMakerForm
 			, megaCopyStatus == MegaCopyStatusFlags.Selected && pictureBoxViewEditorRubberBand.Visible
 			, CopyPasteRange
 		);
-	}
-
-	public void ActionPageSwitch(int pageNr)
-	{
-		if (InPagesSetup) return;
-
-		comboBoxPages.SelectedIndex = pageNr;
 	}
 
 	/// <summary>

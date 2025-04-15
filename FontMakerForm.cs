@@ -40,7 +40,12 @@ namespace FontMaker
 
 		public enum MegaCopyStatusFlags
 		{
-			None, Selecting, Selected, Pasting
+			None,
+			Selecting, 
+			Selected, 
+			Pasting,		// Can paste into view and font
+			PastingView,	// Can only paste into the view
+			PastingFont,	// Can only paste into the font
 		}
 
 		public enum DirectionFlags

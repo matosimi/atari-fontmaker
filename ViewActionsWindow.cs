@@ -43,6 +43,8 @@ namespace FontMaker
 
 		public void RebuildPagesDropDown(List<PageData>? pages, int selectIndex)
 		{
+			InPagesSetup = true;
+
 			Pages = pages;
 			// Clear the old list
 			comboBoxPages.Items.Clear();
@@ -63,17 +65,25 @@ namespace FontMaker
 			InPagesSetup = false;
 		}
 
+		/// <summary>
+		/// 
+		/// </summary>
+		/// <param name="selectIndex"></param>
 		public void SelectPage(int selectIndex)
 		{
+			InPagesSetup = true;
+
 			comboBoxPages.SelectedIndex = selectIndex; //comboBoxPages.Items.Count - 1;
 			CurrentPageIndex = selectIndex;
+
+			InPagesSetup = false;
 		}
 
 		private void ViewActionsWindow_Pages_SelectedIndexChanged(object sender, EventArgs e)
 		{
 			if (InPagesSetup) return;
 
-			MainForm?.ActionPageSwitch(comboBoxPages.SelectedIndex);
+			MainForm?.PickPage(comboBoxPages.SelectedIndex);
 		}
 
 		private void pictureBoxX_Click(object sender, EventArgs e)

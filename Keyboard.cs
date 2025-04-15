@@ -54,6 +54,8 @@
 						break;
 
 					case MegaCopyStatusFlags.Pasting:
+					case MegaCopyStatusFlags.PastingView:
+					case MegaCopyStatusFlags.PastingFont:
 						ResetMegaCopyStatus();
 						break;
 				}

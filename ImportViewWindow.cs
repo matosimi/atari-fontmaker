@@ -6,8 +6,9 @@ public partial class ImportViewWindow : Form
 	public bool InColorMode { get; set; }
 	public int WhichColorMode { get; set; }
 
-	private byte[]? FileData { get; set; }
+	private byte[]? FileDataToImportFrom { get; set; }
 
+	// 40x26 view buffer
 	private byte[,]? ImportedViewBytes { get; set; }
 
 	private bool RememberSelection { get; set; }
@@ -21,7 +22,7 @@ public partial class ImportViewWindow : Form
 	{
 		InitializeComponent();
 		RememberSelection = true;
-		UpdateData();
+		UpdateDataFeedback();
 	}
 
 	public void LoadConfiguration(bool rememberSelection, int lineWidth, int skipX, int skipY, int width, int height)
@@ -48,6 +49,11 @@ public partial class ImportViewWindow : Form
 		return (RememberSelection, PreviousLineWidth, PreviousSkipX, PreviousSkipY, PreviousWidth, PreviousHeight);
 	}
 
+	/// <summary>
+	/// Form is loading, set the saved/initial load configuration
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
 	private void ImportViewWindow_Load(object sender, EventArgs e)
 	{
 		checkBoxRememberState.Checked = RememberSelection;
@@ -61,6 +67,11 @@ public partial class ImportViewWindow : Form
 		}
 	}
 
+	/// <summary>
+	/// Form is closing, save the configuration if needed
+	/// </summary>
+	/// <param name="sender"></param>
+	/// <param name="e"></param>
 	private void ImportViewWindow_FormClosing(object sender, FormClosingEventArgs e)
 	{
 		RememberSelection = checkBoxRememberState.Checked;
@@ -79,44 +90,47 @@ public partial class ImportViewWindow : Form
 		Close();
 	}
 
+	/// <summary>
+	/// Load data to be imported.
+	/// Loaded data will end up in 'FileDataToImportFrom'
+	/// </summary>
 	private void Button_LoadData_Click(object sender, EventArgs e)
 	{
-		FileData = null;
-
 		dialogOpenFile.FileName = string.Empty;
 		dialogOpenFile.Filter = $@"Any binary data|*.*";
 		var ok = dialogOpenFile.ShowDialog();
 
 		if (ok == DialogResult.OK)
 		{
+			FileDataToImportFrom = null;
 			try
 			{
-				FileData = File.ReadAllBytes(dialogOpenFile.FileName);
-				if (FileData == null || FileData.Length == 0)
+				FileDataToImportFrom = File.ReadAllBytes(dialogOpenFile.FileName);
+				if (FileDataToImportFrom == null || FileDataToImportFrom.Length == 0)
 				{
 					MessageBox.Show($@"Failed to load '{dialogOpenFile.FileName}'. File is empty.");
-					FileData = null;
+					FileDataToImportFrom = null;
 				}
-				UpdateData();
+				UpdateDataFeedback();
 			}
 			catch (Exception ex)
 			{
 				MessageBox.Show($@"Failed to load '{dialogOpenFile.FileName}'. Reason:{ex.Message}");
-				FileData = null;
-				UpdateData();
+				FileDataToImportFrom = null;
+				UpdateDataFeedback();
 			}
 		}
 	}
 
-	private void UpdateData()
+	private void UpdateDataFeedback()
 	{
-		labelFileSize.Text = FileData == null ? "(Load some data)" : $"{FileData.Length} bytes";
+		labelFileSize.Text = FileDataToImportFrom == null ? "(Load some data)" : $"{FileDataToImportFrom.Length} bytes";
 
-		numericSkipX.Enabled = FileData != null;
-		numericSkipY.Enabled = FileData != null;
-		numericWidth.Enabled = FileData != null;
-		numericHeight.Enabled = FileData != null;
-		numericLineWidth.Enabled = FileData != null;
+		numericSkipX.Enabled = FileDataToImportFrom != null;
+		numericSkipY.Enabled = FileDataToImportFrom != null;
+		numericWidth.Enabled = FileDataToImportFrom != null;
+		numericHeight.Enabled = FileDataToImportFrom != null;
+		numericLineWidth.Enabled = FileDataToImportFrom != null;
 
 		UpdateConstraints(null, EventArgs.Empty);
 	}
@@ -127,13 +141,13 @@ public partial class ImportViewWindow : Form
 		numericSkipX.ForeColor = widthOk ? Color.Black : Color.Red;
 		numericWidth.ForeColor = widthOk ? Color.Black : Color.Red;
 
-		var heightOk = ((int)numericLineWidth.Value * numericSkipY.Value + (int)numericLineWidth.Value * numericHeight.Value <= (FileData?.Length ?? 0));
+		var heightOk = ((int)numericLineWidth.Value * numericSkipY.Value + (int)numericLineWidth.Value * numericHeight.Value <= (FileDataToImportFrom?.Length ?? 0));
 		numericSkipY.ForeColor = heightOk ? Color.Black : Color.Red;
 		numericHeight.ForeColor = heightOk ? Color.Black : Color.Red;
 
 		labelActionInfo.Text = $"Skip {numericSkipX.Value} byte and then take {numericWidth.Value} bytes.";
 
-		labelSomeMoreInfo.Text = FileData == null ? "..." : $"# of lines: {(FileData.Length / (int)numericLineWidth.Value)}";
+		labelSomeMoreInfo.Text = FileDataToImportFrom == null ? "..." : $"# of lines: {(FileDataToImportFrom.Length / (int)numericLineWidth.Value)}";
 
 		Button_Import.Enabled = widthOk && heightOk;
 
@@ -146,8 +160,11 @@ public partial class ImportViewWindow : Form
 
 	private void GenerateData()
 	{
+		if (FileDataToImportFrom == null)
+			return;
+
 		// Copy the data from FileData into ViewBytes
-		ImportedViewBytes = new byte[AtariView.VIEW_WIDTH, AtariView.VIEW_HEIGHT];
+		ImportedViewBytes = new byte[AtariView.Width, AtariView.Height];
 
 		var lineWidth = (int)numericLineWidth.Value;
 		var skipX = (int)numericSkipX.Value;
@@ -160,13 +177,16 @@ public partial class ImportViewWindow : Form
 		{
 			for (var x = 0; x < width; ++x)
 			{
-				ImportedViewBytes[x, y] = FileData[srcIndex + skipX + x];
+				ImportedViewBytes[x, y] = FileDataToImportFrom[srcIndex + skipX + x];
 			}
 
 			srcIndex += lineWidth;
 		}
 	}
 
+	/// <summary>
+	/// Render the imported data into the 40x26 view
+	/// </summary>
 	private void RenderTestData()
 	{
 		if (ImportedViewBytes == null)
@@ -188,9 +208,9 @@ public partial class ImportViewWindow : Form
 				Height = 1,
 			};
 
-			for (var y = 0; y < AtariView.VIEW_HEIGHT; y++)
+			for (var y = 0; y < AtariView.VIEW_HEIGHT_LIMIT; y++)
 			{
-				for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
+				for (var x = 0; x < AtariView.VIEW_WIDTH_LIMIT; x++)
 				{
 					var rx = ImportedViewBytes[x, y] % 32;
 					var ry = ImportedViewBytes[x, y] / 32;
@@ -226,10 +246,9 @@ public partial class ImportViewWindow : Form
 	{
 		if (ImportedViewBytes != null)
 		{
-
-			for (var y = 0; y < AtariView.VIEW_HEIGHT; ++y)
+			for (var y = 0; y < AtariView.Height; ++y)
 			{
-				for (var x = 0; x < AtariView.VIEW_WIDTH; ++x)
+				for (var x = 0; x < AtariView.Width; ++x)
 				{
 					AtariView.ViewBytes[x, y] = ImportedViewBytes[x, y];
 				}

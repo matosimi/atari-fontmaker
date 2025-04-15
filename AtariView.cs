@@ -2,6 +2,9 @@
 {
 	public static class AtariView
 	{
+		public const int VIEW_WIDTH_LIMIT = 40;
+		public const int VIEW_HEIGHT_LIMIT = 26;
+
 		public const int VIEW_WIDTH = 40;
 		public const int VIEW_HEIGHT = 26;
 		public const int VIEW_HEIGHT_TALL = 13;
@@ -20,6 +23,9 @@
 		/// Which fontNr is used on which line of the view
 		/// </summary>
 		public static byte[] UseFontOnLine = new byte[VIEW_HEIGHT];
+
+		public static int Width { get; set; } = VIEW_WIDTH;
+		public static int Height { get; set; } = VIEW_HEIGHT;
 
 		#endregion
 

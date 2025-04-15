@@ -203,6 +203,16 @@ Width and height are integers, chars and data are hexadecimals.
 
 You can easily store some important clipboard data in text editor for later use.
 
+The following fields are available in the clipboard JSON object.
+Name | Type | Required | Comment
+-|-|-|-|
+Width|string|Yes| Width of the data (in characters). Has to be > 0.
+Height|string|Yes| Height of the data (in characters). Has to be > 0.
+Chars|string|Optional| The character byte values converted into HEX. Each character ranged from 00-FF. The `Chars` field needs be be `Width` x `Height` x 2 chars long.
+Data|string|Optional| The font bytes of each character in the Width x Height area. Each byte is converted into HEX. The `Data` field needs to be `Width` x `Height` x 2 x 8 chars long.
+FontNr|string|Optional| String where each element represents the font that the character data comes from. For each line of the data there can be one element between 1 and 4. If the FontNr is missing then it is assumed that font #1 is used. The string should the `Height` elements long.
+Nulls|string|Optional| String where each element represents if the character at a location is present of should be skipped. "0" means the character will be pasted, "1" means the character will be skipped. The string should be `Width` x `Height` elements long. Missing data is replaced with a "0", means the character will be pasted.
+
 ## fnt format ##
 
 Main output of Atari Font Maker is Atari font file *.fnt. It is a raw binary file, 1024 bytes long without any header. It can be inserted to your project using MADS pseudoinstruction ins, and in order to display it correctly it has to be aligned with any fourth memory page, code example:
@@ -327,6 +337,11 @@ ALT + Mouse Wheel - Select the next/previous tile for drawing/pasting. This sele
 
 ## Changes/History
 
+V1.6.16.3
+Improved the clipboard handling. If the clipboard data is damaged or incorrect then Atari Font Maker will try to fix as much of the data as it can.
+If for example the clipboard only contains characters, and no font data, then you will not be able to paste into the font window. If on the other hand only font data is present then you can only paste into the font window and not the view window.
+If data fields are too short then it should not cause problems, since the values are replaced with sane defaults. Missing characters are shown as ? in the preview window.
+
 V1.6.16.2
 - Added Undo/Redo buffer to the tile set editor.
 	Press the relevant buttons or CTRL+Z/CTRL+Y to action the undo/redo.
@@ -336,7 +351,7 @@ V1.6.16.2
   When checked and pasting a tile/area in the view editor then the state will not be reset.
   This means that you can select tile/area and use it like a stamp to paste it multiple times. 
   The same can we achieved by holding down ALT when pasting; the tile will stay selected.
-  Pressing ESC will cancel the paste process and return to the selection mode.
+  Pressing ESC (or right right double click) will cancel the paste process and return to the selection mode.
 -The number of tiles has been increased to 256.
 
 V1.6.16.1

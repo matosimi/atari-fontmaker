@@ -794,30 +794,34 @@ public partial class TileSetEditorWindow : Form
 		if (TileSet.CurrentTile == null)
 			return;
 
-		int width;
-		int height;
 		string? characterBytes;
-		string? fontNr;
+		string fontNr;
 		string? nulls;
+
+		ClipboardJson? jsonObj;
 
 		try
 		{
-			var jsonText = MainForm.SafeGetClipboard();
-			var jsonObj = jsonText.FromJson<ClipboardJson?>();
-			if (jsonObj == null)
-				return;
-			int.TryParse(jsonObj.Width, out width);
-			int.TryParse(jsonObj.Height, out height);
-
-			characterBytes = jsonObj.Chars;
-			fontNr = jsonObj.FontNr;
-			nulls = jsonObj.Nulls!;
-
-			if (string.IsNullOrEmpty(characterBytes) || characterBytes.Length == 0)
+			jsonObj = MainForm.SafeGetClipboard().FromJson<ClipboardJson?>();
+			if (jsonObj == null || !jsonObj.VerifyWidthHeight())
 			{
 				MessageBox.Show(@"Clipboard data parsing error");
 				return;
 			}
+			
+			if (string.IsNullOrEmpty(jsonObj.Chars) || jsonObj.Chars.Length == 0)
+			{
+				MessageBox.Show(@"Clipboard data parsing error");
+				return;
+			}
+			jsonObj.FixCharacters();
+			characterBytes = jsonObj.Chars;
+
+			jsonObj.FixFontNr();
+			fontNr = jsonObj.FontNr!;
+
+			jsonObj.FixNulls();
+			nulls = jsonObj.Nulls!;
 		}
 		catch (Exception)
 		{
@@ -826,13 +830,13 @@ public partial class TileSetEditorWindow : Form
 		}
 
 		var charsBytes = Convert.FromHexString(characterBytes);
-		for (var y = 0; y < height && y < TileData.TILE_HEIGHT; y++)
+		for (var y = 0; y < jsonObj.ParsedHeight && y < TileData.TILE_HEIGHT; y++)
 		{
-			for (var x = 0; x < width && x < TileData.TILE_WIDTH; x++)
+			for (var x = 0; x < jsonObj.ParsedWidth && x < TileData.TILE_WIDTH; x++)
 			{
-				if (nulls[y * width + x] == '1')
+				if (nulls[y * jsonObj.ParsedWidth + x] == '1')
 					continue;
-				TileSet.CurrentTile.View[x, y] = charsBytes[y * width + x];
+				TileSet.CurrentTile.View[x, y] = charsBytes[y * jsonObj.ParsedWidth + x];
 			}
 
 			// Set the fontNr
@@ -874,26 +878,33 @@ public partial class TileSetEditorWindow : Form
 
 		if (ok == DialogResult.OK)
 		{
-			var jsonText = File.ReadAllText(dialogOpenFile.FileName, Encoding.UTF8);
-			var jsonObj = jsonText.FromJson<AtrTileSetJson>();
-
-			if (jsonObj.Version != AtrTileSetJson.MY_VERSION)
+			try
 			{
-				MessageBox.Show($@"Failed to load tile-set from '{dialogOpenFile.FileName}'.");
-				return;
-			}
+				var jsonText = File.ReadAllText(dialogOpenFile.FileName, Encoding.UTF8);
+				var jsonObj = jsonText.FromJson<AtrTileSetJson>();
 
-			TileSet.Setup();
-			TileSetOffset = 0;
-			if (jsonObj.Tiles?.Count > 0)
-			{
-				foreach (var tileData in jsonObj.Tiles)
+				if (jsonObj.Version != AtrTileSetJson.MY_VERSION)
 				{
-					TileSet.Load(tileData);
+					MessageBox.Show($@"Failed to load tile-set from '{dialogOpenFile.FileName}'.");
+					return;
 				}
-			}
 
-			Redraw();
+				TileSet.Setup();
+				TileSetOffset = 0;
+				if (jsonObj.Tiles?.Count > 0)
+				{
+					foreach (var tileData in jsonObj.Tiles)
+					{
+						TileSet.Load(tileData);
+					}
+				}
+
+				Redraw();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($@"Failed to load tile-set from '{dialogOpenFile.FileName}'.\n{ex.Message}");
+			}
 		}
 	}
 
@@ -936,19 +947,26 @@ public partial class TileSetEditorWindow : Form
 
 		if (ok == DialogResult.OK)
 		{
-			var jsonText = File.ReadAllText(dialogOpenFile.FileName, Encoding.UTF8);
-			var jsonObj = jsonText.FromJson<AtrTileJson>();
-
-			if (jsonObj.Version != AtrTileJson.MY_VERSION)
+			try
 			{
-				MessageBox.Show($@"Failed to load tile from '{dialogOpenFile.FileName}'.");
-				return;
-			}
+				var jsonText = File.ReadAllText(dialogOpenFile.FileName, Encoding.UTF8);
+				var jsonObj = jsonText.FromJson<AtrTileJson>();
 
-			TileSet.CurrentTile.Load(jsonObj.Tile);
-			DrawCurrentTile();
-			UpdateTileSetWindow();
-			UpdateTileUndoRedoButton();
+				if (jsonObj.Version != AtrTileJson.MY_VERSION)
+				{
+					MessageBox.Show($@"Failed to load tile from '{dialogOpenFile.FileName}'.");
+					return;
+				}
+
+				TileSet.CurrentTile.Load(jsonObj.Tile);
+				DrawCurrentTile();
+				UpdateTileSetWindow();
+				UpdateTileUndoRedoButton();
+			}
+			catch (Exception ex)
+			{
+				MessageBox.Show($@"Failed to load tile from '{dialogOpenFile.FileName}'.\n{ex.Message}");
+			}
 		}
 	}
 
