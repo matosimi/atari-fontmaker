@@ -13,7 +13,7 @@
 			{
 				if (CharacterEdited())
 				{
-					UndoBuffer.Add2Undo(true);
+					AtariFontUndoBuffer.Add2Undo(true);
 				}
 			}
 
@@ -28,7 +28,7 @@
 			{
 				if (CharacterEdited())
 				{
-					UndoBuffer.Add2Undo(true);
+					AtariFontUndoBuffer.Add2Undo(true);
 				}
 			}
 

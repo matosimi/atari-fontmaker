@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualBasic;
+using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
@@ -11,68 +12,7 @@ internal class AtariViewEditor
 {
 }
 
-/// <summary>
-/// The data structure of the .atrview file
-/// </summary>
-public class AtrViewInfoJson
-{
-	public string? Version { get; set; }
 
-	/// <summary>
-	/// Mode 4/5 indicator
-	/// 0 = mode 2 B & W
-	/// 1 = mode 4 Color
-	/// 2 = mode 5 Color
-	/// 3 = mode 10 9 colors
-	/// </summary>
-	public string ColoredGfx { get; set; } = string.Empty;
-
-	/// <summary>
-	/// Characters in the view
-	/// </summary>
-	public string Chars { get; set; } = string.Empty;
-
-	public int Width { get; set; } = 40;
-	public int Height { get; set; } = 26;
-
-	/// <summary>
-	/// Use which font on which of the 26 lines of the view "1234"
-	/// </summary>
-	public string Lines { get; set; } = string.Empty;
-
-	/// <summary>
-	/// Hex encoded array of the 6 selected colors
-	/// </summary>
-	public string Colors { get; set; } = string.Empty;
-
-	public string Fontname1 { get; set; } = string.Empty;
-	public string Fontname2 { get; set; } = string.Empty;
-	public string? Fontname3 { get; set; }
-	public string? Fontname4 { get; set; }
-
-	/// <summary>
-	/// Hex encoded 1024 bytes per font
-	/// </summary>
-	public string Data { get; set; } = string.Empty;
-
-	public string FortyBytes { get; set; } = string.Empty;
-
-	/// <summary>
-	/// For each page we have some data:
-	/// - name
-	/// - characters (40x26)
-	/// - selected font
-	/// </summary>
-	public List<SavedPageData>? Pages { get; set; }
-
-	/// <summary>
-	/// For each tile we have:
-	/// - index where to store it
-	/// - characters (5x5)
-	/// - selected font
-	/// </summary>
-	public List<SavedTileData>? Tiles { get; set; }
-}
 
 
 // All functions that interact with the view can be found here
@@ -625,8 +565,6 @@ public partial class FontMakerForm
 			if (version >= 1911)
 			{
 				// Take out the values from the parsed JSON container
-				var characterBytes = jsonObj.Chars;
-				var lineTypes = jsonObj.Lines;
 				var colors = jsonObj.Colors;
 				var fontBytes = jsonObj.Data;
 
@@ -647,23 +585,18 @@ public partial class FontMakerForm
 					FortyBytes = jsonObj.FortyBytes;
 				}
 
-				AtariView.UseFontOnLine = Convert.FromHexString(lineTypes);
-				for (var i = 0; i < AtariView.UseFontOnLine.Length; i++)
+				// Handle the older format where we have no width/height information for the view
+				if (jsonObj.Width == 0)
 				{
-					if (AtariView.UseFontOnLine[i] == 0)
-						++AtariView.UseFontOnLine[i];
+					jsonObj.Width = 40;
+				}
+				if (jsonObj.Height == 0)
+				{
+					jsonObj.Height = 26;
 				}
 
-				var bytes = Convert.FromHexString(characterBytes);
-				var idx = 0;
-				for (var y = 0; y < AtariView.VIEW_HEIGHT; ++y)
-				{
-					for (var x = 0; x < viewWidth; ++x)
-					{
-						AtariView.ViewBytes[x, y] = bytes[idx];
-						++idx;
-					}
-				}
+				AtariView.Resize(jsonObj.Width, jsonObj.Height);
+				AtariView.Load(jsonObj.Lines, jsonObj.Chars, viewWidth);
 
 				// Load the AtariPalette selection
 				InColorSetSetup = true;
@@ -672,7 +605,7 @@ public partial class FontMakerForm
 				BuildBrushCache();
 				InColorSetSetup = false;
 
-				if ((forceLoadFont) || (MessageBox.Show(@"Would you like to load fonts embedded in this view file?", @"Load embedded fonts", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
+				if (forceLoadFont || (MessageBox.Show(@"Would you like to load fonts embedded in this view file?", @"Load embedded fonts", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes))
 				{
 					Font1Filename = filenames[0];
 					Font2Filename = filenames[1];
@@ -687,7 +620,7 @@ public partial class FontMakerForm
 					AtariFont.FontBytes = Convert.FromHexString(fontBytes);
 
 					UpdateFormCaption();
-					UndoBuffer.Add2UndoFullDifferenceScan(); //full font scan
+					AtariFontUndoBuffer.Add2UndoFullDifferenceScan(); // Full font scan
 					UpdateUndoButtons(false);
 				}
 
@@ -705,22 +638,7 @@ public partial class FontMakerForm
 					Pages = [];
 					for (var pageIndex = 0; pageIndex < jsonObj.Pages.Count; ++pageIndex)
 					{
-						var pageSrc = jsonObj.Pages[pageIndex];
-
-						bytes = Convert.FromHexString(pageSrc.View);
-						idx = 0;
-						var viewData = new byte[AtariView.VIEW_WIDTH, AtariView.VIEW_HEIGHT];
-						for (var y = 0; y < AtariView.VIEW_HEIGHT; ++y)
-						{
-							for (var x = 0; x < viewWidth; ++x)
-							{
-								viewData[x, y] = bytes[idx];
-								++idx;
-							}
-						}
-
-						var page = new PageData(pageSrc.Nr, pageSrc.Name, viewData, Convert.FromHexString(pageSrc.SelectedFont), pageIndex);
-						Pages.Add(page);
+						Pages.Add(new PageData(jsonObj.Pages[pageIndex], pageIndex, viewWidth));
 					}
 
 					SwopPageAction(0);
@@ -783,10 +701,13 @@ public partial class FontMakerForm
 		// Mode 10 = 3
 		jo.ColoredGfx = WhatColorModeToSave().ToString();
 
+		jo.Width = AtariView.Width;
+		jo.Height = AtariView.Height;
+
 		// Characters in the current view
-		for (var i = 0; i < AtariView.VIEW_HEIGHT; i++)
+		for (var i = 0; i < AtariView.Height; i++)
 		{
-			for (var j = 0; j < AtariView.VIEW_WIDTH; j++)
+			for (var j = 0; j < AtariView.Width; j++)
 			{
 				characterBytes = characterBytes + $"{AtariView.ViewBytes[j, i]:X2}";
 			}
@@ -815,23 +736,7 @@ public partial class FontMakerForm
 		jo.Pages = [];
 		foreach (var srcPage in Pages)
 		{
-			var page = new SavedPageData()
-			{
-				Nr = srcPage.Nr,
-				Name = srcPage.Name,
-				SelectedFont = Convert.ToHexString(srcPage.SelectedFont),
-			};
-			var pageView = string.Empty;
-			for (var i = 0; i < AtariView.VIEW_HEIGHT; i++)
-			{
-				for (var j = 0; j < AtariView.VIEW_WIDTH; j++)
-				{
-					pageView = pageView + $"{srcPage.View[j, i]:X2}";
-				}
-			}
-
-			page.View = pageView;
-			jo.Pages.Add(page);
+			jo.Pages.Add(new SavedPageData(srcPage));
 		}
 
 		// Save the TileSet information

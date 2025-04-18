@@ -31,9 +31,43 @@
 
 		public static void Setup()
 		{
-			for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
+			for (var i = 0; i < UseFontOnLine.Length; i++)
 			{
-				UseFontOnLine[a] = 1;
+				UseFontOnLine[i] = 1;
+			}
+		}
+
+		public static void Resize(int width, int height)
+		{
+			Width = width;
+			Height = height;
+			ViewBytes = new byte[Width, Height];
+			UseFontOnLine = new byte[Height];
+
+			Setup();
+		}
+
+		public static void Load(string lineTypes, string characterBytes, int viewWidth)
+		{
+			var useFontOnLine = Convert.FromHexString(lineTypes);
+			for (var i = 0; i < useFontOnLine.Length; i++)
+			{
+				UseFontOnLine[i] = useFontOnLine[i];
+				// If OLD format issues
+				// Font numbers 1-4
+				if (UseFontOnLine[i] == 0)
+					++UseFontOnLine[i];
+			}
+
+			var bytes = Convert.FromHexString(characterBytes);
+			var idx = 0;
+			for (var y = 0; y < Height; ++y)
+			{
+				for (var x = 0; x < viewWidth; ++x)
+				{
+					ViewBytes[x, y] = bytes[idx];
+					++idx;
+				}
 			}
 		}
 	}

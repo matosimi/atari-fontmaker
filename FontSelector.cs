@@ -62,7 +62,7 @@ namespace FontMaker
 		{
 			if (CharacterEdited())
 			{
-				UndoBuffer.Add2Undo(true);
+				AtariFontUndoBuffer.Add2Undo(true);
 			}
 
 			SelectedCharacterIndex = SelectedCharacterIndex % 512;
@@ -148,7 +148,7 @@ namespace FontMaker
 			{
 				if (CharacterEdited())
 				{
-					UndoBuffer.Add2Undo(true);
+					AtariFontUndoBuffer.Add2Undo(true);
 				}
 			}
 
@@ -208,7 +208,7 @@ namespace FontMaker
 							if (e.Button == MouseButtons.Left)
 							{
 								CopyPasteTargetLocation = new Point(rx, ry);
-								UndoBuffer.Add2UndoFullDifferenceScan();
+								AtariFontUndoBuffer.Add2UndoFullDifferenceScan();
 								UpdateUndoButtons(false);
 								ExecutePasteFromClipboard(false);
 								ResetMegaCopyStatus();

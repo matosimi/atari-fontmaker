@@ -186,7 +186,7 @@ namespace FontMaker
 			// Position fix
 			panelColorSwitcherMode10.Location = panelColorSwitcher.Location;
 
-			UndoBuffer.Setup();
+			AtariFontUndoBuffer.Setup();
 			AtariView.Setup();
 			TileSet.Setup();
 			LoadPalette();
@@ -316,7 +316,7 @@ namespace FontMaker
 			RedrawRecolorMode10Source();
 			RedrawRecolorMode10Target();
 
-			UndoBuffer.Add2UndoInitial(); // initial undo buffer entry
+			AtariFontUndoBuffer.Add2UndoInitial(); // initial undo buffer entry
 			UpdateUndoButtons(false);
 
 			MakeSomeColoredBlocks();
@@ -469,7 +469,7 @@ namespace FontMaker
 				// Ctrl + Z = Undo font change
 				if (e.Shift == false && e.KeyCode == Keys.Z)
 				{
-					var (_, undoEnabled) = UndoBuffer.GetRedoUndoButtonState(CharacterEdited());
+					var (_, undoEnabled) = AtariFontUndoBuffer.GetRedoUndoButtonState(CharacterEdited());
 					if (undoEnabled)
 						Undo_Click(0, EventArgs.Empty);
 					return;
@@ -477,7 +477,7 @@ namespace FontMaker
 				// Ctrl + Y = Redo font change
 				if (e.Shift == false && e.KeyCode == Keys.Y)
 				{
-					var (redoEnabled, _) = UndoBuffer.GetRedoUndoButtonState(CharacterEdited());
+					var (redoEnabled, _) = AtariFontUndoBuffer.GetRedoUndoButtonState(CharacterEdited());
 					if (redoEnabled)
 						Redo_Click(0, EventArgs.Empty);
 					return;
@@ -1382,7 +1382,7 @@ namespace FontMaker
 			RedrawFonts();
 			UpdateCharacterViews();
 			RedrawView();
-			UndoBuffer.Add2UndoFullDifferenceScan();
+			AtariFontUndoBuffer.Add2UndoFullDifferenceScan();
 			UpdateUndoButtons(false);
 		}
 

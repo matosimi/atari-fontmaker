@@ -22,13 +22,14 @@ namespace FontMaker
 
 		public enum FormatTypes
 		{
-			BinaryData,
+			BinaryData = 0,
 			Assembler,
 			Action,
 			AtariBasic,
 			FastBasic,
 			MADSdta,
 			CDataArray,
+			MadPascalArray
 		};
 
 		public enum SelectionStatusFlags
@@ -224,6 +225,7 @@ namespace FontMaker
 
 				case FormatTypes.Action:
 				case FormatTypes.CDataArray:
+				case FormatTypes.MadPascalArray:
 					{
 						ButtonCopyClipboard.Enabled = true;
 
@@ -328,7 +330,12 @@ namespace FontMaker
 
 			if (exportType == FormatTypes.CDataArray)
 			{
-				sb.Append("{");
+				sb.Append("{\n\t");
+			}
+
+			if (exportType == FormatTypes.MadPascalArray)
+			{
+				sb.Append($"data: array [0..{exportRegion.Width * exportRegion.Height - 1}] of byte = (\n\t");
 			}
 
 			// Find the view bytes and export them
@@ -375,7 +382,7 @@ namespace FontMaker
 				{
 					charCounter = 0;
 
-					if (exportType is FormatTypes.FastBasic or FormatTypes.CDataArray)
+					if (exportType is FormatTypes.FastBasic or FormatTypes.CDataArray or FormatTypes.MadPascalArray)
 					{
 						sb.Append(',');
 					}
@@ -402,6 +409,11 @@ namespace FontMaker
 					{
 						sb.Append("\tdta ");
 					}
+
+					if (exportType is FormatTypes.CDataArray or FormatTypes.MadPascalArray)
+					{
+						sb.Append("\t");
+					}
 				}
 
 				if (charCounter != 8 && charCounter != 0 && bytesLeft > 0)
@@ -411,7 +423,12 @@ namespace FontMaker
 						case FormatTypes.Action:
 							sb.Append(' ');
 							break;
-						case FormatTypes.Assembler or FormatTypes.AtariBasic or FormatTypes.FastBasic or FormatTypes.MADSdta or FormatTypes.CDataArray:
+						case FormatTypes.Assembler:
+						case FormatTypes.AtariBasic:
+						case FormatTypes.FastBasic:
+						case FormatTypes.MADSdta:
+						case FormatTypes.CDataArray:
+						case FormatTypes.MadPascalArray:
 							sb.Append(',');
 							break;
 					}
@@ -424,7 +441,11 @@ namespace FontMaker
 			}
 			if (exportType == FormatTypes.CDataArray)
 			{
-				sb.Append(" }");
+				sb.Append("\n}");
+			}
+			if (exportType == FormatTypes.MadPascalArray)
+			{
+				sb.Append("\n);\n");
 			}
 
 			return sb.ToString();

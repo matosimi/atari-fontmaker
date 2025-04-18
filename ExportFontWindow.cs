@@ -15,8 +15,9 @@ namespace FontMaker
 			FastBasic,
 			MADSdta,
 			CDataArray,
+			MadPascalArray,
 			BinaryData,
-			BasicListingFile, // 9
+			BasicListingFile, // 10
 		};
 
 		public ExportFontWindow()
@@ -124,6 +125,17 @@ namespace FontMaker
 						break;
 
 					case FormatTypes.CDataArray:
+					{
+						ButtonCopyClipboard.Enabled = true;
+
+						ComboBoxDataType.Text = @"Select an item";
+						ComboBoxDataType.Items.Add("Byte in decimal");
+						ComboBoxDataType.Items.Add("Byte in hexadecimal");
+						ComboBoxDataType.SelectedIndex = 0;
+						break;
+					}
+
+					case FormatTypes.MadPascalArray:
 					{
 						ButtonCopyClipboard.Enabled = true;
 
@@ -242,7 +254,7 @@ namespace FontMaker
 
 				return;
 			}
-
+			
 			// These are handled above:
 			// 0 = BMP
 			// 1 = BMP color
@@ -295,7 +307,7 @@ namespace FontMaker
 		/// <param name="fontNr"></param>
 		/// <param name="filename"></param>
 		/// <param name="asColor"></param>
-		public static void SaveFontBMP(int fontNr, string filename, bool asColor)
+		private static void SaveFontBMP(int fontNr, string filename, bool asColor)
 		{
 			int startFontIndex;
 			int endFontIndex;
@@ -369,7 +381,7 @@ namespace FontMaker
 			bmp2.Image.Save(filename, ImageFormat.Bmp);
 		}
 
-		public static void SaveRemFont(int fontIndex, string fileName)
+		private static void SaveRemFont(int fontIndex, string fileName)
 		{
 			// Load the basic starting REM font from disc
 			try
@@ -399,7 +411,7 @@ namespace FontMaker
 			}
 		}
 
-		public static void SaveBinaryData(int fontNr, string filename)
+		private static void SaveBinaryData(int fontNr, string filename)
 		{
 			var fontStartByte = 0;
 			var fontEndByte = 0;
@@ -407,7 +419,7 @@ namespace FontMaker
 			switch (fontNr)
 			{
 				default:
-					fontNr = fontNr % 4;
+					fontNr %= 4;
 					fontStartByte = fontNr * 1024;
 					fontEndByte = (fontNr + 1) * 1024;
 					break;
@@ -426,15 +438,15 @@ namespace FontMaker
 			}
 
 			var exportSize = fontEndByte - fontStartByte;
-			var viewBytes = new byte[exportSize];
+			var fontData = new byte[exportSize];
 			var runner = 0;
 			for (var index = fontStartByte; index < fontEndByte; index++)
 			{
-				viewBytes[runner++] = AtariFont.FontBytes[index];
+				fontData[runner++] = AtariFont.FontBytes[index];
 			}
 			try
 			{
-				File.WriteAllBytes(filename, viewBytes);
+				File.WriteAllBytes(filename, fontData);
 			}
 			catch (Exception ex)
 			{
@@ -461,6 +473,30 @@ namespace FontMaker
 			var line = 0;
 			var lineNumber = 10010;
 			var charCounter = 0;
+
+			var fontStartByte = 0;
+			var fontEndByte = 0;
+
+			switch (fontNumber)
+			{
+				default:
+					fontNumber = fontNumber % 4;
+					fontStartByte = fontNumber * 1024;
+					fontEndByte = (fontNumber + 1) * 1024;
+					break;
+				case 4: // 1+2
+					fontStartByte = 0;
+					fontEndByte = 2 * 1024;
+					break;
+				case 5: // 3+4
+					fontStartByte = 2 * 1024;
+					fontEndByte = 4 * 1024;
+					break;
+				case 6: // 1+2+3+4
+					fontStartByte = 0;
+					fontEndByte = 4 * 1024;
+					break;
+			}
 
 			if (exportType == FormatTypes.Assembler)
 			{
@@ -491,31 +527,12 @@ namespace FontMaker
 
 			if (exportType == FormatTypes.CDataArray)
 			{
-				sb.Append("{ ");
+				sb.Append("{\n\t");
 			}
 
-			var fontStartByte = 0;
-			var fontEndByte = 0;
-			
-			switch (fontNumber)
+			if (exportType == FormatTypes.MadPascalArray)
 			{
-				default:
-					fontNumber = fontNumber % 4;
-					fontStartByte = fontNumber * 1024;
-					fontEndByte = (fontNumber + 1) * 1024;
-					break;
-				case 4: // 1+2
-					fontStartByte = 0;
-					fontEndByte = 2* 1024;
-					break;
-				case 5: // 3+4
-					fontStartByte = 2 * 1024;
-					fontEndByte = 4 * 1024;
-					break;
-				case 6: // 1+2+3+4
-					fontStartByte = 0;
-					fontEndByte = 4 * 1024;
-					break;
+				sb.Append($"font: array [0..{fontEndByte - fontStartByte - 1}] of byte = (\n\t");
 			}
 
 			var lastLine = (fontEndByte - fontStartByte) / 8 - 1;
@@ -542,7 +559,7 @@ namespace FontMaker
 					charCounter = 0;
 					line++;
 
-					if (exportType is FormatTypes.FastBasic or FormatTypes.CDataArray)
+					if (exportType is FormatTypes.FastBasic or FormatTypes.CDataArray or FormatTypes.MadPascalArray)
 					{
 						sb.Append(',');
 					}
@@ -569,6 +586,11 @@ namespace FontMaker
 					{
 						sb.Append("\tdta ");
 					}
+
+					if (exportType is FormatTypes.CDataArray or FormatTypes.MadPascalArray)
+					{
+						sb.Append("\t");
+					}
 				}
 
 				if ((charCounter != 8) && (charCounter != 0))
@@ -578,7 +600,12 @@ namespace FontMaker
 						case FormatTypes.Action:
 							sb.Append(' ');
 							break;
-						case FormatTypes.Assembler or FormatTypes.AtariBasic or FormatTypes.FastBasic or FormatTypes.MADSdta or FormatTypes.CDataArray:
+						case FormatTypes.Assembler: 
+						case FormatTypes.AtariBasic:
+						case FormatTypes.FastBasic:
+						case FormatTypes.MADSdta:
+						case FormatTypes.CDataArray:
+						case FormatTypes.MadPascalArray:
 							sb.Append(',');
 							break;
 					}
@@ -592,7 +619,12 @@ namespace FontMaker
 
 			if (exportType == FormatTypes.CDataArray)
 			{
-				sb.Append(" }");
+				sb.Append("\n}");
+			}
+
+			if (exportType == FormatTypes.MadPascalArray)
+			{
+				sb.Append("\n);");
 			}
 
 			return sb.ToString();

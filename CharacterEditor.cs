@@ -714,10 +714,10 @@ namespace FontMaker
 		{
 			if (CharacterEdited())
 			{
-				UndoBuffer.Add2Undo(true); // Add 2 undo but don't change index
+				AtariFontUndoBuffer.Add2Undo(true); // Add 2 undo but don't change index
 			}
 
-			UndoBuffer.Undo(); // Copy the old fonts back
+			AtariFontUndoBuffer.Undo(); // Copy the old fonts back
 
 			UpdateUndoButtons(CharacterEdited());
 			RedrawChar();
@@ -728,7 +728,7 @@ namespace FontMaker
 
 		public bool Redo()
 		{
-			UndoBuffer.Redo();
+			AtariFontUndoBuffer.Redo();
 
 			UpdateUndoButtons(CharacterEdited());
 			RedrawChar();
@@ -740,7 +740,7 @@ namespace FontMaker
 		// updates undo/redo button state based on info if character has been edited and what the buffer index is
 		public void UpdateUndoButtons(bool edited)
 		{
-			var (redoEnabled, undoEnabled) = UndoBuffer.GetRedoUndoButtonState(edited);
+			var (redoEnabled, undoEnabled) = AtariFontUndoBuffer.GetRedoUndoButtonState(edited);
 			buttonRedo.Enabled = redoEnabled;
 			buttonUndo.Enabled = undoEnabled;
 		}
@@ -977,7 +977,7 @@ namespace FontMaker
 						}
 					}
 
-					UndoBuffer.Add2UndoFullDifferenceScan();
+					AtariFontUndoBuffer.Add2UndoFullDifferenceScan();
 					UpdateUndoButtons(false);
 				}
 			}
@@ -1302,7 +1302,7 @@ namespace FontMaker
 
 			for (var i = 0; i < 8; ++i)
 			{
-				if (AtariFont.FontBytes[ptr + i] != UndoBuffer.undoBuffer[UndoBuffer.undoBufferIndex, ptr + i])
+				if (AtariFont.FontBytes[ptr + i] != AtariFontUndoBuffer.undoBuffer[AtariFontUndoBuffer.undoBufferIndex, ptr + i])
 					return true;
 			}
 
@@ -1782,7 +1782,7 @@ namespace FontMaker
 			RedrawFonts();
 			CheckDuplicate();
 			RedrawView();
-			UndoBuffer.Add2UndoFullDifferenceScan();
+			AtariFontUndoBuffer.Add2UndoFullDifferenceScan();
 			UpdateUndoButtons(false);
 		}
 

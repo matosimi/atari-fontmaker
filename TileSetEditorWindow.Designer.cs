@@ -57,12 +57,7 @@ partial class TileSetEditorWindow
 		labelTile5 = new Label();
 		labelTile6 = new Label();
 		labelTile7 = new Label();
-		labelTile8 = new Label();
-		labelTile9 = new Label();
 		pictureBoxCurrenctChar = new PictureBox();
-		label3 = new Label();
-		label5 = new Label();
-		label6 = new Label();
 		buttonLoadCurrentTile = new Button();
 		label7 = new Label();
 		buttonSaveCurrentTile = new Button();
@@ -81,10 +76,10 @@ partial class TileSetEditorWindow
 		ShiftRight = new Button();
 		buttonShiftDown = new Button();
 		buttonShiftUp = new Button();
-		label2 = new Label();
 		buttonViewUndo = new Button();
 		label8 = new Label();
 		buttonViewRedo = new Button();
+		checkBoxShowGrid = new CheckBox();
 		((System.ComponentModel.ISupportInitialize)pictureBoxTileSets).BeginInit();
 		((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 		((System.ComponentModel.ISupportInitialize)pictureBoxEditTile).BeginInit();
@@ -95,11 +90,12 @@ partial class TileSetEditorWindow
 		// 
 		// hScrollBarTiles
 		// 
-		hScrollBarTiles.Location = new Point(0, 100);
+		hScrollBarTiles.LargeChange = 8;
+		hScrollBarTiles.Location = new Point(0, 146);
 		hScrollBarTiles.Maximum = 99;
 		hScrollBarTiles.Name = "hScrollBarTiles";
 		hScrollBarTiles.ScaleScrollBarForDpiChange = false;
-		hScrollBarTiles.Size = new Size(800, 17);
+		hScrollBarTiles.Size = new Size(1024, 17);
 		hScrollBarTiles.TabIndex = 0;
 		hScrollBarTiles.ValueChanged += hScrollBarTiles_ValueChanged;
 		// 
@@ -109,9 +105,10 @@ partial class TileSetEditorWindow
 		pictureBoxTileSets.Location = new Point(0, 0);
 		pictureBoxTileSets.Margin = new Padding(0);
 		pictureBoxTileSets.Name = "pictureBoxTileSets";
-		pictureBoxTileSets.Size = new Size(800, 80);
+		pictureBoxTileSets.Size = new Size(1024, 128);
 		pictureBoxTileSets.TabIndex = 1;
 		pictureBoxTileSets.TabStop = false;
+		pictureBoxTileSets.DoubleClick += pictureBoxTileSets_DoubleClick;
 		pictureBoxTileSets.MouseDown += pictureBoxTileSets_MouseDown;
 		pictureBoxTileSets.MouseMove += pictureBoxTileSets_MouseMove;
 		// 
@@ -125,10 +122,11 @@ partial class TileSetEditorWindow
 		// 
 		// pictureBoxFontSelector
 		// 
-		pictureBoxFontSelector.Location = new Point(0, 271);
+		pictureBoxFontSelector.BorderStyle = BorderStyle.FixedSingle;
+		pictureBoxFontSelector.Location = new Point(462, 174);
 		pictureBoxFontSelector.Margin = new Padding(0);
 		pictureBoxFontSelector.Name = "pictureBoxFontSelector";
-		pictureBoxFontSelector.Size = new Size(512, 128);
+		pictureBoxFontSelector.Size = new Size(514, 130);
 		pictureBoxFontSelector.TabIndex = 43;
 		pictureBoxFontSelector.TabStop = false;
 		pictureBoxFontSelector.MouseDown += FontSelector_MouseDown;
@@ -136,7 +134,7 @@ partial class TileSetEditorWindow
 		// buttonTilePaste
 		// 
 		buttonTilePaste.AutoSize = true;
-		buttonTilePaste.Location = new Point(217, 215);
+		buttonTilePaste.Location = new Point(254, 272);
 		buttonTilePaste.Name = "buttonTilePaste";
 		buttonTilePaste.Size = new Size(82, 23);
 		buttonTilePaste.TabIndex = 53;
@@ -147,7 +145,7 @@ partial class TileSetEditorWindow
 		// buttonTileCopy
 		// 
 		buttonTileCopy.AutoSize = true;
-		buttonTileCopy.Location = new Point(6, 215);
+		buttonTileCopy.Location = new Point(7, 272);
 		buttonTileCopy.Margin = new Padding(0);
 		buttonTileCopy.Name = "buttonTileCopy";
 		buttonTileCopy.Size = new Size(82, 23);
@@ -160,7 +158,7 @@ partial class TileSetEditorWindow
 		// 
 		labelTileNr.BackColor = Color.FromArgb(255, 128, 0);
 		labelTileNr.BorderStyle = BorderStyle.FixedSingle;
-		labelTileNr.Location = new Point(147, 236);
+		labelTileNr.Location = new Point(35, 300);
 		labelTileNr.Name = "labelTileNr";
 		labelTileNr.Size = new Size(28, 20);
 		labelTileNr.TabIndex = 51;
@@ -172,7 +170,7 @@ partial class TileSetEditorWindow
 		// 
 		buttonNextTile.ImageIndex = 1;
 		buttonNextTile.ImageList = imageListViewShift;
-		buttonNextTile.Location = new Point(177, 234);
+		buttonNextTile.Location = new Point(65, 298);
 		buttonNextTile.Name = "buttonNextTile";
 		buttonNextTile.Size = new Size(24, 24);
 		buttonNextTile.TabIndex = 50;
@@ -184,7 +182,7 @@ partial class TileSetEditorWindow
 		// 
 		buttonPrevTile.ImageIndex = 0;
 		buttonPrevTile.ImageList = imageListViewShift;
-		buttonPrevTile.Location = new Point(121, 234);
+		buttonPrevTile.Location = new Point(9, 298);
 		buttonPrevTile.Name = "buttonPrevTile";
 		buttonPrevTile.Size = new Size(24, 24);
 		buttonPrevTile.TabIndex = 49;
@@ -194,10 +192,10 @@ partial class TileSetEditorWindow
 		// 
 		// pictureBoxEditTile
 		// 
-		pictureBoxEditTile.Location = new Point(121, 151);
+		pictureBoxEditTile.Location = new Point(116, 180);
 		pictureBoxEditTile.Margin = new Padding(0);
 		pictureBoxEditTile.Name = "pictureBoxEditTile";
-		pictureBoxEditTile.Size = new Size(80, 80);
+		pictureBoxEditTile.Size = new Size(128, 128);
 		pictureBoxEditTile.TabIndex = 48;
 		pictureBoxEditTile.TabStop = false;
 		pictureBoxEditTile.MouseDown += pictureBoxEditTile_MouseDown;
@@ -206,7 +204,7 @@ partial class TileSetEditorWindow
 		// pictureBoxFontSelectorRubberBand
 		// 
 		pictureBoxFontSelectorRubberBand.BackColor = Color.Transparent;
-		pictureBoxFontSelectorRubberBand.Location = new Point(17, 288);
+		pictureBoxFontSelectorRubberBand.Location = new Point(473, 186);
 		pictureBoxFontSelectorRubberBand.Margin = new Padding(0);
 		pictureBoxFontSelectorRubberBand.Name = "pictureBoxFontSelectorRubberBand";
 		pictureBoxFontSelectorRubberBand.Size = new Size(20, 20);
@@ -216,15 +214,15 @@ partial class TileSetEditorWindow
 		// label4
 		// 
 		label4.BorderStyle = BorderStyle.FixedSingle;
-		label4.Location = new Point(0, 119);
+		label4.Location = new Point(0, 167);
 		label4.Name = "label4";
-		label4.Size = new Size(800, 2);
+		label4.Size = new Size(1024, 2);
 		label4.TabIndex = 55;
 		// 
 		// label1
 		// 
 		label1.AutoSize = true;
-		label1.Location = new Point(524, 271);
+		label1.Location = new Point(462, 314);
 		label1.Name = "label1";
 		label1.Size = new Size(44, 13);
 		label1.TabIndex = 56;
@@ -234,7 +232,7 @@ partial class TileSetEditorWindow
 		// 
 		labelFontNr.BackColor = Color.FromArgb(255, 128, 0);
 		labelFontNr.BorderStyle = BorderStyle.FixedSingle;
-		labelFontNr.Location = new Point(540, 285);
+		labelFontNr.Location = new Point(531, 310);
 		labelFontNr.Name = "labelFontNr";
 		labelFontNr.Size = new Size(28, 20);
 		labelFontNr.TabIndex = 59;
@@ -246,7 +244,7 @@ partial class TileSetEditorWindow
 		// 
 		buttonNextFontNr.ImageIndex = 1;
 		buttonNextFontNr.ImageList = imageListViewShift;
-		buttonNextFontNr.Location = new Point(570, 283);
+		buttonNextFontNr.Location = new Point(561, 308);
 		buttonNextFontNr.Name = "buttonNextFontNr";
 		buttonNextFontNr.Size = new Size(24, 24);
 		buttonNextFontNr.TabIndex = 58;
@@ -258,7 +256,7 @@ partial class TileSetEditorWindow
 		// 
 		buttonPrevFontNr.ImageIndex = 0;
 		buttonPrevFontNr.ImageList = imageListViewShift;
-		buttonPrevFontNr.Location = new Point(514, 283);
+		buttonPrevFontNr.Location = new Point(505, 308);
 		buttonPrevFontNr.Name = "buttonPrevFontNr";
 		buttonPrevFontNr.Size = new Size(24, 24);
 		buttonPrevFontNr.TabIndex = 57;
@@ -268,19 +266,20 @@ partial class TileSetEditorWindow
 		// 
 		// labelEditCharInfo
 		// 
-		labelEditCharInfo.Location = new Point(514, 310);
+		labelEditCharInfo.AutoSize = true;
+		labelEditCharInfo.Location = new Point(126, 314);
 		labelEditCharInfo.Name = "labelEditCharInfo";
-		labelEditCharInfo.Size = new Size(80, 29);
+		labelEditCharInfo.Size = new Size(109, 13);
 		labelEditCharInfo.TabIndex = 60;
-		labelEditCharInfo.Text = "Font 1 $00 #0";
+		labelEditCharInfo.Text = "Font 1 $00 #0 @ 0,0";
 		labelEditCharInfo.TextAlign = ContentAlignment.MiddleLeft;
 		// 
 		// buttonTileClear
 		// 
 		buttonTileClear.AutoSize = true;
-		buttonTileClear.Location = new Point(307, 215);
+		buttonTileClear.Location = new Point(344, 272);
 		buttonTileClear.Name = "buttonTileClear";
-		buttonTileClear.Size = new Size(74, 23);
+		buttonTileClear.Size = new Size(81, 23);
 		buttonTileClear.TabIndex = 61;
 		buttonTileClear.Text = "Clear";
 		buttonTileClear.UseVisualStyleBackColor = true;
@@ -288,9 +287,9 @@ partial class TileSetEditorWindow
 		// 
 		// pictureBoxCharacterSetSelector
 		// 
-		pictureBoxCharacterSetSelector.Location = new Point(105, 151);
+		pictureBoxCharacterSetSelector.Location = new Point(100, 180);
 		pictureBoxCharacterSetSelector.Name = "pictureBoxCharacterSetSelector";
-		pictureBoxCharacterSetSelector.Size = new Size(15, 80);
+		pictureBoxCharacterSetSelector.Size = new Size(15, 128);
 		pictureBoxCharacterSetSelector.TabIndex = 64;
 		pictureBoxCharacterSetSelector.TabStop = false;
 		pictureBoxCharacterSetSelector.MouseDown += pictureBoxCharacterSetSelector_MouseDown;
@@ -298,9 +297,9 @@ partial class TileSetEditorWindow
 		// labelTile0
 		// 
 		labelTile0.BorderStyle = BorderStyle.Fixed3D;
-		labelTile0.Location = new Point(0, 80);
+		labelTile0.Location = new Point(0, 128);
 		labelTile0.Name = "labelTile0";
-		labelTile0.Size = new Size(80, 18);
+		labelTile0.Size = new Size(128, 18);
 		labelTile0.TabIndex = 65;
 		labelTile0.Text = "Tile: 1";
 		labelTile0.TextAlign = ContentAlignment.MiddleCenter;
@@ -308,9 +307,9 @@ partial class TileSetEditorWindow
 		// labelTile1
 		// 
 		labelTile1.BorderStyle = BorderStyle.Fixed3D;
-		labelTile1.Location = new Point(80, 80);
+		labelTile1.Location = new Point(128, 128);
 		labelTile1.Name = "labelTile1";
-		labelTile1.Size = new Size(80, 18);
+		labelTile1.Size = new Size(128, 18);
 		labelTile1.TabIndex = 66;
 		labelTile1.Text = "Tile: 2";
 		labelTile1.TextAlign = ContentAlignment.MiddleCenter;
@@ -318,9 +317,9 @@ partial class TileSetEditorWindow
 		// labelTile2
 		// 
 		labelTile2.BorderStyle = BorderStyle.Fixed3D;
-		labelTile2.Location = new Point(160, 80);
+		labelTile2.Location = new Point(256, 128);
 		labelTile2.Name = "labelTile2";
-		labelTile2.Size = new Size(80, 18);
+		labelTile2.Size = new Size(128, 18);
 		labelTile2.TabIndex = 67;
 		labelTile2.Text = "Tile: 3";
 		labelTile2.TextAlign = ContentAlignment.MiddleCenter;
@@ -328,9 +327,9 @@ partial class TileSetEditorWindow
 		// labelTile3
 		// 
 		labelTile3.BorderStyle = BorderStyle.Fixed3D;
-		labelTile3.Location = new Point(240, 80);
+		labelTile3.Location = new Point(384, 128);
 		labelTile3.Name = "labelTile3";
-		labelTile3.Size = new Size(80, 18);
+		labelTile3.Size = new Size(128, 18);
 		labelTile3.TabIndex = 68;
 		labelTile3.Text = "Tile: 4";
 		labelTile3.TextAlign = ContentAlignment.MiddleCenter;
@@ -338,9 +337,9 @@ partial class TileSetEditorWindow
 		// labelTile4
 		// 
 		labelTile4.BorderStyle = BorderStyle.Fixed3D;
-		labelTile4.Location = new Point(320, 80);
+		labelTile4.Location = new Point(512, 128);
 		labelTile4.Name = "labelTile4";
-		labelTile4.Size = new Size(80, 18);
+		labelTile4.Size = new Size(128, 18);
 		labelTile4.TabIndex = 69;
 		labelTile4.Text = "Tile: 5";
 		labelTile4.TextAlign = ContentAlignment.MiddleCenter;
@@ -348,9 +347,9 @@ partial class TileSetEditorWindow
 		// labelTile5
 		// 
 		labelTile5.BorderStyle = BorderStyle.Fixed3D;
-		labelTile5.Location = new Point(400, 80);
+		labelTile5.Location = new Point(640, 128);
 		labelTile5.Name = "labelTile5";
-		labelTile5.Size = new Size(80, 18);
+		labelTile5.Size = new Size(128, 18);
 		labelTile5.TabIndex = 70;
 		labelTile5.Text = "Tile: 6";
 		labelTile5.TextAlign = ContentAlignment.MiddleCenter;
@@ -358,9 +357,9 @@ partial class TileSetEditorWindow
 		// labelTile6
 		// 
 		labelTile6.BorderStyle = BorderStyle.Fixed3D;
-		labelTile6.Location = new Point(480, 80);
+		labelTile6.Location = new Point(768, 128);
 		labelTile6.Name = "labelTile6";
-		labelTile6.Size = new Size(80, 18);
+		labelTile6.Size = new Size(128, 18);
 		labelTile6.TabIndex = 71;
 		labelTile6.Text = "Tile: 7";
 		labelTile6.TextAlign = ContentAlignment.MiddleCenter;
@@ -368,75 +367,29 @@ partial class TileSetEditorWindow
 		// labelTile7
 		// 
 		labelTile7.BorderStyle = BorderStyle.Fixed3D;
-		labelTile7.Location = new Point(560, 80);
+		labelTile7.Location = new Point(896, 128);
 		labelTile7.Name = "labelTile7";
-		labelTile7.Size = new Size(80, 18);
+		labelTile7.Size = new Size(128, 18);
 		labelTile7.TabIndex = 72;
 		labelTile7.Text = "Tile: 8";
 		labelTile7.TextAlign = ContentAlignment.MiddleCenter;
 		// 
-		// labelTile8
-		// 
-		labelTile8.BorderStyle = BorderStyle.Fixed3D;
-		labelTile8.Location = new Point(640, 80);
-		labelTile8.Name = "labelTile8";
-		labelTile8.Size = new Size(80, 18);
-		labelTile8.TabIndex = 73;
-		labelTile8.Text = "Tile: 9";
-		labelTile8.TextAlign = ContentAlignment.MiddleCenter;
-		// 
-		// labelTile9
-		// 
-		labelTile9.BorderStyle = BorderStyle.Fixed3D;
-		labelTile9.Location = new Point(720, 80);
-		labelTile9.Name = "labelTile9";
-		labelTile9.Size = new Size(80, 18);
-		labelTile9.TabIndex = 74;
-		labelTile9.Text = "Tile: 10";
-		labelTile9.TextAlign = ContentAlignment.MiddleCenter;
-		// 
 		// pictureBoxCurrenctChar
 		// 
 		pictureBoxCurrenctChar.BorderStyle = BorderStyle.Fixed3D;
-		pictureBoxCurrenctChar.Location = new Point(181, 126);
+		pictureBoxCurrenctChar.Location = new Point(100, 312);
 		pictureBoxCurrenctChar.Name = "pictureBoxCurrenctChar";
 		pictureBoxCurrenctChar.Size = new Size(20, 20);
 		pictureBoxCurrenctChar.TabIndex = 75;
 		pictureBoxCurrenctChar.TabStop = false;
 		// 
-		// label3
-		// 
-		label3.BorderStyle = BorderStyle.FixedSingle;
-		label3.Location = new Point(0, 264);
-		label3.Name = "label3";
-		label3.Size = new Size(800, 2);
-		label3.TabIndex = 77;
-		// 
-		// label5
-		// 
-		label5.AutoSize = true;
-		label5.Location = new Point(97, 134);
-		label5.Name = "label5";
-		label5.Size = new Size(31, 13);
-		label5.TabIndex = 78;
-		label5.Text = "Font";
-		// 
-		// label6
-		// 
-		label6.AutoSize = true;
-		label6.Location = new Point(148, 134);
-		label6.Name = "label6";
-		label6.Size = new Size(24, 13);
-		label6.TabIndex = 79;
-		label6.Text = "Tile";
-		// 
 		// buttonLoadCurrentTile
 		// 
 		buttonLoadCurrentTile.AutoSize = true;
-		buttonLoadCurrentTile.Location = new Point(307, 169);
+		buttonLoadCurrentTile.Location = new Point(344, 226);
 		buttonLoadCurrentTile.Margin = new Padding(0);
 		buttonLoadCurrentTile.Name = "buttonLoadCurrentTile";
-		buttonLoadCurrentTile.Size = new Size(74, 23);
+		buttonLoadCurrentTile.Size = new Size(81, 23);
 		buttonLoadCurrentTile.TabIndex = 80;
 		buttonLoadCurrentTile.Text = "Load Tile";
 		buttonLoadCurrentTile.UseVisualStyleBackColor = true;
@@ -445,18 +398,18 @@ partial class TileSetEditorWindow
 		// label7
 		// 
 		label7.BorderStyle = BorderStyle.FixedSingle;
-		label7.Location = new Point(387, 130);
+		label7.Location = new Point(439, 172);
 		label7.Name = "label7";
-		label7.Size = new Size(2, 130);
+		label7.Size = new Size(2, 193);
 		label7.TabIndex = 81;
 		// 
 		// buttonSaveCurrentTile
 		// 
 		buttonSaveCurrentTile.AutoSize = true;
-		buttonSaveCurrentTile.Location = new Point(307, 192);
+		buttonSaveCurrentTile.Location = new Point(344, 249);
 		buttonSaveCurrentTile.Margin = new Padding(0);
 		buttonSaveCurrentTile.Name = "buttonSaveCurrentTile";
-		buttonSaveCurrentTile.Size = new Size(74, 23);
+		buttonSaveCurrentTile.Size = new Size(81, 23);
 		buttonSaveCurrentTile.TabIndex = 82;
 		buttonSaveCurrentTile.Text = "Save Tile";
 		buttonSaveCurrentTile.UseVisualStyleBackColor = true;
@@ -465,10 +418,10 @@ partial class TileSetEditorWindow
 		// buttonLoadTileSet
 		// 
 		buttonLoadTileSet.AutoSize = true;
-		buttonLoadTileSet.Location = new Point(666, 290);
+		buttonLoadTileSet.Location = new Point(344, 295);
 		buttonLoadTileSet.Margin = new Padding(0);
 		buttonLoadTileSet.Name = "buttonLoadTileSet";
-		buttonLoadTileSet.Size = new Size(108, 23);
+		buttonLoadTileSet.Size = new Size(81, 23);
 		buttonLoadTileSet.TabIndex = 83;
 		buttonLoadTileSet.Text = "Load Tile Set";
 		buttonLoadTileSet.UseVisualStyleBackColor = true;
@@ -477,10 +430,10 @@ partial class TileSetEditorWindow
 		// buttonSaveTileSet
 		// 
 		buttonSaveTileSet.AutoSize = true;
-		buttonSaveTileSet.Location = new Point(666, 318);
+		buttonSaveTileSet.Location = new Point(344, 318);
 		buttonSaveTileSet.Margin = new Padding(0);
 		buttonSaveTileSet.Name = "buttonSaveTileSet";
-		buttonSaveTileSet.Size = new Size(108, 23);
+		buttonSaveTileSet.Size = new Size(81, 23);
 		buttonSaveTileSet.TabIndex = 84;
 		buttonSaveTileSet.Text = "Save Tile Set";
 		buttonSaveTileSet.UseVisualStyleBackColor = true;
@@ -489,10 +442,10 @@ partial class TileSetEditorWindow
 		// buttonNewTileSet
 		// 
 		buttonNewTileSet.AutoSize = true;
-		buttonNewTileSet.Location = new Point(666, 347);
+		buttonNewTileSet.Location = new Point(344, 341);
 		buttonNewTileSet.Margin = new Padding(0);
 		buttonNewTileSet.Name = "buttonNewTileSet";
-		buttonNewTileSet.Size = new Size(108, 23);
+		buttonNewTileSet.Size = new Size(81, 23);
 		buttonNewTileSet.TabIndex = 85;
 		buttonNewTileSet.Text = "New Tile Set";
 		buttonNewTileSet.UseVisualStyleBackColor = true;
@@ -508,9 +461,9 @@ partial class TileSetEditorWindow
 		// 
 		// buttonRedraw
 		// 
-		buttonRedraw.Location = new Point(515, 342);
+		buttonRedraw.Location = new Point(462, 336);
 		buttonRedraw.Name = "buttonRedraw";
-		buttonRedraw.Size = new Size(79, 48);
+		buttonRedraw.Size = new Size(162, 23);
 		buttonRedraw.TabIndex = 87;
 		buttonRedraw.Text = "Redraw / Update All";
 		buttonRedraw.UseVisualStyleBackColor = true;
@@ -519,9 +472,9 @@ partial class TileSetEditorWindow
 		// buttonUse
 		// 
 		buttonUse.BackColor = Color.Gold;
-		buttonUse.Location = new Point(307, 123);
+		buttonUse.Location = new Point(344, 180);
 		buttonUse.Name = "buttonUse";
-		buttonUse.Size = new Size(74, 46);
+		buttonUse.Size = new Size(81, 46);
 		buttonUse.TabIndex = 88;
 		buttonUse.Text = "Draw with this Tile";
 		buttonUse.UseVisualStyleBackColor = false;
@@ -529,7 +482,7 @@ partial class TileSetEditorWindow
 		// 
 		// buttonRotateLeft
 		// 
-		buttonRotateLeft.Location = new Point(6, 123);
+		buttonRotateLeft.Location = new Point(7, 180);
 		buttonRotateLeft.Name = "buttonRotateLeft";
 		buttonRotateLeft.Size = new Size(82, 23);
 		buttonRotateLeft.TabIndex = 91;
@@ -539,7 +492,7 @@ partial class TileSetEditorWindow
 		// 
 		// buttonRotateRight
 		// 
-		buttonRotateRight.Location = new Point(217, 123);
+		buttonRotateRight.Location = new Point(254, 180);
 		buttonRotateRight.Name = "buttonRotateRight";
 		buttonRotateRight.Size = new Size(82, 23);
 		buttonRotateRight.TabIndex = 92;
@@ -549,7 +502,7 @@ partial class TileSetEditorWindow
 		// 
 		// buttonMirrorH
 		// 
-		buttonMirrorH.Location = new Point(6, 146);
+		buttonMirrorH.Location = new Point(7, 203);
 		buttonMirrorH.Name = "buttonMirrorH";
 		buttonMirrorH.Size = new Size(82, 23);
 		buttonMirrorH.TabIndex = 93;
@@ -559,7 +512,7 @@ partial class TileSetEditorWindow
 		// 
 		// buttonMirrorV
 		// 
-		buttonMirrorV.Location = new Point(217, 146);
+		buttonMirrorV.Location = new Point(254, 203);
 		buttonMirrorV.Name = "buttonMirrorV";
 		buttonMirrorV.Size = new Size(82, 23);
 		buttonMirrorV.TabIndex = 94;
@@ -569,7 +522,7 @@ partial class TileSetEditorWindow
 		// 
 		// buttonShiftLeft
 		// 
-		buttonShiftLeft.Location = new Point(6, 169);
+		buttonShiftLeft.Location = new Point(7, 226);
 		buttonShiftLeft.Name = "buttonShiftLeft";
 		buttonShiftLeft.Size = new Size(82, 23);
 		buttonShiftLeft.TabIndex = 95;
@@ -579,7 +532,7 @@ partial class TileSetEditorWindow
 		// 
 		// ShiftRight
 		// 
-		ShiftRight.Location = new Point(217, 169);
+		ShiftRight.Location = new Point(254, 226);
 		ShiftRight.Name = "ShiftRight";
 		ShiftRight.Size = new Size(82, 23);
 		ShiftRight.TabIndex = 96;
@@ -589,7 +542,7 @@ partial class TileSetEditorWindow
 		// 
 		// buttonShiftDown
 		// 
-		buttonShiftDown.Location = new Point(6, 192);
+		buttonShiftDown.Location = new Point(7, 249);
 		buttonShiftDown.Name = "buttonShiftDown";
 		buttonShiftDown.Size = new Size(82, 23);
 		buttonShiftDown.TabIndex = 97;
@@ -599,7 +552,7 @@ partial class TileSetEditorWindow
 		// 
 		// buttonShiftUp
 		// 
-		buttonShiftUp.Location = new Point(217, 192);
+		buttonShiftUp.Location = new Point(254, 249);
 		buttonShiftUp.Name = "buttonShiftUp";
 		buttonShiftUp.Size = new Size(82, 23);
 		buttonShiftUp.TabIndex = 98;
@@ -607,18 +560,10 @@ partial class TileSetEditorWindow
 		buttonShiftUp.UseVisualStyleBackColor = true;
 		buttonShiftUp.Click += buttonShiftUp_Click;
 		// 
-		// label2
-		// 
-		label2.BorderStyle = BorderStyle.FixedSingle;
-		label2.Location = new Point(638, 269);
-		label2.Name = "label2";
-		label2.Size = new Size(2, 130);
-		label2.TabIndex = 99;
-		// 
 		// buttonViewUndo
 		// 
 		buttonViewUndo.Image = (Image)resources.GetObject("buttonViewUndo.Image");
-		buttonViewUndo.Location = new Point(319, 240);
+		buttonViewUndo.Location = new Point(275, 318);
 		buttonViewUndo.Name = "buttonViewUndo";
 		buttonViewUndo.Size = new Size(22, 22);
 		buttonViewUndo.TabIndex = 100;
@@ -627,7 +572,7 @@ partial class TileSetEditorWindow
 		// label8
 		// 
 		label8.AutoSize = true;
-		label8.Location = new Point(232, 245);
+		label8.Location = new Point(266, 302);
 		label8.Name = "label8";
 		label8.Size = new Size(70, 13);
 		label8.TabIndex = 101;
@@ -636,22 +581,36 @@ partial class TileSetEditorWindow
 		// buttonViewRedo
 		// 
 		buttonViewRedo.Image = (Image)resources.GetObject("buttonViewRedo.Image");
-		buttonViewRedo.Location = new Point(342, 240);
+		buttonViewRedo.Location = new Point(298, 318);
 		buttonViewRedo.Name = "buttonViewRedo";
 		buttonViewRedo.Size = new Size(22, 22);
 		buttonViewRedo.TabIndex = 102;
 		buttonViewRedo.Click += buttonViewRedo_Click;
+		// 
+		// checkBoxShowGrid
+		// 
+		checkBoxShowGrid.AutoSize = true;
+		checkBoxShowGrid.Checked = true;
+		checkBoxShowGrid.CheckState = CheckState.Checked;
+		checkBoxShowGrid.Location = new Point(101, 337);
+		checkBoxShowGrid.Name = "checkBoxShowGrid";
+		checkBoxShowGrid.Size = new Size(80, 17);
+		checkBoxShowGrid.TabIndex = 103;
+		checkBoxShowGrid.Text = "Show Grid";
+		checkBoxShowGrid.UseMnemonic = false;
+		checkBoxShowGrid.UseVisualStyleBackColor = true;
+		checkBoxShowGrid.CheckStateChanged += checkBoxShowGrid_CheckStateChanged;
 		// 
 		// TileSetEditorWindow
 		// 
 		AutoScaleDimensions = new SizeF(6F, 13F);
 		AutoScaleMode = AutoScaleMode.Font;
 		BackColor = SystemColors.ControlLight;
-		ClientSize = new Size(800, 399);
+		ClientSize = new Size(1024, 370);
+		Controls.Add(checkBoxShowGrid);
 		Controls.Add(buttonViewUndo);
 		Controls.Add(label8);
 		Controls.Add(buttonViewRedo);
-		Controls.Add(label2);
 		Controls.Add(buttonShiftUp);
 		Controls.Add(buttonShiftDown);
 		Controls.Add(ShiftRight);
@@ -668,12 +627,7 @@ partial class TileSetEditorWindow
 		Controls.Add(buttonSaveCurrentTile);
 		Controls.Add(label7);
 		Controls.Add(buttonLoadCurrentTile);
-		Controls.Add(label6);
-		Controls.Add(label5);
-		Controls.Add(label3);
 		Controls.Add(pictureBoxCurrenctChar);
-		Controls.Add(labelTile9);
-		Controls.Add(labelTile8);
 		Controls.Add(labelTile7);
 		Controls.Add(labelTile6);
 		Controls.Add(labelTile5);
@@ -750,12 +704,7 @@ partial class TileSetEditorWindow
 	private Label labelTile5;
 	private Label labelTile6;
 	private Label labelTile7;
-	private Label labelTile8;
-	private Label labelTile9;
 	private PictureBox pictureBoxCurrenctChar;
-	private Label label3;
-	private Label label5;
-	private Label label6;
 	private Button buttonLoadCurrentTile;
 	private Label label7;
 	private Button buttonSaveCurrentTile;
@@ -774,8 +723,8 @@ partial class TileSetEditorWindow
 	private Button ShiftRight;
 	private Button buttonShiftDown;
 	private Button buttonShiftUp;
-	private Label label2;
 	private Button buttonViewUndo;
 	private Label label8;
 	private Button buttonViewRedo;
+	private CheckBox checkBoxShowGrid;
 }

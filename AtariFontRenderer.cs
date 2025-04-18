@@ -5,8 +5,8 @@ namespace FontMaker
 	public static class AtariFontRenderer
 	{
 		private static readonly Color[] AtariColors = new Color[256];
-		private static readonly byte[] MyPalette = new byte[AtariConstants.NumColors]; // Mono (0 + 1) Color (1, 2, 3, 4, 5, [6,7,8,])
-		private static readonly int[] CachedColors = new int[AtariConstants.NumColors];
+		private static readonly byte[] MyPalette = new byte[Constants.NumColors]; // Mono (0 + 1) Color (1, 2, 3, 4, 5, [6,7,8,])
+		private static readonly int[] CachedColors = new int[Constants.NumColors];
 
 		private static readonly int[] Mode4Colors = new int[5]; // Map from color index to actual color value
 

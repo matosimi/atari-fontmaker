@@ -99,7 +99,7 @@
 				SimulateSafeLeftMouseButtonClick();
 
 				RedrawView();
-				UndoBuffer.Add2UndoFullDifferenceScan(); // Full font scan
+				AtariFontUndoBuffer.Add2UndoFullDifferenceScan(); // Full font scan
 				UpdateUndoButtons(false);
 			}
 
@@ -134,7 +134,7 @@
 				RedrawFonts();
 				SimulateSafeLeftMouseButtonClick();
 				RedrawView();
-				UndoBuffer.Add2UndoFullDifferenceScan(); //full font scan
+				AtariFontUndoBuffer.Add2UndoFullDifferenceScan(); //full font scan
 				UpdateUndoButtons(false);
 			}
 

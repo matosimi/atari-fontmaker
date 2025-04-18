@@ -311,7 +311,7 @@ Use the button to quickly clear the whole edit window or just the selected area.
 - Click the box to set the character to replace
 - Click the [Fill View] or [Fill Area] buttons to set the area with the selected character
 
-## Tile Set editor
+## Tile Set Editor
 Its one thing to edit your fonts and test your creating in the View Editor, but the true test is if your characters will tile correctly.  Before V1.6.17.0 you had to manually draw your characters into the view editor and then used the MegaCopy mode to copy-paste your creations.
 
 Launch the **Tile Set Editor** by clicking the button found just below the **I/O area**.
@@ -319,12 +319,23 @@ Launch the **Tile Set Editor** by clicking the button found just below the **I/O
 You will see a window similar to this one
 ![18](images/18.JPG)
 
-The Tile Set editor lets you manage a total of 256 5x5 character tiles. A tile does not have to use all 25 characters.  It starts off in the empty state and as you draw characters into it the unused spaces will stay empty. That means when pasting a tile into the **View editor** the unused spots will be left untouched. Or expressed differently, each unused character in a tile is a hole that leaves the exiting character in the view in place.
+The Tile Set editor lets you manage a total of 256 8x8 character tiles. A tile does not have to use all 64 characters. It starts off in the empty state and as you draw characters into it, the unused spaces will stay empty. That means when pasting a tile into the **View editor** the unused spots will be left untouched. Or expressed differently, each unused character in a tile is a hole that leaves the exiting character in the view in place.
 
-At the top of the **Tile Set editor** you will find the 256 individual tiles. Left-click with the mouse to activate the tile and load it into the editor. If you left-click and hold the mouse and move left and right you can quickly switch between various tiles, which acts like an animation. Good for testing transitions.  Use the scroll bar to select the 10 tiles to view.
+At the top of the **Tile Set Editor** you will find the 256 individual tiles. Left-click with the mouse to activate the tile and load it into the editor. If you left-click and hold the mouse and move left and right you can quickly switch between various tiles, which acts like an animation. Good for testing transitions. Use the scroll bar to select the 8 tiles to view.
 
- The individual editor can be found just below the tile set list and is surrounded by three columns of command buttons. These commands handle actions like: Rotation, mirroring, shifting, copy and paste.
+Double click on a tile to use it for drawing or click the [Draw with this tile] button to do the same.
+
+ The individual Tile Editor can be found just below the tile set list and is surrounded by three columns of command buttons. These commands handle actions like: Rotation, mirroring, shifting, copy and paste.
  You can use the Copy button (CTRL+C) to copy the current tile to the clipboard. Then you can paste it into another tile or to the view editor window.
+
+ A powerful feature is that you can paste multiple tiles into the save tile. 
+ For example:
+ - Lets say you copy a 4x3 area from the view.
+ - Paste this into a tile.
+ - Shift the tile right by 4 characters
+ - Paste the area again into the view, and you would have two copies, side by side, in the tile.
+  
+This method is good for building more complex tiles from others.
 
  **Keyboard/Mouse shortcuts for the TileSet editor**
  CTRL+C - Copy the current tile to the clipboard
@@ -334,8 +345,16 @@ At the top of the **Tile Set editor** you will find the 256 individual tiles. Le
  CTRL+LEFT ARROW (cursor) - Select previous tile
  CTRL+RIGHT ARROW (cursor) - Select next tile
 ALT + Mouse Wheel - Select the next/previous tile for drawing/pasting. This selects only valid tiles, thus skipping empty tiles.
+Double Click on a tile in the horizontal tile set viewer to select it for drawing.
 
 ## Changes/History
+
+V1.6.16.4
+The size of tiles has increased from 5x5 to 8x8.
+Double Clicking on a specific tile in the tile set viewer now selects the tile for drawing.
+Added support for MadPascal export of font and view data
+Added a Show Grid option in the Tile Set Editor.
+
 
 V1.6.16.3
 Improved the clipboard handling. If the clipboard data is damaged or incorrect then Atari Font Maker will try to fix as much of the data as it can.

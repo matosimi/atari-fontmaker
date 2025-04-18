@@ -37,6 +37,9 @@ public class SavedTileData
 	/// 0 = data
 	/// </summary>
 	public string Nulls { get; set; }
+
+	public int Width { get; set; } = 5;
+	public int Height { get; set; } = 5;
 }
 #endregion
 
@@ -44,8 +47,11 @@ public class SavedTileData
 
 public class TileData
 {
-	public const int TILE_WIDTH = 5;
-	public const int TILE_HEIGHT = 5;
+	public const int OLD_TILE_WIDTH = 5;
+	public const int OLD_TILE_HEIGHT = 5;
+
+	public const int TILE_WIDTH = 8;
+	public const int TILE_HEIGHT = 8;
 
 	public bool IsValid()
 	{
@@ -137,25 +143,37 @@ public class TileData
 			View = sbView.ToString(),
 			Font = Convert.ToHexString(SelectedFont),
 			Nulls = sbNulls.ToString(),
+			Width = TILE_WIDTH,
+			Height = TILE_HEIGHT,
 		};
 		return data;
 	}
 
 	public bool Load(SavedTileData data)
 	{
-		var viewBytes = Convert.FromHexString(data.View);		// Convert the HEX string into bytes and store in the View
+		var width = data.Width;
+		var height = data.Height;
+
+		if (width == 0) width = OLD_TILE_WIDTH;
+		if (height == 0) height = OLD_TILE_HEIGHT;
+
+		var viewData = Convert.FromHexString(data.View);		// Convert the HEX string into bytes and store in the View
 
 		var index = 0;
-		for (var y = 0; y < TILE_HEIGHT; ++y)
+		for (var y = 0; y < height; ++y)
 		{
-			for (var x = 0; x < TILE_WIDTH; ++x)
+			for (var x = 0; x < width; ++x)
 			{
-				View[x, y] = data.Nulls[index] == '0' ? viewBytes[index] : null;
+				View[x, y] = data.Nulls[index] == '0' ? viewData[index] : null;
 				++index;
 			}
 		}
 
-		SelectedFont = Convert.FromHexString(data.Font);
+		var selectedFont = Convert.FromHexString(data.Font);
+		for (var i = 0; i < height; ++i)
+		{
+			SelectedFont[i] = selectedFont[i];
+		}
 
 		return true;
 	}

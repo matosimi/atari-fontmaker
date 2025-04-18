@@ -114,7 +114,7 @@
 			// 
 			ComboBoxExportType.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxExportType.FormattingEnabled = true;
-			ComboBoxExportType.Items.AddRange(new object[] { "Binary Data", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "C data {}" });
+			ComboBoxExportType.Items.AddRange(new object[] { "Binary Data", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "C data {}", "MadPascal Array" });
 			ComboBoxExportType.Location = new Point(104, 8);
 			ComboBoxExportType.Name = "ComboBoxExportType";
 			ComboBoxExportType.Size = new Size(145, 21);

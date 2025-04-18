@@ -14,11 +14,13 @@ public partial class TileSetEditorWindow : Form
 
 	private const int OneCharInEditorDimension = 16;
 
-	private const int TileSetPictureWidth = 800;
-	private const int TileSetPictureHeight = 80;
+	private const int TileSetPictureWidth = 1024;
+	private const int TileSetPictureHeight = 128;
 
-	private const int CurrentTilePictureWidth = 80;
-	private const int CurrentTilePictureHeight = 80;
+	private const int CurrentTilePictureWidth = 128;
+	private const int CurrentTilePictureHeight = 128;
+
+	private const int TileDimension = 8;
 
 	private int LastViewCharacterX { get; set; }
 	private int LastViewCharacterY { get; set; }
@@ -168,7 +170,7 @@ public partial class TileSetEditorWindow : Form
 
 			gr.FillRectangle(GrayBrush, 0, 0, TileSetPictureWidth, TileSetPictureHeight);
 
-			for (var i = 0; i < 10; ++i)
+			for (var i = 0; i < 8; ++i)
 			{
 				var drawIt = TileSet.Tiles[i + TileSetOffset];
 				var tileXOffset = i * CurrentTilePictureWidth;
@@ -195,7 +197,7 @@ public partial class TileSetEditorWindow : Form
 					}
 				}
 
-				gr.DrawLine(pen, i * 80, 0, i * 80, TileSetPictureHeight);
+				gr.DrawLine(pen, i * TileSetPictureHeight, 0, i * TileSetPictureHeight, TileSetPictureHeight);
 
 			}
 		}
@@ -209,8 +211,6 @@ public partial class TileSetEditorWindow : Form
 		labelTile5.Text = $@"Tile: {(tileNr++)}";
 		labelTile6.Text = $@"Tile: {(tileNr++)}";
 		labelTile7.Text = $@"Tile: {(tileNr++)}";
-		labelTile8.Text = $@"Tile: {(tileNr++)}";
-		labelTile9.Text = $@"Tile: {(tileNr++)}";
 	}
 
 	public void SwitchColorMode()
@@ -290,16 +290,21 @@ public partial class TileSetEditorWindow : Form
 		var ry = e.Y / 16;
 		SelectedCharacterIndex = rx + ry * 32;
 
-		pictureBoxFontSelectorRubberBand.Left = pictureBoxFontSelector.Bounds.Left + e.X - e.X % 16 - 2;
-		pictureBoxFontSelectorRubberBand.Top = pictureBoxFontSelector.Bounds.Top + e.Y - e.Y % 16 - 2;
+		pictureBoxFontSelectorRubberBand.Left = pictureBoxFontSelector.Bounds.Left + e.X - e.X % 16 - 1;
+		pictureBoxFontSelectorRubberBand.Top = pictureBoxFontSelector.Bounds.Top + e.Y - e.Y % 16 - 1;
 
-		labelEditCharInfo.Text = $"Font {(FontNr + 1)}\n${SelectedCharacterIndex:X2} #{SelectedCharacterIndex}";
+		UpdateFontAndCursorInfo();
 		RedrawChar();
 	}
 
 	private void RedrawChar()
 	{
 		RenderCharIntoPictureBox(pictureBoxCurrenctChar);
+	}
+
+	private void UpdateFontAndCursorInfo()
+	{
+		labelEditCharInfo.Text = $"Font {(FontNr + 1)} ${SelectedCharacterIndex:X2} #{SelectedCharacterIndex} @ {LastViewCharacterX},{LastViewCharacterY}";
 	}
 
 	public byte RenderCharIntoPictureBox(PictureBox target)
@@ -357,7 +362,7 @@ public partial class TileSetEditorWindow : Form
 		{
 			gr.FillRectangle(FontMakerForm.WhiteBrush, 0, 0, img.Width, img.Height);
 
-			for (var a = 0; a < 5; a++)
+			for (var a = 0; a < TileDimension; a++)
 			{
 				gr.DrawString(ToDraw[TileSet.CurrentTile!.SelectedFont[a]], this.Font, FontMakerForm.BlackBrush, 3, a * OneCharInEditorDimension);
 			}
@@ -372,7 +377,7 @@ public partial class TileSetEditorWindow : Form
 			return;
 		var ry = e.Y / OneCharInEditorDimension;
 
-		if (ry is < 0 or >= 5)
+		if (ry is < 0 or >= TileDimension)
 		{
 			// Note: This should not happen but when running on Mac things get funky
 			return;
@@ -413,12 +418,12 @@ public partial class TileSetEditorWindow : Form
 	/// <param name="e"></param>
 	private void pictureBoxTileSets_MouseDown(object sender, MouseEventArgs e)
 	{
-		if (e.X < 0 || e.X >= 800 || e.Y < 0 || e.Y >= 80)
+		if (e.X < 0 || e.X >= TileSetPictureWidth || e.Y < 0 || e.Y >= TileSetPictureHeight)
 		{
 			return;
 		}
 
-		var selectIndex = e.X / 80;
+		var selectIndex = e.X / CurrentTilePictureWidth;
 
 		var nextTileToSelect = selectIndex + TileSetOffset;
 		if (nextTileToSelect == SelectedTileNr)
@@ -428,10 +433,15 @@ public partial class TileSetEditorWindow : Form
 		NewTileSelected();
 	}
 
+	private void pictureBoxTileSets_DoubleClick(object sender, EventArgs e)
+	{
+		CopyCurrentTileToClipboard(true);
+	}
+
 
 	private void pictureBoxTileSets_MouseMove(object sender, MouseEventArgs e)
 	{
-		if (e.X < 0 || e.X >= 800 || e.Y < 0 || e.Y >= 80)
+		if (e.X < 0 || e.X >= TileSetPictureWidth || e.Y < 0 || e.Y >= TileSetPictureHeight)
 		{
 			return;
 		}
@@ -439,7 +449,7 @@ public partial class TileSetEditorWindow : Form
 		if (e.Button == MouseButtons.Left)
 		{
 			// Left button is held down, and we are moving the mouse
-			var selectIndex = e.X / 80;
+			var selectIndex = e.X / CurrentTilePictureWidth;
 
 			var nextTileToSelect = selectIndex + TileSetOffset;
 			if (nextTileToSelect == SelectedTileNr)
@@ -447,12 +457,8 @@ public partial class TileSetEditorWindow : Form
 			SelectedTileNr = nextTileToSelect;
 			NewTileSelected();
 		}
-
 	}
-
 	#endregion
-
-
 
 	private void buttonPrevTile_Click(object sender, EventArgs e)
 	{
@@ -469,7 +475,7 @@ public partial class TileSetEditorWindow : Form
 		if (seekValidOnly)
 		{
 			// Scan left until we find a valid tile
-			for (var idx = SelectedTileNr-1; idx >= 0; --idx)
+			for (var idx = SelectedTileNr - 1; idx >= 0; --idx)
 			{
 				if (TileSet.Tiles[idx].IsValid())
 				{
@@ -574,10 +580,13 @@ public partial class TileSetEditorWindow : Form
 				}
 			}
 
-			for (var i = 1; i < 5; ++i)
+			if (checkBoxShowGrid.Checked)
 			{
-				gr.DrawLine(pen, i * OneCharInEditorDimension, 0, i * OneCharInEditorDimension, CurrentTilePictureHeight);
-				gr.DrawLine(pen, 0, i * OneCharInEditorDimension, CurrentTilePictureWidth, i * OneCharInEditorDimension);
+				for (var i = 1; i < TileDimension; ++i)
+				{
+					gr.DrawLine(pen, i * OneCharInEditorDimension, 0, i * OneCharInEditorDimension, CurrentTilePictureHeight);
+					gr.DrawLine(pen, 0, i * OneCharInEditorDimension, CurrentTilePictureWidth, i * OneCharInEditorDimension);
+				}
 			}
 		}
 		pictureBoxEditTile.Refresh();
@@ -595,7 +604,6 @@ public partial class TileSetEditorWindow : Form
 			// Current tile is in the visible range.
 			DrawTileSetView();
 		}
-
 	}
 
 	private void UpdateTileUndoRedoButton()
@@ -621,9 +629,21 @@ public partial class TileSetEditorWindow : Form
 		if (e.X is >= 0 and < CurrentTilePictureWidth &&
 			e.Y is >= 0 and < CurrentTilePictureHeight &&
 			(e.X / OneCharInEditorDimension != LastViewCharacterX || e.Y / OneCharInEditorDimension != LastViewCharacterY)
-			&& (e.Button & (MouseButtons.Left | MouseButtons.Right)) > 0)
+		)
 		{
-			ActionEditorMouseDown(new MouseEventArgs(e.Button, 1, e.X, e.Y, -1000));      // -1000 indicates that this is a simulated event
+			if ((e.Button & (MouseButtons.Left | MouseButtons.Right)) > 0)
+				ActionEditorMouseDown(new MouseEventArgs(e.Button, 1, e.X, e.Y, -1000));      // -1000 indicates that this is a simulated event
+			else
+			{
+				var rx = e.X / OneCharInEditorDimension;
+				var ry = e.Y / OneCharInEditorDimension;
+
+				LastViewCharacterX = rx;
+				LastViewCharacterY = ry;
+
+				UpdateFontAndCursorInfo();
+			}
+
 		}
 	}
 
@@ -656,6 +676,7 @@ public partial class TileSetEditorWindow : Form
 		DrawCurrentTile();
 		UpdateTileSetWindow();
 		UpdateTileUndoRedoButton();
+		UpdateFontAndCursorInfo();
 	}
 
 
@@ -808,7 +829,7 @@ public partial class TileSetEditorWindow : Form
 				MessageBox.Show(@"Clipboard data parsing error");
 				return;
 			}
-			
+
 			if (string.IsNullOrEmpty(jsonObj.Chars) || jsonObj.Chars.Length == 0)
 			{
 				MessageBox.Show(@"Clipboard data parsing error");
@@ -899,6 +920,7 @@ public partial class TileSetEditorWindow : Form
 					}
 				}
 
+				hScrollBarTiles.Value = 0;
 				Redraw();
 			}
 			catch (Exception ex)
@@ -960,6 +982,7 @@ public partial class TileSetEditorWindow : Form
 
 				TileSet.CurrentTile.Load(jsonObj.Tile);
 				DrawCurrentTile();
+				RedrawLineTypes();
 				UpdateTileSetWindow();
 				UpdateTileUndoRedoButton();
 			}
@@ -1100,7 +1123,7 @@ public partial class TileSetEditorWindow : Form
 				ActionUndo();
 				return;
 			}
-			
+
 			if (e.KeyCode == Keys.Y)
 			{
 				ActionRedo();
@@ -1148,4 +1171,10 @@ public partial class TileSetEditorWindow : Form
 		UpdateTileSetWindow();
 		UpdateTileUndoRedoButton();
 	}
+
+	private void checkBoxShowGrid_CheckStateChanged(object sender, EventArgs e)
+	{
+		DrawCurrentTile();
+	}
+
 }
