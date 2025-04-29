@@ -1,12 +1,5 @@
 ﻿namespace FontMaker;
 
-public class ViewUndoEntry
-{
-	public byte[,]? ViewBytes { get; set; }
-	public int Width { get; set; }
-	public int Height { get; set; }
-}
-
 /// <summary>
 /// Every page contains an undo buffer.
 /// The buffer is fed with AtariView data before something is changed.
@@ -17,8 +10,8 @@ public class AtariViewUndoBuffer
 {
 	public const int UndoBufferSize = 250;
 
-	private readonly LinkedList<ViewUndoEntry> _undoCommands = [];
-	private readonly Stack<ViewUndoEntry> _redoCommands = new();
+	private readonly LinkedList<AtariViewUndoInfo> _undoCommands = [];
+	private readonly Stack<AtariViewUndoInfo> _redoCommands = new();
 
 	/// <summary>
 	/// Push the current AtariView into the undo buffer
@@ -29,13 +22,7 @@ public class AtariViewUndoBuffer
 		{
 			_undoCommands.RemoveFirst();
 		}
-		var newEntry = new ViewUndoEntry()
-		{
-			ViewBytes = AtariView.ViewBytes.Clone() as byte[,],
-			Width = AtariView.Width,
-			Height = AtariView.Height,
-		};
-		_undoCommands.AddLast(newEntry);
+		_undoCommands.AddLast(AtariView.BuildForUndo());
 		if (_redoCommands.Count > 0)
 			_redoCommands.Clear();
 	}
@@ -44,14 +31,8 @@ public class AtariViewUndoBuffer
 	{
 		if (_undoCommands.Count > 0)
 		{
-			var newEntry = new ViewUndoEntry()
-			{
-				ViewBytes = AtariView.ViewBytes.Clone() as byte[,],
-				Width = AtariView.Width,
-				Height = AtariView.Height,
-			};
 			// Save the current screen
-			_redoCommands.Push(newEntry);
+			_redoCommands.Push(AtariView.BuildForUndo());
 
 			// Get the last screen and restore it
 			RestoreScreen(_undoCommands.Last());
@@ -72,25 +53,17 @@ public class AtariViewUndoBuffer
 		{
 			_undoCommands.RemoveFirst();
 		}
-		var newEntry = new ViewUndoEntry()
-		{
-			ViewBytes = AtariView.ViewBytes.Clone() as byte[,],
-			Width = AtariView.Width,
-			Height = AtariView.Height,
-		};
-		_undoCommands.AddLast(newEntry);
+		_undoCommands.AddLast(AtariView.BuildForUndo());
 
 		// Get the last screen and restore it
 		RestoreScreen(_redoCommands.Pop());
 	}
 
-	private static void RestoreScreen(ViewUndoEntry data)
+	private static void RestoreScreen(AtariViewUndoInfo data)
 	{
 		if (data is { ViewBytes: not null })
 		{
-			Buffer.BlockCopy(data.ViewBytes, 0, AtariView.ViewBytes, 0, data.ViewBytes.Length);
-			AtariView.Width = data.Width;
-			AtariView.Height = data.Height;
+			AtariView.RestoreFromUndo(data);
 		}
 	}
 

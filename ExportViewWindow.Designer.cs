@@ -54,12 +54,20 @@
 			saveDialog = new SaveFileDialog();
 			checkBoxRememberState = new CheckBox();
 			checkBoxTranspose = new CheckBox();
+			vScrollBar = new VScrollBar();
+			hScrollBar = new HScrollBar();
+			numericOffsetY = new NumericUpDown();
+			numericOffsetX = new NumericUpDown();
+			labelOffsetY = new Label();
+			labelOffsetX = new Label();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariViewSmall).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericFromX).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericFromY).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericHeight).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericWidth).BeginInit();
+			((System.ComponentModel.ISupportInitialize)numericOffsetY).BeginInit();
+			((System.ComponentModel.ISupportInitialize)numericOffsetX).BeginInit();
 			SuspendLayout();
 			// 
 			// Button_Export
@@ -133,9 +141,9 @@
 			// 
 			// pictureBoxAtariViewSmall
 			// 
-			pictureBoxAtariViewSmall.Location = new Point(8, 83);
+			pictureBoxAtariViewSmall.Location = new Point(3, 83);
 			pictureBoxAtariViewSmall.Name = "pictureBoxAtariViewSmall";
-			pictureBoxAtariViewSmall.Size = new Size(320, 208);
+			pictureBoxAtariViewSmall.Size = new Size(640, 416);
 			pictureBoxAtariViewSmall.TabIndex = 18;
 			pictureBoxAtariViewSmall.TabStop = false;
 			pictureBoxAtariViewSmall.MouseDown += pictureBoxAtariViewSmall_MouseDown;
@@ -157,16 +165,16 @@
 			// 
 			// MemoExport
 			// 
-			MemoExport.Location = new Point(343, 83);
+			MemoExport.Location = new Point(662, 83);
 			MemoExport.Name = "MemoExport";
-			MemoExport.Size = new Size(342, 324);
+			MemoExport.Size = new Size(342, 545);
 			MemoExport.TabIndex = 20;
 			MemoExport.Text = "";
 			// 
 			// label3
 			// 
 			label3.AutoSize = true;
-			label3.Location = new Point(8, 298);
+			label3.Location = new Point(8, 526);
 			label3.Name = "label3";
 			label3.Size = new Size(45, 13);
 			label3.TabIndex = 21;
@@ -175,7 +183,7 @@
 			// label4
 			// 
 			label4.AutoSize = true;
-			label4.Location = new Point(8, 326);
+			label4.Location = new Point(8, 554);
 			label4.Name = "label4";
 			label4.Size = new Size(44, 13);
 			label4.TabIndex = 22;
@@ -183,7 +191,7 @@
 			// 
 			// numericFromX
 			// 
-			numericFromX.Location = new Point(52, 296);
+			numericFromX.Location = new Point(52, 524);
 			numericFromX.Maximum = new decimal(new int[] { 39, 0, 0, 0 });
 			numericFromX.Name = "numericFromX";
 			numericFromX.Size = new Size(49, 22);
@@ -192,7 +200,7 @@
 			// 
 			// numericFromY
 			// 
-			numericFromY.Location = new Point(52, 322);
+			numericFromY.Location = new Point(52, 550);
 			numericFromY.Maximum = new decimal(new int[] { 25, 0, 0, 0 });
 			numericFromY.Name = "numericFromY";
 			numericFromY.Size = new Size(49, 22);
@@ -201,7 +209,7 @@
 			// 
 			// numericHeight
 			// 
-			numericHeight.Location = new Point(159, 322);
+			numericHeight.Location = new Point(159, 550);
 			numericHeight.Maximum = new decimal(new int[] { 26, 0, 0, 0 });
 			numericHeight.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
 			numericHeight.Name = "numericHeight";
@@ -212,7 +220,7 @@
 			// 
 			// numericWidth
 			// 
-			numericWidth.Location = new Point(159, 296);
+			numericWidth.Location = new Point(159, 524);
 			numericWidth.Maximum = new decimal(new int[] { 40, 0, 0, 0 });
 			numericWidth.Minimum = new decimal(new int[] { 1, 0, 0, 0 });
 			numericWidth.Name = "numericWidth";
@@ -224,7 +232,7 @@
 			// label5
 			// 
 			label5.AutoSize = true;
-			label5.Location = new Point(118, 326);
+			label5.Location = new Point(118, 554);
 			label5.Name = "label5";
 			label5.Size = new Size(45, 13);
 			label5.TabIndex = 27;
@@ -233,7 +241,7 @@
 			// label6
 			// 
 			label6.AutoSize = true;
-			label6.Location = new Point(118, 298);
+			label6.Location = new Point(118, 526);
 			label6.Name = "label6";
 			label6.Size = new Size(42, 13);
 			label6.TabIndex = 26;
@@ -242,7 +250,7 @@
 			// labelDimensions
 			// 
 			labelDimensions.AutoSize = true;
-			labelDimensions.Location = new Point(98, 354);
+			labelDimensions.Location = new Point(98, 582);
 			labelDimensions.Name = "labelDimensions";
 			labelDimensions.Size = new Size(16, 13);
 			labelDimensions.TabIndex = 30;
@@ -255,7 +263,7 @@
 			// 
 			// buttonResetSelection
 			// 
-			buttonResetSelection.Location = new Point(253, 296);
+			buttonResetSelection.Location = new Point(248, 605);
 			buttonResetSelection.Name = "buttonResetSelection";
 			buttonResetSelection.Size = new Size(75, 23);
 			buttonResetSelection.TabIndex = 31;
@@ -266,7 +274,7 @@
 			// label7
 			// 
 			label7.AutoSize = true;
-			label7.Location = new Point(8, 354);
+			label7.Location = new Point(8, 582);
 			label7.Name = "label7";
 			label7.Size = new Size(90, 13);
 			label7.TabIndex = 32;
@@ -293,7 +301,7 @@
 			checkBoxTranspose.AutoSize = true;
 			checkBoxTranspose.Checked = true;
 			checkBoxTranspose.CheckState = CheckState.Checked;
-			checkBoxTranspose.Location = new Point(12, 383);
+			checkBoxTranspose.Location = new Point(12, 611);
 			checkBoxTranspose.Name = "checkBoxTranspose";
 			checkBoxTranspose.Size = new Size(188, 17);
 			checkBoxTranspose.TabIndex = 34;
@@ -301,12 +309,80 @@
 			checkBoxTranspose.UseVisualStyleBackColor = true;
 			checkBoxTranspose.CheckedChanged += CheckBoxTranspose_CheckedChanged;
 			// 
+			// vScrollBar
+			// 
+			vScrollBar.Enabled = false;
+			vScrollBar.LargeChange = 1;
+			vScrollBar.Location = new Point(644, 83);
+			vScrollBar.Maximum = 0;
+			vScrollBar.Name = "vScrollBar";
+			vScrollBar.Size = new Size(17, 418);
+			vScrollBar.TabIndex = 35;
+			vScrollBar.ValueChanged += vScrollBar_ValueChanged;
+			// 
+			// hScrollBar
+			// 
+			hScrollBar.Enabled = false;
+			hScrollBar.LargeChange = 1;
+			hScrollBar.Location = new Point(3, 501);
+			hScrollBar.Maximum = 0;
+			hScrollBar.Name = "hScrollBar";
+			hScrollBar.Size = new Size(657, 17);
+			hScrollBar.TabIndex = 36;
+			hScrollBar.ValueChanged += hScrollBar_ValueChanged;
+			// 
+			// numericOffsetY
+			// 
+			numericOffsetY.Enabled = false;
+			numericOffsetY.Location = new Point(273, 550);
+			numericOffsetY.Maximum = new decimal(new int[] { 25, 0, 0, 0 });
+			numericOffsetY.Name = "numericOffsetY";
+			numericOffsetY.Size = new Size(49, 22);
+			numericOffsetY.TabIndex = 40;
+			numericOffsetY.ValueChanged += numericOffsetY_ValueChanged;
+			// 
+			// numericOffsetX
+			// 
+			numericOffsetX.Enabled = false;
+			numericOffsetX.Location = new Point(273, 524);
+			numericOffsetX.Maximum = new decimal(new int[] { 39, 0, 0, 0 });
+			numericOffsetX.Name = "numericOffsetX";
+			numericOffsetX.Size = new Size(49, 22);
+			numericOffsetX.TabIndex = 39;
+			numericOffsetX.ValueChanged += numericOffsetX_ValueChanged;
+			// 
+			// labelOffsetY
+			// 
+			labelOffsetY.AutoSize = true;
+			labelOffsetY.Enabled = false;
+			labelOffsetY.Location = new Point(221, 554);
+			labelOffsetY.Name = "labelOffsetY";
+			labelOffsetY.Size = new Size(50, 13);
+			labelOffsetY.TabIndex = 38;
+			labelOffsetY.Text = "Offset Y:";
+			// 
+			// labelOffsetX
+			// 
+			labelOffsetX.AutoSize = true;
+			labelOffsetX.Enabled = false;
+			labelOffsetX.Location = new Point(220, 526);
+			labelOffsetX.Name = "labelOffsetX";
+			labelOffsetX.Size = new Size(51, 13);
+			labelOffsetX.TabIndex = 37;
+			labelOffsetX.Text = "Offset X:";
+			// 
 			// ExportViewWindow
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			CancelButton = Button_Cancel;
-			ClientSize = new Size(690, 412);
+			ClientSize = new Size(1005, 634);
+			Controls.Add(numericOffsetY);
+			Controls.Add(numericOffsetX);
+			Controls.Add(labelOffsetY);
+			Controls.Add(labelOffsetX);
+			Controls.Add(hScrollBar);
+			Controls.Add(vScrollBar);
 			Controls.Add(checkBoxTranspose);
 			Controls.Add(checkBoxRememberState);
 			Controls.Add(label7);
@@ -347,6 +423,8 @@
 			((System.ComponentModel.ISupportInitialize)numericFromY).EndInit();
 			((System.ComponentModel.ISupportInitialize)numericHeight).EndInit();
 			((System.ComponentModel.ISupportInitialize)numericWidth).EndInit();
+			((System.ComponentModel.ISupportInitialize)numericOffsetY).EndInit();
+			((System.ComponentModel.ISupportInitialize)numericOffsetX).EndInit();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -377,5 +455,11 @@
 		private SaveFileDialog saveDialog;
 		private CheckBox checkBoxRememberState;
 		private CheckBox checkBoxTranspose;
+		private VScrollBar vScrollBar;
+		private HScrollBar hScrollBar;
+		private NumericUpDown numericOffsetY;
+		private NumericUpDown numericOffsetX;
+		private Label labelOffsetY;
+		private Label labelOffsetX;
 	}
 }

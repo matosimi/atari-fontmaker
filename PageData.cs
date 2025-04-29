@@ -1,8 +1,4 @@
 ﻿#pragma warning disable WFO1000
-using System.Windows.Forms;
-using System.Xml.Linq;
-using System;
-
 namespace FontMaker;
 
 /// <summary>
@@ -66,10 +62,19 @@ public class PageData
 	{
 	}
 
-	public void Save(byte[,] view, byte[] selectedFont)
+	/// <summary>
+	/// Save the current AtariView data to the page container
+	/// </summary>
+	/// <param name="view"></param>
+	/// <param name="selectedFont"></param>
+	public void Save()
 	{
-		View = view.Clone() as byte[,];
-		SelectedFont = selectedFont.Clone() as byte[];
+		View = AtariView.ViewBytes.Clone() as byte[,];
+		SelectedFont = AtariView.UseFontOnLine.Clone() as byte[];
+		Width = AtariView.Width;
+		Height = AtariView.Height;
+		OffsetX = AtariView.OffsetX;
+		OffsetY = AtariView.OffsetY;
 	}
 
 
@@ -90,6 +95,8 @@ public class PageData
 
 	public int Width { get; set; } = 40;
 	public int Height { get; set; } = 26;
+	public int OffsetX { get; set; } = 0;
+	public int OffsetY { get; set; } = 0;
 }
 
 public class SavedPageData
@@ -193,7 +200,7 @@ public partial class FontMakerForm
 	{
 		// Save the current page data
 		var currentPage = Pages[CurrentPageIndex];
-		currentPage.Save(AtariView.ViewBytes, AtariView.UseFontOnLine);
+		currentPage.Save();
 	}
 
 	private void SwopPage(bool saveCurrent)
@@ -219,8 +226,15 @@ public partial class FontMakerForm
 	{
 		// Select the next page and copy the data
 		var page = Pages[nextPageIndex];
+
 		AtariView.ViewBytes = page.View.Clone() as byte[,];
 		AtariView.UseFontOnLine = page.SelectedFont.Clone() as byte[];
+		AtariView.Width = page.Width;
+		AtariView.Height = page.Height;
+		AtariView.OffsetX = page.OffsetX;
+		AtariView.OffsetY = page.OffsetY;
+
+		UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
 
 		CurrentPageIndex = nextPageIndex;
 		CurrentPage = Pages[CurrentPageIndex];

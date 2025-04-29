@@ -116,7 +116,7 @@ namespace FontMaker
 		}
 		private void ButtonReplaceXwithYInViewClick(object sender, EventArgs e)
 		{
-			MainForm?.ReplaceCharXWithY(ReplaceThisChar, ReplaceWithThisChar, checkFont1.Checked, checkFont2.Checked, checkFont3.Checked, checkFont4.Checked, FullScreen);
+			MainForm?.ReplaceCharXWithY(ReplaceThisChar, ReplaceWithThisChar, checkFont1.Checked, checkFont2.Checked, checkFont3.Checked, checkFont4.Checked, new Rectangle(0, 0, AtariView.Width - 1, AtariView.Height - 1));
 		}
 
 		private void buttonReplaceXwithYInArea_Click(object sender, EventArgs e)
@@ -169,27 +169,26 @@ namespace FontMaker
 			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Right, ActionArea);
 		}
 
-		private static Rectangle FullScreen = new Rectangle(0, 0, 39, 25);
 		private void buttonViewShiftUp_Click(object sender, EventArgs e)
 		{
-			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Up, FullScreen);
+			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Up, new Rectangle(0, 0, AtariView.Width - 1, AtariView.Height - 1));
 		}
 		private void buttonViewShiftDown_Click(object sender, EventArgs e)
 		{
-			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Down, FullScreen);
+			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Down, new Rectangle(0, 0, AtariView.Width - 1, AtariView.Height - 1));
 		}
 		private void buttonViewShiftLeft_Click(object sender, EventArgs e)
 		{
-			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Left, FullScreen);
+			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Left, new Rectangle(0, 0, AtariView.Width - 1, AtariView.Height - 1));
 		}
 		private void buttonViewShiftRight_Click(object sender, EventArgs e)
 		{
-			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Right, FullScreen);
+			MainForm?.ActionAreaShift(comboBoxPages.SelectedIndex, FontMakerForm.DirectionFlags.Right, new Rectangle(0, 0, AtariView.Width - 1, AtariView.Height - 1));
 		}
 
 		private void buttonClearView_Click(object sender, EventArgs e)
 		{
-			MainForm?.FillArea(FullScreen, 0);
+			MainForm?.FillArea(new Rectangle(0, 0, AtariView.Width-1, AtariView.Height-1), 0);
 		}
 
 		private void buttonClearArea_Click(object sender, EventArgs e)
@@ -215,7 +214,7 @@ namespace FontMaker
 
 		private void buttonFillView_Click(object sender, EventArgs e)
 		{
-			MainForm?.FillArea(FullScreen, FillWithThisChar);
+			MainForm?.FillArea(new Rectangle(0, 0, AtariView.Width - 1, AtariView.Height - 1), FillWithThisChar);
 		}
 
 		private void buttonFillArea_Click(object sender, EventArgs e)

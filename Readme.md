@@ -90,6 +90,18 @@ Ctrl+0 ... 9 lets you quickly select any of the first 10 pages in your list.
 
 Tip: Drawing an animation over a couple of pages and quickly flipping through them is a quick way to check things out.
 
+![11a](images/11a.JPG)
+Each page can be a different size. Use the config button in the page editor section to open the configuration tool.
+
+![11b](images/11b.JPG)
+
+The current page dimensions are shown at the top.
+1. Set the new dimensions.
+2. If the height is increasing then specify which font to use for the new lines
+3. Hit the [Resize] button to apply the new dimensions.
+
+If the page size decreases you will be asked to confirm the new dimensions. You can use the Undo buttons to reverse any mistakes you make.
+
 **Mega Copy mode**
 Mega Copy mode has been added in version 1.5, it allows you to copy multiple characters from the font window to the view window and vice versa. It also allows for copy/paste operations in the **view window**.
 
@@ -155,12 +167,15 @@ One special feature is the ability to paste the copy area back into the selected
 
 **Export View**
 The view window is a useful canvas area where you can test your creations and see if your fonts work out.
+
 You can export the view window data in various formats. Clicking the *[Export View]* button opens up the following window:
 ![13](images/13.JPG)
 
-At the top you can select the export format: Binary Data, Assembler, Action!, Atari Basic, FastBasic or MADS dta. Some of these options allow for the data type to be switched between decimal and hex formatting.
+At the top you can select the export format: Binary Data, Assembler, Action!, Atari Basic, FastBasic or MADS dta, C or MadPascal. Some of these options allow for the data type to be switched between decimal and hex formatting.
 
-The power of the exporter comes from selecting export region.  By default the whole view is selected, Top-left to bottom-right (40x26). By clicking and dragging with the left-mouse button held down you can select an export area. If the export format is text then it will be shown in the right hand side window, which you can copy and paste into your source code, or export to disc with the *[Export...]* button.
+The power of the exporter comes from selecting an export region. By default the whole view is selected, Top-left to bottom-right (40x26 or the size of the page). By holding down the left mouse button and dragging the mouse you can select an export area. If the export format is text, then the output will be shown in the right hand side window, which you can copy and paste into your source code, or export to disc with the *[Export...]* button.
+
+You can use the scroll bars on the side or the OffsetX/Y controls to shift the visible area of a page.
 
 **Import View**
 The [Import View] button can be used to convert binary data into view data.
@@ -183,6 +198,8 @@ To find out where you have used the character left-click it and a box with more 
 Clicking the character will also select it in the character editor.
 You can click a text line in the details box to quickly jump to the page where the character was used.
 Having highlighted a character to get its detailed information you can use the mouse-wheel to move to the previous or next character or hold down the Control key to move by a row at a time.
+
+
 
 ## Clipboard
 Since version 1.5 windows clipboard is used by Atari FontMaker. That means you can copy character or set of characters (Mega Copy mode) between multiple instances of Atari FontMaker.
@@ -349,12 +366,15 @@ Double Click on a tile in the horizontal tile set viewer to select it for drawin
 
 ## Changes/History
 
+V1.6.17.0
+The view area can now be set to any size (1024x1024 is max).
+Together with the tiles this makes Atari Font Maker more like an all-in-one map editor.
+
 V1.6.16.4
 The size of tiles has increased from 5x5 to 8x8.
 Double Clicking on a specific tile in the tile set viewer now selects the tile for drawing.
 Added support for MadPascal export of font and view data
 Added a Show Grid option in the Tile Set Editor.
-
 
 V1.6.16.3
 Improved the clipboard handling. If the clipboard data is damaged or incorrect then Atari Font Maker will try to fix as much of the data as it can.

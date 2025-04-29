@@ -624,14 +624,21 @@ namespace FontMaker
 
 		private void ColorMode_Change()
 		{
+			// Note: Color mode can cause Y-Offset issues.
+			// Mode 2,4 and 10 have 26 lines
+			// Mode 5 only has 13.
+			// When switching away from mode 5 then make sure that the view Y-offset is set correctly.
+			
 			InMode5 = false;
 
 			if (!InColorMode)
 			{
+				UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
 				RedrawLineTypes();
 				ShowCorrectFontBank();
 				ShowColorSelectors();
 				TileSetEditorForm?.SwitchColorMode();
+				UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
 				return;
 			}
 
@@ -641,6 +648,7 @@ namespace FontMaker
 			InMode5 = WhichColorMode == 5;
 			AtariFontRenderer.RebuildFontCache(WhichColorMode);
 
+			UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
 			RedrawLineTypes();
 			ShowCorrectFontBank();
 			RedrawView();

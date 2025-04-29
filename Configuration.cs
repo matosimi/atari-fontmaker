@@ -20,6 +20,9 @@ namespace FontMaker
 		public int ExportViewRegionY { get; set; }
 		public int ExportViewRegionW { get; set; }
 		public int ExportViewRegionH { get; set; }
+		public int ExportViewOffsetX { get; set; }
+		public int ExportViewOffsetY { get; set; }
+
 		public bool ExportViewTranspose { get; set; }
 
 		public bool ImportViewRemember { get; set; }
@@ -131,6 +134,7 @@ namespace FontMaker
 				Configuration.Values.ExportViewExportType,
 				Configuration.Values.ExportViewDataType,
 				new Rectangle(Configuration.Values.ExportViewRegionX, Configuration.Values.ExportViewRegionY, Configuration.Values.ExportViewRegionW, Configuration.Values.ExportViewRegionH),
+				new Point(Configuration.Values.ExportViewOffsetX, Configuration.Values.ExportViewOffsetY),
 				Configuration.Values.ExportViewTranspose
 			);
 
@@ -155,22 +159,30 @@ namespace FontMaker
 			Configuration.Values.AnalysisDupColor = FontAnalysisWindowForm.GetDuplicateColor;
 			Configuration.Values.AnalysisDupAlpha = FontAnalysisWindowForm.GetDuplicateAlpha;
 
-			(Configuration.Values.ExportViewRemember, Configuration.Values.ExportViewExportType, Configuration.Values.ExportViewDataType, var exportRegion, Configuration.Values.ExportViewTranspose)
-				= ExportViewWindowForm.SaveConfiguration();
+			(
+				Configuration.Values.ExportViewRemember, 
+				Configuration.Values.ExportViewExportType, 
+				Configuration.Values.ExportViewDataType, 
+				var exportRegion, 
+				var exportOffset,
+				Configuration.Values.ExportViewTranspose
+			) = ExportViewWindowForm.SaveConfiguration();
+
 			Configuration.Values.ExportViewRegionX = exportRegion.X;
 			Configuration.Values.ExportViewRegionY = exportRegion.Y;
 			Configuration.Values.ExportViewRegionW = exportRegion.Width;
 			Configuration.Values.ExportViewRegionH = exportRegion.Height;
+			Configuration.Values.ExportViewOffsetX = exportOffset.X;
+			Configuration.Values.ExportViewOffsetY = exportOffset.Y;
 
 			(
-					Configuration.Values.ImportViewRemember, 
-					Configuration.Values.ImportLineWidth, 
-					Configuration.Values.ImportSkipX, 
-					Configuration.Values.ImportSkipY,
-					Configuration.Values.ImportWidth,
-					Configuration.Values.ImportHeight
-					)
-				= ImportViewWindowForm.SaveConfiguration();
+				Configuration.Values.ImportViewRemember, 
+				Configuration.Values.ImportLineWidth, 
+				Configuration.Values.ImportSkipX, 
+				Configuration.Values.ImportSkipY,
+				Configuration.Values.ImportWidth,
+				Configuration.Values.ImportHeight
+			) = ImportViewWindowForm.SaveConfiguration();
 
 			Configuration.Save();
 		}

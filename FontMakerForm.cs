@@ -41,11 +41,11 @@ namespace FontMaker
 		public enum MegaCopyStatusFlags
 		{
 			None,
-			Selecting, 
-			Selected, 
-			Pasting,		// Can paste into view and font
-			PastingView,	// Can only paste into the view
-			PastingFont,	// Can only paste into the font
+			Selecting,
+			Selected,
+			Pasting,        // Can paste into view and font
+			PastingView,    // Can only paste into the view
+			PastingFont,    // Can only paste into the font
 		}
 
 		public enum DirectionFlags
@@ -784,6 +784,12 @@ namespace FontMaker
 			e.Cancel = true;
 			ActionExitApplication();
 		}
+
+		private void buttonTileSetEditor_Click(object sender, EventArgs e)
+		{
+			TileSetEditorForm?.Show();
+			TileSetEditorForm?.Focus();
+		}
 		#endregion
 
 		// ==========================================================================
@@ -1049,15 +1055,15 @@ namespace FontMaker
 				// 40 bytes mode
 				Width = 1210;
 				vScrollBar.Location = new Point(1176, 0);
-				hScrollBar.Width = 640;
+				hScrollBar.Width = 673;
 				//Width += (checkBox40Bytes.Checked ? (130 + 16) : (-130 - 16));
 			}
 			else
 			{
 				// 32 bytes mode
-				Width = 1210 - 8*16;
-				vScrollBar.Location = new Point(1176 - 8*16, 0);
-				hScrollBar.Width = 640 - 8 * 16;
+				Width = 1210 - 8 * 16;
+				vScrollBar.Location = new Point(1176 - 8 * 16, 0);
+				hScrollBar.Width = 673 - 8 * 16;
 			}
 		}
 
@@ -1235,6 +1241,18 @@ namespace FontMaker
 		private void trackBarSkipCharX_Scroll(object sender, EventArgs e)
 		{
 			checkBoxSkipChar0.Text = $"Skip char #{trackBarSkipCharX.Value} on paste";
+		}
+
+		private void buttonConfigurePage_Click(object sender, EventArgs e)
+		{
+			ActionConfigurePage();
+		}
+
+		private void scrollBar_ValueChanged(object sender, EventArgs e)
+		{
+			if (PreventScrollProcessing)
+				return;
+			ActionAtariViewOffsetChanged();
 		}
 
 		#endregion
@@ -1609,34 +1627,5 @@ namespace FontMaker
 		}
 
 		#endregion
-
-
-		private void buttonTileSetEditor_Click(object sender, EventArgs e)
-		{
-			TileSetEditorForm?.Show();
-			TileSetEditorForm?.Focus();
-		}
-
-		public void SwitchToTileDrawing()
-		{
-			// The font and characters have been copied to the clipboard
-			// Enabled specific clipboard modification/action buttons
-			if (buttonMegaCopy.Checked == false)
-			{
-				// Switch into MegaCopy mode
-				buttonMegaCopy.Checked = true;
-				MegaCopy_Click(0, EventArgs.Empty);
-			}
-
-
-			ConfigureClipboardActionButtons();
-
-			UpdateClipboardInformation();
-			PastingToView = true;
-			RevalidateClipboard();
-			ExecutePasteFromClipboard();
-
-			pictureBoxAtariView.Focus();
-		}
 	}
 }

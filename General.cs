@@ -260,5 +260,27 @@
 			pictureBoxAbout.Visible = false;
 			Environment.Exit(Environment.ExitCode);
 		}
+
+		public void SwitchToTileDrawing()
+		{
+			// The font and characters have been copied to the clipboard
+			// Enabled specific clipboard modification/action buttons
+			if (buttonMegaCopy.Checked == false)
+			{
+				// Switch into MegaCopy mode
+				buttonMegaCopy.Checked = true;
+				MegaCopy_Click(0, EventArgs.Empty);
+			}
+
+
+			ConfigureClipboardActionButtons();
+
+			UpdateClipboardInformation();
+			PastingToView = true;
+			RevalidateClipboard();
+			ExecutePasteFromClipboard();
+
+			pictureBoxAtariView.Focus();
+		}
 	}
 }

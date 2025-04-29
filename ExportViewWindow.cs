@@ -1,13 +1,17 @@
 ﻿using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.Text;
+
 #pragma warning disable WFO1000
 
 namespace FontMaker
 {
 	public partial class ExportViewWindow : Form
 	{
-		private const int BITMAP_WIDTH = 320;
-		private const int BITMAP_HEIGHT = 208;
+		private const int BITMAP_WIDTH = 640;
+		private const int BITMAP_HEIGHT = 416;
+
+		private const int CHAR_PIXEL_WIDTH = 16;
 
 		private int PreviousExportType { get; set; } = -1;
 		private int PreviousDataType { get; set; } = -1;
@@ -19,6 +23,8 @@ namespace FontMaker
 
 		public bool InColorMode { get; set; }
 		public int WhichColorMode { get; set; }
+
+		public bool InOffsetUpdate { get; set; }
 
 		public enum FormatTypes
 		{
@@ -40,8 +46,11 @@ namespace FontMaker
 		private static readonly SolidBrush cyanBrush = new(Color.Cyan);
 
 		private Rectangle _exportRegion = new(0, 0, 40, 26);
+		private Point _exportOffset = new Point(0, 0);
 
 		private SelectionStatusFlags _selectionStatus;
+		private int OffsetX { get; set; }
+		private int OffsetY { get; set; }
 
 		public ExportViewWindow()
 		{
@@ -49,7 +58,23 @@ namespace FontMaker
 			RememberSelection = true;
 		}
 
-		public void LoadConfiguration(bool rememberSelection, int exportType, int dataType, Rectangle box, bool transpose)
+		#region Load/Save the current configuration
+		private void ExportViewWindow_FormClosing(object sender, FormClosingEventArgs e)
+		{
+			if (checkBoxRememberState.Checked)
+			{
+				PreviousExportType = ComboBoxExportType.SelectedIndex;
+				PreviousDataType = ComboBoxDataType.SelectedIndex;
+				PreviousTransposeFlag = checkBoxTranspose.Checked;
+				RememberSelection = true;
+			}
+			else
+			{
+				RememberSelection = false;
+			}
+		}
+
+		public void LoadConfiguration(bool rememberSelection, int exportType, int dataType, Rectangle box, Point offset, bool transpose)
 		{
 			if (rememberSelection)
 			{
@@ -59,22 +84,58 @@ namespace FontMaker
 
 				PreviousDataType = dataType;
 				_exportRegion = box;
+				_exportOffset = offset;
 				if (_exportRegion.X < 0) _exportRegion.X = 0;
 				if (_exportRegion.Y < 0) _exportRegion.Y = 0;
-				if (_exportRegion.X + _exportRegion.Width >= 40) _exportRegion.Width = 40 - _exportRegion.X;
-				if (_exportRegion.Y + _exportRegion.Height >= 26) _exportRegion.Height = 26 - _exportRegion.X;
+				if (_exportRegion.X + _exportRegion.Width >= AtariView.Width) _exportRegion.Width = AtariView.Width - _exportRegion.X;
+				if (_exportRegion.Y + _exportRegion.Height >= AtariView.Height) _exportRegion.Height = AtariView.Height - _exportRegion.X;
 				if (_exportRegion.Width < 1) _exportRegion.Width = 1;
 				if (_exportRegion.Height < 1) _exportRegion.Height = 1;
 			}
 		}
 
-		public (bool, int, int, Rectangle, bool) SaveConfiguration()
+		public (bool, int, int, Rectangle, Point, bool) SaveConfiguration()
 		{
-			return (RememberSelection, PreviousExportType, PreviousDataType, _exportRegion, PreviousTransposeFlag);
+			return (RememberSelection, PreviousExportType, PreviousDataType, _exportRegion, _exportOffset, PreviousTransposeFlag);
 		}
+		#endregion
 
 		private void ExportViewWindow_Load(object sender, EventArgs e)
 		{
+			// Check if the view is larger than 40x26. If so then enable the horizontal and or vertical scrollbars
+			if (AtariView.Width > 40)
+			{
+				// Horizontal scroll bar
+				hScrollBar.Enabled = true;
+				hScrollBar.Maximum = AtariView.Width - 40;
+				hScrollBar.Value = 0;
+
+				numericFromX.Maximum = AtariView.Width - 1;
+				numericOffsetX.Maximum = AtariView.Width - 40;
+				numericWidth.Maximum = AtariView.Width;
+				FullViewRegion.Width = AtariView.Width;
+
+				labelOffsetX.Enabled = true;
+				numericOffsetX.Enabled = true;
+			}
+
+			if (AtariView.Height > 26)
+			{
+				// Vertical scroll bar
+				vScrollBar.Enabled = true;
+				vScrollBar.Maximum = AtariView.Height - 26;
+				vScrollBar.Value = 0;
+
+				numericFromY.Maximum = AtariView.Height - 1;
+				numericOffsetY.Maximum = AtariView.Height - 26;
+				numericHeight.Maximum = AtariView.Height;
+				FullViewRegion.Height = AtariView.Height;
+
+				labelOffsetY.Enabled = true;
+				numericOffsetY.Enabled = true;
+			}
+
+			pictureBoxViewEditorRubberBand_Resize(null, EventArgs.Empty);
 			RedrawSmallView();
 			MemoExport.Clear();
 
@@ -96,38 +157,31 @@ namespace FontMaker
 
 				ComboBoxExportType.SelectedIndex = 0; // This will fire the export type handler and setup the rest of the GUI
 
-				_exportRegion = new Rectangle(0, 0, 40, 26);
-			}
+				_exportRegion = new Rectangle(0, 0, AtariView.Width, AtariView.Height);
+			} 
 
 			UpdateRegionEdits();
 
-			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
-			pictureBoxViewEditorRubberBand.Visible = true;
-		}
-
-		private void ExportViewWindow_FormClosing(object sender, FormClosingEventArgs e)
-		{
-			if (checkBoxRememberState.Checked)
-			{
-				PreviousExportType = ComboBoxExportType.SelectedIndex;
-				PreviousDataType = ComboBoxDataType.SelectedIndex;
-				PreviousTransposeFlag = checkBoxTranspose.Checked;
-				RememberSelection = true;
-			}
-			else
-			{
-				RememberSelection = false;
-			}
+			ShowSelectionRubberBand();
 		}
 
 		private void UpdateRegionEdits()
 		{
+			if (InOffsetUpdate) return;
+			InOffsetUpdate = true;
+
 			numericFromX.Value = _exportRegion.X;
 			numericFromY.Value = _exportRegion.Y;
 			numericWidth.Value = _exportRegion.Width;
 			numericHeight.Value = _exportRegion.Height;
+			numericOffsetX.Value = 0;
+			numericOffsetY.Value = 0;
+
+			InOffsetUpdate = false;
 
 			UpdateRegionLabel();
+			RedrawSmallView();
+			ShowSelectionRubberBand();
 		}
 
 		private void UpdateRegionLabel()
@@ -140,50 +194,43 @@ namespace FontMaker
 			var colorOffset = InColorMode ? 512 : 0;
 			var img = Helpers.GetImage(pictureBoxAtariViewSmall);
 			using (var gr = Graphics.FromImage(img))
+			using (var wrapMode = new ImageAttributes())
 			{
+				wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+				gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+				//gr.Clear(AtariPalette[SetOfSelectedColors[1]]);
+
 				var destRect = new Rectangle
 				{
-					Width = 1,
-					Height = 1,
+					Width = 16,
+					Height = 16,
 				};
 
 				var srcRect = new Rectangle
 				{
-					Width = 1,
-					Height = 1,
+					Width = 16,
+					Height = 16,
 				};
 
 				for (var y = 0; y < AtariView.VIEW_HEIGHT; y++)
 				{
 					for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
 					{
-						var rx = AtariView.ViewBytes[x, y] % 32;
-						var ry = AtariView.ViewBytes[x, y] / 32;
+						var charFromView = AtariView.ViewBytes[OffsetX + x, OffsetY + y];
+						var rx = charFromView % 32;
+						var ry = charFromView / 32;
 
-						destRect.X = x * 8;
-						destRect.Y = y * 8;
+						destRect.X = x * 16;
+						destRect.Y = y * 16;
 
 						srcRect.X = rx * 16;
-						srcRect.Y = ry * 16 + Constants.FontYOffset[AtariView.UseFontOnLine[y] - 1] + colorOffset;
+						srcRect.Y = ry * 16 + Constants.FontYOffset[AtariView.UseFontOnLine[OffsetY + y] - 1] + colorOffset;
 
-						for (var h = 0; h < 8; ++h)
-						{
-							for (var w = 0; w < 8; ++w)
-							{
-								gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect, GraphicsUnit.Pixel);
-								destRect.X++;
-								srcRect.X += 2;
-							}
-
-							destRect.X -= 8;
-							srcRect.X -= 16;
-							destRect.Y++;
-							srcRect.Y += 2;
-						}
-
+						gr.DrawImage(AtariFontRenderer.BitmapFontBanks, destRect, srcRect.Left, srcRect.Top, srcRect.Width, srcRect.Height, GraphicsUnit.Pixel, wrapMode);
 					}
 				}
 			}
+
 			pictureBoxAtariViewSmall.Refresh();
 		}
 
@@ -203,69 +250,69 @@ namespace FontMaker
 			switch ((FormatTypes)ComboBoxExportType.SelectedIndex)
 			{
 				case FormatTypes.BinaryData:
-					{
-						ButtonCopyClipboard.Enabled = false;
+				{
+					ButtonCopyClipboard.Enabled = false;
 
-						ComboBoxDataType.Items.Add("Binary");
-						ComboBoxDataType.SelectedIndex = 0;
-						ComboBoxDataType.Enabled = false;
-						MemoExport.Text = string.Empty;
-					}
-					break;
+					ComboBoxDataType.Items.Add("Binary");
+					ComboBoxDataType.SelectedIndex = 0;
+					ComboBoxDataType.Enabled = false;
+					MemoExport.Text = string.Empty;
+				}
+				break;
 				case FormatTypes.Assembler:
-					{
-						ButtonCopyClipboard.Enabled = true;
+				{
+					ButtonCopyClipboard.Enabled = true;
 
-						ComboBoxDataType.Text = @"Select an item";
-						ComboBoxDataType.Items.Add("Byte in decimal");
-						ComboBoxDataType.Items.Add("Byte in hexadecimal");
-						ComboBoxDataType.SelectedIndex = 0;
-					}
-					break;
+					ComboBoxDataType.Text = @"Select an item";
+					ComboBoxDataType.Items.Add("Byte in decimal");
+					ComboBoxDataType.Items.Add("Byte in hexadecimal");
+					ComboBoxDataType.SelectedIndex = 0;
+				}
+				break;
 
 				case FormatTypes.Action:
 				case FormatTypes.CDataArray:
 				case FormatTypes.MadPascalArray:
-					{
-						ButtonCopyClipboard.Enabled = true;
+				{
+					ButtonCopyClipboard.Enabled = true;
 
-						ComboBoxDataType.Text = @"Select an item";
-						ComboBoxDataType.Items.Add("Byte in decimal");
-						ComboBoxDataType.Items.Add("Byte in hexadecimal");
-						ComboBoxDataType.SelectedIndex = 0;
-					}
-					break;
+					ComboBoxDataType.Text = @"Select an item";
+					ComboBoxDataType.Items.Add("Byte in decimal");
+					ComboBoxDataType.Items.Add("Byte in hexadecimal");
+					ComboBoxDataType.SelectedIndex = 0;
+				}
+				break;
 
 				case FormatTypes.AtariBasic:
-					{
-						ButtonCopyClipboard.Enabled = true;
+				{
+					ButtonCopyClipboard.Enabled = true;
 
-						ComboBoxDataType.Items.Add("Byte in decimal");
-						ComboBoxDataType.SelectedIndex = 0;
-						ComboBoxDataType.Enabled = false;
-					}
-					break;
+					ComboBoxDataType.Items.Add("Byte in decimal");
+					ComboBoxDataType.SelectedIndex = 0;
+					ComboBoxDataType.Enabled = false;
+				}
+				break;
 
 				case FormatTypes.FastBasic:
-					{
-						ButtonCopyClipboard.Enabled = true;
+				{
+					ButtonCopyClipboard.Enabled = true;
 
-						ComboBoxDataType.Items.Add("Byte in decimal");
-						ComboBoxDataType.SelectedIndex = 0;
-						ComboBoxDataType.Enabled = false;
-					}
-					break;
+					ComboBoxDataType.Items.Add("Byte in decimal");
+					ComboBoxDataType.SelectedIndex = 0;
+					ComboBoxDataType.Enabled = false;
+				}
+				break;
 
 				case FormatTypes.MADSdta:
-					{
-						ButtonCopyClipboard.Enabled = true;
+				{
+					ButtonCopyClipboard.Enabled = true;
 
-						ComboBoxDataType.Text = @"Select an item";
-						ComboBoxDataType.Items.Add("Byte in decimal");
-						ComboBoxDataType.Items.Add("Byte in hexadecimal");
-						ComboBoxDataType.SelectedIndex = 0;
-					}
-					break;
+					ComboBoxDataType.Text = @"Select an item";
+					ComboBoxDataType.Items.Add("Byte in decimal");
+					ComboBoxDataType.Items.Add("Byte in hexadecimal");
+					ComboBoxDataType.SelectedIndex = 0;
+				}
+				break;
 			}
 
 			ComboBoxDataTypeChange(this, EventArgs.Empty);
@@ -458,26 +505,30 @@ namespace FontMaker
 				return;
 			}
 
-			var rx = e.X / 8;
-			var ry = e.Y / 8;
+			var rx = e.X / CHAR_PIXEL_WIDTH;
+			var ry = e.Y / 16;
+
+			if (rx < 0 || rx >= 40 || ry < 0 || ry >= 26)
+			{
+				return;
+			}
 
 			switch (_selectionStatus)
 			{
 				case SelectionStatusFlags.None:
 				case SelectionStatusFlags.Selected:
+				{
+					if (e.Button == MouseButtons.Left)
 					{
-						if (e.Button == MouseButtons.Left)
-						{
-							// Define copy origin point
-							_exportRegion = new Rectangle(rx, ry, 1, 1);
-							UpdateRegionEdits();
-							_selectionStatus = SelectionStatusFlags.Selecting;
+						// Define copy origin point
+						_exportRegion = new Rectangle(OffsetX + rx, OffsetY + ry, 1, 1);
+						UpdateRegionEdits();
+						_selectionStatus = SelectionStatusFlags.Selecting;
 
-							pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + e.X - e.X % 8 - 2, pictureBoxAtariViewSmall.Top + e.Y - e.Y % 8 - 2, 10, 10);
-							pictureBoxViewEditorRubberBand.Visible = true;
-						}
-						break;
+						ShowSelectionRubberBand();
 					}
+					break;
+				}
 			}
 		}
 
@@ -488,38 +539,43 @@ namespace FontMaker
 				return;
 			}
 
-			var rx = e.X / 8;
-			var ry = e.Y / 8;
+			var rx = e.X / CHAR_PIXEL_WIDTH;
+			var ry = e.Y / 16;
 
-			switch (_selectionStatus)
+			if (rx < 0 || rx >= 40 || ry < 0 || ry >= 26)
 			{
-				case SelectionStatusFlags.Selecting:
-					{
-						if (ry <= _exportRegion.Y)
-						{
-							_exportRegion.Height = 1;
-						}
-						else
-						{
-							_exportRegion.Height = ry - _exportRegion.Y + 1;
-						}
+				return;
+			}
 
-						if (rx <= _exportRegion.X)
-						{
-							_exportRegion.Width = 1;
-						}
-						else
-						{
-							_exportRegion.Width = rx - _exportRegion.X + 1;
-						}
+			// Adjust for screen offset
+			rx += OffsetX;
+			ry += OffsetY;
 
-						UpdateRegionEdits();
+			if (_selectionStatus == SelectionStatusFlags.Selecting && e.Button == MouseButtons.Left)
+			{
+				if (ry <= _exportRegion.Y)
+				{
+					_exportRegion.Height = 1;
+				}
+				else
+				{
+					_exportRegion.Height = ry - _exportRegion.Y + 1;
+				}
 
-						_selectionStatus = SelectionStatusFlags.Selected;
+				if (rx <= _exportRegion.X)
+				{
+					_exportRegion.Width = 1;
+				}
+				else
+				{
+					_exportRegion.Width = rx - _exportRegion.X + 1;
+				}
 
-						timerUpdateExportSample.Enabled = true;
-						break;
-					}
+				UpdateRegionEdits();
+
+				_selectionStatus = SelectionStatusFlags.Selected;
+
+				timerUpdateExportSample.Enabled = true;
 			}
 		}
 
@@ -528,53 +584,59 @@ namespace FontMaker
 			switch (_selectionStatus)
 			{
 				case SelectionStatusFlags.Selecting:
+				{
+					if (e.X >= BITMAP_WIDTH || e.Y >= BITMAP_HEIGHT || e.X < 0 || e.Y < 0)
 					{
-						if (e.X >= BITMAP_WIDTH || e.Y >= BITMAP_HEIGHT || e.X < 0 || e.Y < 0)
-						{
-							return;
-						}
-
-						var rx = e.X / 8;
-						var ry = e.Y / 8;
-
-						var origWidth = pictureBoxViewEditorRubberBand.Width;
-						var origHeight = pictureBoxViewEditorRubberBand.Height;
-
-						var w = 10;
-						var h = 10;
-						var temp = (rx - _exportRegion.X + 1) * 8 + 4;
-						if (temp >= 10)
-							w = temp;
-
-						temp = (ry - _exportRegion.Y + 1) * 8 + 4;
-						if (temp >= 10)
-							h = temp;
-
-						if (w != origWidth || h != origHeight)
-						{
-							pictureBoxViewEditorRubberBand.Size = new Size(w, h);
-						}
-
-						if (ry <= _exportRegion.Y)
-						{
-							_exportRegion.Height = 1;
-						}
-						else
-						{
-							_exportRegion.Height = ry - _exportRegion.Y + 1;
-						}
-
-						if (rx <= _exportRegion.X)
-						{
-							_exportRegion.Width = 1;
-						}
-						else
-						{
-							_exportRegion.Width = rx - _exportRegion.X + 1;
-						}
-						UpdateRegionEdits();
-						break;
+						return;
 					}
+
+					var rx = OffsetX + e.X / CHAR_PIXEL_WIDTH;
+					var ry = OffsetY + e.Y / 16;
+
+					if (rx < 0 || rx >= AtariView.Width || ry < 0 || ry >= AtariView.Height)
+					{
+						// Note: This should not happen but when running on Mac things get funky
+						return;
+					}
+
+					var origWidth = pictureBoxViewEditorRubberBand.Width;
+					var origHeight = pictureBoxViewEditorRubberBand.Height;
+
+					var w = 20;
+					var h = 20;
+					var temp = (rx - _exportRegion.X + 1) * 16 + 4;
+					if (temp >= 20)
+						w = temp;
+
+					temp = (ry - _exportRegion.Y + 1) * 16 + 4;
+					if (temp >= 20)
+						h = temp;
+
+					if (w != origWidth || h != origHeight)
+					{
+						pictureBoxViewEditorRubberBand.Size = new Size(w, h);
+					}
+
+					if (ry <= _exportRegion.Y)
+					{
+						_exportRegion.Height = 1;
+					}
+					else
+					{
+						_exportRegion.Height = ry - _exportRegion.Y + 1;
+					}
+
+					if (rx <= _exportRegion.X)
+					{
+						_exportRegion.Width = 1;
+					}
+					else
+					{
+						_exportRegion.Width = rx - _exportRegion.X + 1;
+					}
+					UpdateRegionEdits();
+					break;
+				}
 
 			}
 		}
@@ -610,12 +672,11 @@ namespace FontMaker
 			if (_selectionStatus is SelectionStatusFlags.None or SelectionStatusFlags.Selected)
 			{
 				_exportRegion.X = (int)numericFromX.Value;
-				if (_exportRegion.X + _exportRegion.Width > 40)
-					_exportRegion.Width = 40 - _exportRegion.X;
+				if (_exportRegion.X + _exportRegion.Width > AtariView.Width)
+					_exportRegion.Width = AtariView.Width - _exportRegion.X;
 				UpdateRegionEdits();
 
-				pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
-
+				ShowSelectionRubberBand();
 				timerUpdateExportSample.Enabled = true;
 			}
 		}
@@ -625,12 +686,11 @@ namespace FontMaker
 			if (_selectionStatus is SelectionStatusFlags.None or SelectionStatusFlags.Selected)
 			{
 				_exportRegion.Width = (int)numericWidth.Value;
-				if (_exportRegion.X + _exportRegion.Width > 40)
-					_exportRegion.Width = 40 - _exportRegion.X;
+				if (_exportRegion.X + _exportRegion.Width > AtariView.Width)
+					_exportRegion.Width = AtariView.Width - _exportRegion.X;
 				UpdateRegionEdits();
 
-				pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
-
+				ShowSelectionRubberBand();
 				timerUpdateExportSample.Enabled = true;
 			}
 		}
@@ -640,12 +700,11 @@ namespace FontMaker
 			if (_selectionStatus is SelectionStatusFlags.None or SelectionStatusFlags.Selected)
 			{
 				_exportRegion.Y = (int)numericFromY.Value;
-				if (_exportRegion.Y + _exportRegion.Height > 26)
-					_exportRegion.Height = 26 - _exportRegion.Y;
+				if (_exportRegion.Y + _exportRegion.Height > AtariView.Height)
+					_exportRegion.Height = AtariView.Height - _exportRegion.Y;
 				UpdateRegionEdits();
 
-				pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
-
+				ShowSelectionRubberBand();
 				timerUpdateExportSample.Enabled = true;
 			}
 		}
@@ -655,12 +714,11 @@ namespace FontMaker
 			if (_selectionStatus is SelectionStatusFlags.None or SelectionStatusFlags.Selected)
 			{
 				_exportRegion.Height = (int)numericHeight.Value;
-				if (_exportRegion.Y + _exportRegion.Height > 26)
-					_exportRegion.Height = 26 - _exportRegion.Y;
+				if (_exportRegion.Y + _exportRegion.Height > AtariView.Height)
+					_exportRegion.Height = AtariView.Height - _exportRegion.Y;
 				UpdateRegionEdits();
 
-				pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
-
+				ShowSelectionRubberBand();
 				timerUpdateExportSample.Enabled = true;
 			}
 		}
@@ -681,9 +739,30 @@ namespace FontMaker
 
 		private void buttonResetSelection_Click(object sender, EventArgs e)
 		{
-			_exportRegion = new Rectangle(0, 0, 40, 26);
+			_exportRegion = new Rectangle(0, 0, AtariView.Width, AtariView.Height);
 			UpdateRegionEdits();
-			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left - 2, pictureBoxAtariViewSmall.Top - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
+			ShowSelectionRubberBand();
+		}
+
+		private void ShowSelectionRubberBand()
+		{
+			var rect = new Rectangle(_exportRegion.X, _exportRegion.Y, _exportRegion.Width, _exportRegion.Height);
+			rect.Offset(-OffsetX, -OffsetY);
+
+			var targetRect = new Rectangle(0, 0, AtariView.VIEW_WIDTH, AtariView.VIEW_HEIGHT);
+			rect.Intersect(targetRect);
+
+			if (rect.IsEmpty)
+			{
+				// Selection box if out of bounds.
+				// So hide it
+				pictureBoxViewEditorRubberBand.Visible = false;
+				return;
+			}
+			// Move the selection cursor
+
+			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left - 2 + rect.X * 16, pictureBoxAtariViewSmall.Top - 2 + rect.Y * 16, rect.Width * 16 + 4, rect.Height * 16 + 4);
+			pictureBoxViewEditorRubberBand.Visible = true;
 		}
 
 		private void ButtonCopyClipboard_Click(object sender, EventArgs e)
@@ -815,11 +894,7 @@ namespace FontMaker
 			}
 
 			UpdateRegionEdits();
-
-
-			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
-			pictureBoxViewEditorRubberBand.Visible = true;
-
+			ShowSelectionRubberBand();
 		}
 
 		private void CheckBoxTranspose_CheckedChanged(object sender, EventArgs e)
@@ -832,6 +907,59 @@ namespace FontMaker
 					ComboBoxDataType.SelectedIndex,
 					checkBoxTranspose.Checked);
 			}
+		}
+
+		private void numericOffsetX_ValueChanged(object sender, EventArgs e)
+		{
+			if (InOffsetUpdate) return;
+			InOffsetUpdate = true;
+
+			OffsetX = (int)numericOffsetX.Value;
+			hScrollBar.Value = OffsetX;
+
+			InOffsetUpdate = false;
+			RedrawSmallView();
+			ShowSelectionRubberBand();
+		}
+
+		private void numericOffsetY_ValueChanged(object sender, EventArgs e)
+		{
+			if (InOffsetUpdate) return;
+			InOffsetUpdate = true;
+
+			OffsetY = (int)numericOffsetY.Value;
+			vScrollBar.Value = OffsetY;
+
+			InOffsetUpdate = false;
+			RedrawSmallView();
+			ShowSelectionRubberBand();
+		}
+
+		private void hScrollBar_ValueChanged(object sender, EventArgs e)
+		{
+			if (InOffsetUpdate) return;
+			InOffsetUpdate = true;
+
+			OffsetX = (int)hScrollBar.Value;
+			numericOffsetX.Value = OffsetX;
+
+			InOffsetUpdate = false;
+			RedrawSmallView();
+			ShowSelectionRubberBand();
+		}
+
+		private void vScrollBar_ValueChanged(object sender, EventArgs e)
+		{
+			if (InOffsetUpdate) return;
+			InOffsetUpdate = true;
+
+			OffsetY = (int)vScrollBar.Value;
+			numericOffsetY.Value = OffsetY;
+
+			InOffsetUpdate = false;
+
+			RedrawSmallView();
+			ShowSelectionRubberBand();
 		}
 	}
 }

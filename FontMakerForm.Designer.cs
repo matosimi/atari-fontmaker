@@ -162,6 +162,7 @@
 			checkBoxStayInPasteMode = new CheckBox();
 			hScrollBar = new HScrollBar();
 			vScrollBar = new VScrollBar();
+			labelOffsets = new Label();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -281,7 +282,7 @@
 			// labelViewCharInfo
 			// 
 			labelViewCharInfo.AutoSize = true;
-			labelViewCharInfo.Location = new Point(523, 436);
+			labelViewCharInfo.Location = new Point(520, 436);
 			labelViewCharInfo.Name = "labelViewCharInfo";
 			labelViewCharInfo.Size = new Size(104, 13);
 			labelViewCharInfo.TabIndex = 6;
@@ -1333,7 +1334,7 @@
 			// checkBox40Bytes
 			// 
 			checkBox40Bytes.AutoSize = true;
-			checkBox40Bytes.Location = new Point(980, 439);
+			checkBox40Bytes.Location = new Point(823, 547);
 			checkBox40Bytes.Name = "checkBox40Bytes";
 			checkBox40Bytes.Size = new Size(68, 17);
 			checkBox40Bytes.TabIndex = 10;
@@ -1588,13 +1589,14 @@
 			// buttonConfigurePage
 			// 
 			buttonConfigurePage.BackgroundImageLayout = ImageLayout.Center;
-			buttonConfigurePage.Enabled = false;
 			buttonConfigurePage.Image = (Image)resources.GetObject("buttonConfigurePage.Image");
 			buttonConfigurePage.Location = new Point(156, 57);
 			buttonConfigurePage.Margin = new Padding(0);
 			buttonConfigurePage.Name = "buttonConfigurePage";
 			buttonConfigurePage.Size = new Size(28, 28);
 			buttonConfigurePage.TabIndex = 35;
+			buttonConfigurePage.UseMnemonic = false;
+			buttonConfigurePage.Click += buttonConfigurePage_Click;
 			// 
 			// label6
 			// 
@@ -1677,7 +1679,7 @@
 			// labelSelectedArea
 			// 
 			labelSelectedArea.AutoSize = true;
-			labelSelectedArea.Location = new Point(695, 436);
+			labelSelectedArea.Location = new Point(863, 436);
 			labelSelectedArea.Name = "labelSelectedArea";
 			labelSelectedArea.Size = new Size(33, 13);
 			labelSelectedArea.TabIndex = 29;
@@ -1715,24 +1717,31 @@
 			// hScrollBar
 			// 
 			hScrollBar.LargeChange = 1;
-			hScrollBar.Location = new Point(536, 417);
-			hScrollBar.Maximum = 40;
-			hScrollBar.Minimum = 40;
+			hScrollBar.Location = new Point(520, 417);
+			hScrollBar.Maximum = 0;
 			hScrollBar.Name = "hScrollBar";
-			hScrollBar.Size = new Size(640, 17);
+			hScrollBar.Size = new Size(673, 17);
 			hScrollBar.TabIndex = 34;
-			hScrollBar.Value = 40;
+			hScrollBar.ValueChanged += scrollBar_ValueChanged;
 			// 
 			// vScrollBar
 			// 
 			vScrollBar.LargeChange = 1;
 			vScrollBar.Location = new Point(1176, 0);
-			vScrollBar.Maximum = 26;
-			vScrollBar.Minimum = 26;
+			vScrollBar.Maximum = 0;
 			vScrollBar.Name = "vScrollBar";
-			vScrollBar.Size = new Size(17, 434);
+			vScrollBar.Size = new Size(17, 416);
 			vScrollBar.TabIndex = 35;
-			vScrollBar.Value = 26;
+			vScrollBar.ValueChanged += scrollBar_ValueChanged;
+			// 
+			// labelOffsets
+			// 
+			labelOffsets.AutoSize = true;
+			labelOffsets.Location = new Point(711, 436);
+			labelOffsets.Name = "labelOffsets";
+			labelOffsets.Size = new Size(81, 13);
+			labelOffsets.TabIndex = 36;
+			labelOffsets.Text = "TL: [0,0]-[39,25]";
 			// 
 			// FontMakerForm
 			// 
@@ -1740,6 +1749,7 @@
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1194, 572);
+			Controls.Add(labelOffsets);
 			Controls.Add(vScrollBar);
 			Controls.Add(hScrollBar);
 			Controls.Add(checkBoxStayInPasteMode);
@@ -1966,5 +1976,6 @@
 		private Label labelPageSize;
 		private HScrollBar hScrollBar;
 		private VScrollBar vScrollBar;
+		private Label labelOffsets;
 	}
 }
