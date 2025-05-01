@@ -169,6 +169,8 @@ namespace FontMaker
 			TileSetEditorForm = new TileSetEditorWindow(this);
 
 			this.Load += FormCreate!;
+
+			Compressors.Prepare();
 		}
 
 		private void FormCreate(object sender, EventArgs e)
@@ -1627,5 +1629,9 @@ namespace FontMaker
 		}
 
 		#endregion
+
+
+		
+
 	}
 }

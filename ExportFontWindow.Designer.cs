@@ -39,6 +39,8 @@
 			ComboBoxFontNumber = new ComboBox();
 			ButtonCopyClipboard = new Button();
 			saveDialog = new SaveFileDialog();
+			checkZX0 = new CheckBox();
+			labelSizeInfo = new Label();
 			SuspendLayout();
 			// 
 			// Label1
@@ -75,7 +77,7 @@
 			ComboBoxExportType.Items.AddRange(new object[] { "Image BMP Mono", "Image BMP Color", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "C data {}", "MadPascal Array", "Binary Data", "Basic listing file" });
 			ComboBoxExportType.Location = new Point(104, 43);
 			ComboBoxExportType.Name = "ComboBoxExportType";
-			ComboBoxExportType.Size = new Size(145, 21);
+			ComboBoxExportType.Size = new Size(216, 21);
 			ComboBoxExportType.TabIndex = 0;
 			ComboBoxExportType.SelectedIndexChanged += ComboBoxExportTypeChange;
 			// 
@@ -85,13 +87,13 @@
 			ComboBoxDataType.FormattingEnabled = true;
 			ComboBoxDataType.Location = new Point(104, 75);
 			ComboBoxDataType.Name = "ComboBoxDataType";
-			ComboBoxDataType.Size = new Size(145, 21);
+			ComboBoxDataType.Size = new Size(216, 21);
 			ComboBoxDataType.TabIndex = 1;
 			ComboBoxDataType.SelectedIndexChanged += ComboBoxDataTypeChange;
 			// 
 			// Button_SaveAs
 			// 
-			Button_SaveAs.Location = new Point(269, 8);
+			Button_SaveAs.Location = new Point(326, 8);
 			Button_SaveAs.Name = "Button_SaveAs";
 			Button_SaveAs.Size = new Size(81, 25);
 			Button_SaveAs.TabIndex = 2;
@@ -101,7 +103,7 @@
 			// 
 			// Button_Cancel
 			// 
-			Button_Cancel.Location = new Point(269, 73);
+			Button_Cancel.Location = new Point(326, 73);
 			Button_Cancel.Name = "Button_Cancel";
 			Button_Cancel.Size = new Size(81, 25);
 			Button_Cancel.TabIndex = 3;
@@ -111,9 +113,9 @@
 			// 
 			// MemoExport
 			// 
-			MemoExport.Location = new Point(8, 104);
+			MemoExport.Location = new Point(8, 154);
 			MemoExport.Name = "MemoExport";
-			MemoExport.Size = new Size(342, 324);
+			MemoExport.Size = new Size(399, 353);
 			MemoExport.TabIndex = 4;
 			MemoExport.Text = "";
 			MemoExport.KeyPress += MemoExportKeyPress;
@@ -125,13 +127,13 @@
 			ComboBoxFontNumber.Items.AddRange(new object[] { "1", "2", "3", "4", "1+2", "3+4", "1+2+3+4" });
 			ComboBoxFontNumber.Location = new Point(104, 8);
 			ComboBoxFontNumber.Name = "ComboBoxFontNumber";
-			ComboBoxFontNumber.Size = new Size(145, 21);
+			ComboBoxFontNumber.Size = new Size(216, 21);
 			ComboBoxFontNumber.TabIndex = 5;
 			ComboBoxFontNumber.SelectedIndexChanged += ComboBoxFontNumber_SelectedIndexChanged;
 			// 
 			// ButtonCopyClipboard
 			// 
-			ButtonCopyClipboard.Location = new Point(269, 42);
+			ButtonCopyClipboard.Location = new Point(326, 42);
 			ButtonCopyClipboard.Name = "ButtonCopyClipboard";
 			ButtonCopyClipboard.Size = new Size(81, 25);
 			ButtonCopyClipboard.TabIndex = 6;
@@ -141,7 +143,27 @@
 			// 
 			// saveDialog
 			// 
-			saveDialog.FileName = "saveDialog";
+			saveDialog.FileName = "font-export";
+			// 
+			// checkZX0
+			// 
+			checkZX0.AutoSize = true;
+			checkZX0.Location = new Point(104, 108);
+			checkZX0.Name = "checkZX0";
+			checkZX0.Size = new Size(169, 17);
+			checkZX0.TabIndex = 7;
+			checkZX0.Text = "Compress the data with ZX0";
+			checkZX0.UseVisualStyleBackColor = true;
+			checkZX0.CheckedChanged += checkZX0_CheckedChanged;
+			// 
+			// labelSizeInfo
+			// 
+			labelSizeInfo.Location = new Point(8, 132);
+			labelSizeInfo.Name = "labelSizeInfo";
+			labelSizeInfo.Size = new Size(399, 17);
+			labelSizeInfo.TabIndex = 8;
+			labelSizeInfo.Text = "...";
+			labelSizeInfo.TextAlign = ContentAlignment.MiddleCenter;
 			// 
 			// ExportFontWindow
 			// 
@@ -149,7 +171,9 @@
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			CancelButton = Button_Cancel;
-			ClientSize = new Size(360, 443);
+			ClientSize = new Size(416, 516);
+			Controls.Add(labelSizeInfo);
+			Controls.Add(checkZX0);
 			Controls.Add(Label1);
 			Controls.Add(Label2);
 			Controls.Add(Label3);
@@ -183,5 +207,7 @@
 		private System.Windows.Forms.ComboBox ComboBoxFontNumber;
 		private System.Windows.Forms.Button ButtonCopyClipboard;
 		private System.Windows.Forms.SaveFileDialog saveDialog;
+		private CheckBox checkZX0;
+		private Label labelSizeInfo;
 	}
 }

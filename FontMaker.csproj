@@ -13,10 +13,10 @@
 	<ApplicationHighDpiMode>SystemAware</ApplicationHighDpiMode>
 	<ApplicationDefaultFont>Segoe UI, 8.25pt</ApplicationDefaultFont>
 	<ApplicationIcon>Resources\FontMaker.ico</ApplicationIcon>
-	<FileVersion>1.6.17.0</FileVersion>
-	<AssemblyVersion>1.6.17.0</AssemblyVersion>
+	<FileVersion>1.6.17.1</FileVersion>
+	<AssemblyVersion>1.6.17.1</AssemblyVersion>
 	<ProduceReferenceAssembly>False</ProduceReferenceAssembly>
-	<Version>1.6.17.0</Version>
+	<Version>1.6.17.1</Version>
 	<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
   </PropertyGroup>
 
@@ -35,6 +35,7 @@
     <None Remove="Resources\basicremfont.lst" />
     <None Remove="Resources\default.atrview" />
     <None Remove="Resources\Default.fnt" />
+    <None Remove="Resources\zx0.exe" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,6 +47,7 @@
     <EmbeddedResource Include="Resources\basicremfont.lst" />
     <EmbeddedResource Include="Resources\default.atrview" />
     <EmbeddedResource Include="Resources\Default.fnt" />
+    <EmbeddedResource Include="Resources\zx0.exe" />
   </ItemGroup>
 
   <ItemGroup>

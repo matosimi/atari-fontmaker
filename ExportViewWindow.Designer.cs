@@ -60,6 +60,9 @@
 			numericOffsetX = new NumericUpDown();
 			labelOffsetY = new Label();
 			labelOffsetX = new Label();
+			groupBox1 = new GroupBox();
+			labelSizeInfo = new Label();
+			checkZX0 = new CheckBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariViewSmall).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericFromX).BeginInit();
@@ -68,6 +71,7 @@
 			((System.ComponentModel.ISupportInitialize)numericWidth).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericOffsetY).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericOffsetX).BeginInit();
+			groupBox1.SuspendLayout();
 			SuspendLayout();
 			// 
 			// Button_Export
@@ -282,7 +286,7 @@
 			// 
 			// saveDialog
 			// 
-			saveDialog.FileName = "saveDialog";
+			saveDialog.FileName = "view-export";
 			// 
 			// checkBoxRememberState
 			// 
@@ -371,12 +375,43 @@
 			labelOffsetX.TabIndex = 37;
 			labelOffsetX.Text = "Offset X:";
 			// 
+			// groupBox1
+			// 
+			groupBox1.Controls.Add(labelSizeInfo);
+			groupBox1.Controls.Add(checkZX0);
+			groupBox1.Location = new Point(568, 6);
+			groupBox1.Name = "groupBox1";
+			groupBox1.Size = new Size(434, 72);
+			groupBox1.TabIndex = 43;
+			groupBox1.TabStop = false;
+			groupBox1.Text = "Compress output";
+			// 
+			// labelSizeInfo
+			// 
+			labelSizeInfo.Location = new Point(14, 44);
+			labelSizeInfo.Name = "labelSizeInfo";
+			labelSizeInfo.Size = new Size(399, 17);
+			labelSizeInfo.TabIndex = 44;
+			labelSizeInfo.Text = "...";
+			// 
+			// checkZX0
+			// 
+			checkZX0.AutoSize = true;
+			checkZX0.Location = new Point(14, 22);
+			checkZX0.Name = "checkZX0";
+			checkZX0.Size = new Size(169, 17);
+			checkZX0.TabIndex = 43;
+			checkZX0.Text = "Compress the data with ZX0";
+			checkZX0.UseVisualStyleBackColor = true;
+			checkZX0.CheckedChanged += checkZX0_CheckedChanged;
+			// 
 			// ExportViewWindow
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			CancelButton = Button_Cancel;
 			ClientSize = new Size(1005, 634);
+			Controls.Add(groupBox1);
 			Controls.Add(numericOffsetY);
 			Controls.Add(numericOffsetX);
 			Controls.Add(labelOffsetY);
@@ -425,6 +460,8 @@
 			((System.ComponentModel.ISupportInitialize)numericWidth).EndInit();
 			((System.ComponentModel.ISupportInitialize)numericOffsetY).EndInit();
 			((System.ComponentModel.ISupportInitialize)numericOffsetX).EndInit();
+			groupBox1.ResumeLayout(false);
+			groupBox1.PerformLayout();
 			ResumeLayout(false);
 			PerformLayout();
 		}
@@ -461,5 +498,8 @@
 		private NumericUpDown numericOffsetX;
 		private Label labelOffsetY;
 		private Label labelOffsetX;
+		private GroupBox groupBox1;
+		private Label labelSizeInfo;
+		private CheckBox checkZX0;
 	}
 }

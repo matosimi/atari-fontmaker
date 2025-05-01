@@ -47,82 +47,86 @@ namespace FontMaker
 				/* bmp mono, bmp color, assembler, action, basic, fastbasic, mads_dta, binary data, basic LST */
 				MemoExport.Enabled = true;
 
+				checkZX0.Enabled = true;
+
 				switch ((FormatTypes)ComboBoxExportType.SelectedIndex)
 				{
 					case FormatTypes.ImageBmpMono:
-						{
-							ButtonCopyClipboard.Enabled = false;
+					{
+						ButtonCopyClipboard.Enabled = false;
 
-							ComboBoxDataType.Items.Add("Binary");
-							ComboBoxDataType.SelectedIndex = 0;
-							ComboBoxDataType.Enabled = false;
-							MemoExport.Text = string.Empty;
-						}
-						break;
+						ComboBoxDataType.Items.Add("Binary");
+						ComboBoxDataType.SelectedIndex = 0;
+						ComboBoxDataType.Enabled = false;
+						checkZX0.Enabled = false;
+						MemoExport.Text = string.Empty;
+					}
+					break;
 
 					case FormatTypes.ImageBmpColor:
-						{
-							ButtonCopyClipboard.Enabled = false;
+					{
+						ButtonCopyClipboard.Enabled = false;
 
-							ComboBoxDataType.Items.Add("Binary");
-							ComboBoxDataType.SelectedIndex = 0;
-							ComboBoxDataType.Enabled = false;
-							MemoExport.Text = string.Empty;
-						}
-						break;
+						ComboBoxDataType.Items.Add("Binary");
+						ComboBoxDataType.SelectedIndex = 0;
+						ComboBoxDataType.Enabled = false;
+						checkZX0.Enabled = false;
+						MemoExport.Text = string.Empty;
+					}
+					break;
 
 					case FormatTypes.Assembler:
-						{
-							ButtonCopyClipboard.Enabled = true;
+					{
+						ButtonCopyClipboard.Enabled = true;
 
-							ComboBoxDataType.Text = @"Select an item";
-							ComboBoxDataType.Items.Add("Byte in decimal");
-							ComboBoxDataType.Items.Add("Byte in hexadecimal");
-							ComboBoxDataType.SelectedIndex = 0;
-						}
-						break;
+						ComboBoxDataType.Text = @"Select an item";
+						ComboBoxDataType.Items.Add("Byte in decimal");
+						ComboBoxDataType.Items.Add("Byte in hexadecimal");
+						ComboBoxDataType.SelectedIndex = 0;
+					}
+					break;
 
 					case FormatTypes.Action:
-						{
-							ButtonCopyClipboard.Enabled = true;
+					{
+						ButtonCopyClipboard.Enabled = true;
 
-							ComboBoxDataType.Text = @"Select an item";
-							ComboBoxDataType.Items.Add("Byte in decimal");
-							ComboBoxDataType.Items.Add("Byte in hexadecimal");
-							ComboBoxDataType.SelectedIndex = 0;
-						}
-						break;
+						ComboBoxDataType.Text = @"Select an item";
+						ComboBoxDataType.Items.Add("Byte in decimal");
+						ComboBoxDataType.Items.Add("Byte in hexadecimal");
+						ComboBoxDataType.SelectedIndex = 0;
+					}
+					break;
 
 					case FormatTypes.AtariBasic:
-						{
-							ButtonCopyClipboard.Enabled = true;
+					{
+						ButtonCopyClipboard.Enabled = true;
 
-							ComboBoxDataType.Items.Add("Byte in decimal");
-							ComboBoxDataType.SelectedIndex = 0;
-							ComboBoxDataType.Enabled = false;
-						}
-						break;
+						ComboBoxDataType.Items.Add("Byte in decimal");
+						ComboBoxDataType.SelectedIndex = 0;
+						ComboBoxDataType.Enabled = false;
+					}
+					break;
 
 					case FormatTypes.FastBasic:
-						{
-							ButtonCopyClipboard.Enabled = true;
+					{
+						ButtonCopyClipboard.Enabled = true;
 
-							ComboBoxDataType.Items.Add("Byte in decimal");
-							ComboBoxDataType.SelectedIndex = 0;
-							ComboBoxDataType.Enabled = false;
-						}
-						break;
+						ComboBoxDataType.Items.Add("Byte in decimal");
+						ComboBoxDataType.SelectedIndex = 0;
+						ComboBoxDataType.Enabled = false;
+					}
+					break;
 
 					case FormatTypes.MADSdta:
-						{
-							ButtonCopyClipboard.Enabled = true;
+					{
+						ButtonCopyClipboard.Enabled = true;
 
-							ComboBoxDataType.Text = @"Select an item";
-							ComboBoxDataType.Items.Add("Byte in decimal");
-							ComboBoxDataType.Items.Add("Byte in hexadecimal");
-							ComboBoxDataType.SelectedIndex = 0;
-						}
-						break;
+						ComboBoxDataType.Text = @"Select an item";
+						ComboBoxDataType.Items.Add("Byte in decimal");
+						ComboBoxDataType.Items.Add("Byte in hexadecimal");
+						ComboBoxDataType.SelectedIndex = 0;
+					}
+					break;
 
 					case FormatTypes.CDataArray:
 					{
@@ -153,26 +157,27 @@ namespace FontMaker
 						ComboBoxDataType.Items.Add("Binary");
 						ComboBoxDataType.SelectedIndex = 0;
 						ComboBoxDataType.Enabled = false;
-						MemoExport.Text = "This export option generates a binary data file with 1, 2 or 4 of the fonts.";
+						MemoExport.Text = @"This export option generates a binary data file with 1, 2 or 4 of the fonts.";
 						break;
 					}
 
 					case FormatTypes.BasicListingFile:
-						{
-							ButtonCopyClipboard.Enabled = false;
+					{
+						ButtonCopyClipboard.Enabled = false;
 
-							ComboBoxDataType.Items.Add("Basic listing");
-							ComboBoxDataType.SelectedIndex = 0;
-							ComboBoxDataType.Enabled = false;
-							MemoExport.Text =
-								"This export option generates basic .LST file that can be easily incorporated to your " +
-								"own basic source with ENTER \"D:filename.LST\". Export file contains Basic lines 0 to 11 " +
-								"with assembly routine that very quickly deploys font to memtop.";
-						}
-						break;
+						ComboBoxDataType.Items.Add("Basic listing");
+						ComboBoxDataType.SelectedIndex = 0;
+						ComboBoxDataType.Enabled = false;
+						checkZX0.Enabled = false;
+						MemoExport.Text =
+							"This export option generates basic .LST file that can be easily incorporated to your " +
+							"own basic source with ENTER \"D:filename.LST\". Export file contains Basic lines 0 to 11 " +
+							"with assembly routine that very quickly deploys font to memtop.";
+					}
+					break;
 				}
 
-				ComboBoxDataTypeChange(this, EventArgs.Empty);
+//				ComboBoxDataTypeChange(this, EventArgs.Empty);
 			}
 		}
 
@@ -188,16 +193,48 @@ namespace FontMaker
 				Button_SaveAs.Enabled = false;
 			}
 
-			if ((FormatTypes)ComboBoxExportType.SelectedIndex > FormatTypes.ImageBmpColor && (FormatTypes)ComboBoxExportType.SelectedIndex < FormatTypes.BinaryData)
+			switch ((FormatTypes)ComboBoxExportType.SelectedIndex)
 			{
-				MemoExport.Text = GenerateFileAsText(
-					ComboBoxFontNumber.SelectedIndex,
-					(FormatTypes)ComboBoxExportType.SelectedIndex,
-					ComboBoxDataType.SelectedIndex);
+				case FormatTypes.ImageBmpMono:
+				case FormatTypes.ImageBmpColor:
+					labelSizeInfo.Text = string.Empty;
+					break;
+
+				case FormatTypes.Assembler:
+				case FormatTypes.Action:
+				case FormatTypes.AtariBasic:
+				case FormatTypes.FastBasic:
+				case FormatTypes.MADSdta:
+				case FormatTypes.CDataArray:
+				case FormatTypes.MadPascalArray:
+				{
+					var (newText, originalSize, dataSize) = GenerateFileAsText(
+						ComboBoxFontNumber.SelectedIndex,
+						(FormatTypes)ComboBoxExportType.SelectedIndex,
+						ComboBoxDataType.SelectedIndex,
+						checkZX0.Enabled && checkZX0.Checked);
+
+					MemoExport.Text = newText;
+
+					labelSizeInfo.Text = originalSize != dataSize ? $"Original font size: {originalSize} bytes  Compressed font size: {dataSize} bytes" : $"Font Size:{originalSize} bytes";
+					break;
+				}
+				case FormatTypes.BinaryData:
+				{
+					var (_, originalSize, dataSize) = GetFontData(ComboBoxFontNumber.SelectedIndex, checkZX0.Enabled && checkZX0.Checked);
+					labelSizeInfo.Text = originalSize != dataSize ? $"Original font size: {originalSize} bytes Compressed font size: {dataSize} bytes" : $"Font Size:{originalSize} bytes";
+					break;
+				}
+				default:
+				{
+					var (fontStartByte, fontEndByte) = CalcFontStartEnd(ComboBoxFontNumber.SelectedIndex);
+					labelSizeInfo.Text = $"Font Size: {fontEndByte - fontStartByte} bytes";
+					break;
+				}
 			}
 		}
 
-		private string MakeFilenamePartFromFontSelectionNr(int fontNr)
+		private static string MakeFilenamePartFromFontSelectionNr(int fontNr)
 		{
 			switch (fontNr)
 			{
@@ -211,6 +248,36 @@ namespace FontMaker
 					return "Font1+2+3+4";
 			}
 		}
+
+		private static (int, int) CalcFontStartEnd(int fontNr)
+		{
+			int fontStartByte;
+			int fontEndByte;
+
+			switch (fontNr)
+			{
+				default:
+					fontNr %= 4;
+					fontStartByte = fontNr * 1024;
+					fontEndByte = (fontNr + 1) * 1024;
+					break;
+				case 4: // 1+2
+					fontStartByte = 0;
+					fontEndByte = 2 * 1024;
+					break;
+				case 5: // 3+4
+					fontStartByte = 2 * 1024;
+					fontEndByte = 4 * 1024;
+					break;
+				case 6: // 1+2+3+4
+					fontStartByte = 0;
+					fontEndByte = 4 * 1024;
+					break;
+			}
+
+			return (fontStartByte, fontEndByte);
+		}
+
 		public void ButtonSaveAsClick(object sender, EventArgs e)
 		{
 			if ((FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.ImageBmpMono ||
@@ -235,7 +302,7 @@ namespace FontMaker
 
 				if (saveDialog.ShowDialog() == DialogResult.OK)
 				{
-					SaveBinaryData(ComboBoxFontNumber.SelectedIndex, saveDialog.FileName);
+					SaveBinaryData(ComboBoxFontNumber.SelectedIndex, saveDialog.FileName, checkZX0.Enabled && checkZX0.Checked);
 				}
 
 				return;
@@ -254,7 +321,7 @@ namespace FontMaker
 
 				return;
 			}
-			
+
 			// These are handled above:
 			// 0 = BMP
 			// 1 = BMP color
@@ -266,7 +333,8 @@ namespace FontMaker
 
 			if (saveDialog.ShowDialog() == DialogResult.OK)
 			{
-				var text = GenerateFileAsText(ComboBoxFontNumber.SelectedIndex, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex);
+				var (text, _, __) = GenerateFileAsText(ComboBoxFontNumber.SelectedIndex, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex, checkZX0.Enabled && checkZX0.Checked);
+
 				File.WriteAllText(saveDialog.FileName, text);
 			}
 		}
@@ -310,28 +378,23 @@ namespace FontMaker
 		private static void SaveFontBMP(int fontNr, string filename, bool asColor)
 		{
 			int startFontIndex;
-			int endFontIndex;
 			int pictureHeight;
 			switch (fontNr)
 			{
 				default:    // 0,1,2,3
-					startFontIndex = 128 * fontNr + (asColor ? 512 : 0);
-					endFontIndex = startFontIndex + 128;
+					startFontIndex = 128 * fontNr;
 					pictureHeight = 64;
 					break;
 				case 4: // 1+2
 					startFontIndex = 0;
-					endFontIndex = 256;
 					pictureHeight = 128;
 					break;
 				case 5: // 3+4
 					startFontIndex = 256;
-					endFontIndex = 512;
 					pictureHeight = 128;
 					break;
 				case 6: // 1+2+3+4
 					startFontIndex = 0;
-					endFontIndex = 512;
 					pictureHeight = 256;
 					break;
 			}
@@ -339,7 +402,6 @@ namespace FontMaker
 			if (asColor)
 			{
 				startFontIndex += 512;
-				endFontIndex += 512;
 			}
 
 			var destRect = new Rectangle
@@ -411,39 +473,10 @@ namespace FontMaker
 			}
 		}
 
-		private static void SaveBinaryData(int fontNr, string filename)
+		private static void SaveBinaryData(int fontNr, string filename, bool withCompression)
 		{
-			var fontStartByte = 0;
-			var fontEndByte = 0;
+			var (fontData, _, __) = GetFontData(fontNr, withCompression);
 
-			switch (fontNr)
-			{
-				default:
-					fontNr %= 4;
-					fontStartByte = fontNr * 1024;
-					fontEndByte = (fontNr + 1) * 1024;
-					break;
-				case 4: // 1+2
-					fontStartByte = 0;
-					fontEndByte = 2 * 1024;
-					break;
-				case 5: // 3+4
-					fontStartByte = 2 * 1024;
-					fontEndByte = 4 * 1024;
-					break;
-				case 6: // 1+2+3+4
-					fontStartByte = 0;
-					fontEndByte = 4 * 1024;
-					break;
-			}
-
-			var exportSize = fontEndByte - fontStartByte;
-			var fontData = new byte[exportSize];
-			var runner = 0;
-			for (var index = fontStartByte; index < fontEndByte; index++)
-			{
-				fontData[runner++] = AtariFont.FontBytes[index];
-			}
 			try
 			{
 				File.WriteAllBytes(filename, fontData);
@@ -462,49 +495,35 @@ namespace FontMaker
 		/// <summary>
 		/// Export data to assembler language, action! and atari basic
 		/// </summary>
-		/// <param name="fontNumber">Index into the font selector, 0,1,2,3, 4,5,6</param>
+		/// <param name="fontNr">Index into the font selector, 0,1,2,3, 4,5,6</param>
 		/// <param name="exportType"></param>
 		/// <param name="dataType"></param>
-		/// <returns></returns>
-		public static string GenerateFileAsText(int fontNumber, FormatTypes exportType, int dataType)
+		/// <param name="withCompression"></param>
+		/// <returns>Text string with the output and the size of the date used to generate the output</returns>
+		public static (string, int, int) GenerateFileAsText(int fontNr, FormatTypes exportType, int dataType, bool withCompression)
 		{
 			var sb = new StringBuilder();
 
-			var line = 0;
 			var lineNumber = 10010;
 			var charCounter = 0;
 
-			var fontStartByte = 0;
-			var fontEndByte = 0;
-
-			switch (fontNumber)
-			{
-				default:
-					fontNumber = fontNumber % 4;
-					fontStartByte = fontNumber * 1024;
-					fontEndByte = (fontNumber + 1) * 1024;
-					break;
-				case 4: // 1+2
-					fontStartByte = 0;
-					fontEndByte = 2 * 1024;
-					break;
-				case 5: // 3+4
-					fontStartByte = 2 * 1024;
-					fontEndByte = 4 * 1024;
-					break;
-				case 6: // 1+2+3+4
-					fontStartByte = 0;
-					fontEndByte = 4 * 1024;
-					break;
-			}
+			var (fontData, inputSize, dataSize) = GetFontData(fontNr, withCompression);
 
 			if (exportType == FormatTypes.Assembler)
 			{
+				if (inputSize != dataSize)
+					sb.AppendLine($"\t; Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+				else
+					sb.AppendLine($"\t; Size: {inputSize} bytes");
 				sb.Append("\t.BYTE ");
 			}
 
 			if (exportType == FormatTypes.Action)
 			{
+				if (inputSize != dataSize)
+					sb.AppendLine($"; Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+				else
+					sb.AppendLine($"; Size: {inputSize} bytes");
 				sb.AppendLine("PROC FONT=*()");
 				sb.AppendLine("[");
 			}
@@ -512,52 +531,71 @@ namespace FontMaker
 			if (exportType == FormatTypes.AtariBasic)
 			{
 				sb.AppendLine("10000 REM *** DATA FONT ***");
+				if (inputSize != dataSize)
+					sb.AppendLine($"10001 REM Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+				else
+					sb.AppendLine($"10001 REM Size: {inputSize} bytes");
 				sb.Append("10010 DATA ");
 			}
 
 			if (exportType == FormatTypes.FastBasic)
 			{
+				if (inputSize != dataSize)
+					sb.AppendLine($"` Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+				else
+					sb.AppendLine($"` Size: {inputSize} bytes");
 				sb.Append("data font() byte = ");
 			}
 
 			if (exportType == FormatTypes.MADSdta)
 			{
+				if (inputSize != dataSize)
+					sb.AppendLine($"\t; Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+				else
+					sb.AppendLine($"\t; Size: {inputSize} bytes");
 				sb.Append("\tdta ");
 			}
 
 			if (exportType == FormatTypes.CDataArray)
 			{
+				if (inputSize != dataSize)
+					sb.AppendLine($"// Original size: {inputSize} ZX0 compressed size: {dataSize} bytes");
+				else
+					sb.AppendLine($"// Size: {inputSize} bytes");
 				sb.Append("{\n\t");
 			}
 
 			if (exportType == FormatTypes.MadPascalArray)
 			{
-				sb.Append($"font: array [0..{fontEndByte - fontStartByte - 1}] of byte = (\n\t");
+				if (inputSize != dataSize)
+					sb.AppendLine($"// Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+				else
+					sb.AppendLine($"// Size: {inputSize} bytes");
+				sb.Append($"font: array [0..{fontData.Length - 1}] of byte = (\n\t");
 			}
 
-			var lastLine = (fontEndByte - fontStartByte) / 8 - 1;
+			var bytesLeft = fontData.Length;
 
-			for (var index = fontStartByte; index < fontEndByte; index++)
+			for (var index = 0; index < fontData.Length; --bytesLeft, index++)
 			{
 				if (dataType == 1)
 				{
 					if (exportType == FormatTypes.CDataArray)
-						sb.Append($"0x{AtariFont.FontBytes[index]:X2}");
+						sb.Append($"0x{fontData[index]:X2}");
 					else
-						sb.Append($"${AtariFont.FontBytes[index]:X2}");
+						sb.Append($"${fontData[index]:X2}");
 				}
 				else
 				{
-					sb.Append($"{AtariFont.FontBytes[index]}");
+					sb.Append($"{fontData[index]}");
 				}
 
 				++charCounter;
 
 				// Start the next line
-				if ((charCounter == 8) && (line != lastLine))
+				if (charCounter == 8 && bytesLeft > 1)
 				{
 					charCounter = 0;
-					line++;
 
 					if (exportType is FormatTypes.FastBasic or FormatTypes.CDataArray or FormatTypes.MadPascalArray)
 					{
@@ -593,14 +631,14 @@ namespace FontMaker
 					}
 				}
 
-				if ((charCounter != 8) && (charCounter != 0))
+				if ((charCounter != 8) && (charCounter != 0) && bytesLeft > 1)
 				{
 					switch (exportType)
 					{
 						case FormatTypes.Action:
 							sb.Append(' ');
 							break;
-						case FormatTypes.Assembler: 
+						case FormatTypes.Assembler:
 						case FormatTypes.AtariBasic:
 						case FormatTypes.FastBasic:
 						case FormatTypes.MADSdta:
@@ -627,7 +665,37 @@ namespace FontMaker
 				sb.Append("\n);");
 			}
 
-			return sb.ToString();
+			return (sb.ToString(), inputSize, fontData.Length);
+		}
+
+		private void checkZX0_CheckedChanged(object sender, EventArgs e)
+		{
+			ComboBoxDataTypeChange(null!, EventArgs.Empty);
+		}
+
+		private static (byte[], int, int) GetFontData(int fontNr, bool withCompression)
+		{
+			var (fontStartByte, fontEndByte) = CalcFontStartEnd(fontNr);
+
+			var inputSize = fontEndByte - fontStartByte;
+
+			var fontData = new byte[inputSize];
+			var runner = 0;
+			for (var index = fontStartByte; index < fontEndByte; index++)
+			{
+				fontData[runner++] = AtariFont.FontBytes[index];
+			}
+
+			if (withCompression)
+			{
+				var compressedFontData = Compressors.Compress(fontData);
+				if (compressedFontData.Length < fontData.Length)
+				{
+					fontData = compressedFontData;
+				}
+			}
+
+			return (fontData, inputSize, fontData.Length);
 		}
 	}
 }

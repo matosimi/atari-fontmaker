@@ -1,4 +1,4 @@
-# Atari FontMaker #
+# Atari FontMaker
 #### by matosimi and RetroCoder
 
 ![1](images/1.JPG)
@@ -70,16 +70,16 @@ Tip: Recolor button can have focus, so its function can be executed by pressing 
 
 **Show Duplicates** Just to the left of the Mega Copy button is the **Show Duplicates** checkbox. Turning it on will cycle through all characters in a font that are identical to (duplicates off) the currently selected character. Very useful to see if you have some duplicates in your character design.
 
-**Export font** button is useful when you need text representation of the font data as an include to your Basic, Action! or Assembly source, there are several formats to choose from:
+**Export font** button is useful when you need a font in source code to be included into your Basic, Action!, C, Pascal or Assembly code, there are several formats to choose from:
 ![10](images/10.JPG)
 
-The fonts can also be exported as black+white or 5-color bitmaps.
+The fonts can also be exported as black+white or color bitmaps.
 
-**View editor window** is basically an area where you can test your fonts and graphics by copying characters from the font window. You can paste characters by left clicking in the view window area. Right click on view window selects the character that has been clicked on.
+If the export format supports it, then the output can be compressed using the ZX0 compression tool.
+
+**View editor window** is basically an area where you can test your fonts by drawing with characters. You can draw with characters by left clicking in the view window area. Right-click on view window selects the character that has been clicked on.
 
 There are several controls below the view window that allows you to switch between 32 and 40 characters per line, clear view window, load and save view window. There were several view formats used throughout history of Atari FontMaker, all of them can be loaded, but saving is only possible in the latest *.atrview format (or RAW data format).
-
-Tip: Raw (*.dat) format can be saved in 32byte line format or 40byte line format depending on the status of 40 Bytes checkbox.
 
 **Font toggle** column is placed on the left edge of **view editor window** and its values defines which font is used on a particular line of the view. By default all lines are displayed in font 1, hence all values are set to “1”. You can change values to 2,3 or 4 by left-clicking on the number in font toggle area. Right-clicking on the number cycles through the fonts backwards.
 
@@ -230,7 +230,7 @@ Data|string|Optional| The font bytes of each character in the Width x Height are
 FontNr|string|Optional| String where each element represents the font that the character data comes from. For each line of the data there can be one element between 1 and 4. If the FontNr is missing then it is assumed that font #1 is used. The string should the `Height` elements long.
 Nulls|string|Optional| String where each element represents if the character at a location is present of should be skipped. "0" means the character will be pasted, "1" means the character will be skipped. The string should be `Width` x `Height` elements long. Missing data is replaced with a "0", means the character will be pasted.
 
-## fnt format ##
+## fnt format
 
 Main output of Atari Font Maker is Atari font file *.fnt. It is a raw binary file, 1024 bytes long without any header. It can be inserted to your project using MADS pseudoinstruction ins, and in order to display it correctly it has to be aligned with any fourth memory page, code example:
 
@@ -239,7 +239,7 @@ Main output of Atari Font Maker is Atari font file *.fnt. It is a raw binary fil
 myFont    ins 'myFont.fnt'
 ```
 
-## atrview format ##
+## atrview format
 
 Atrview is additional file format that can be created within Atari FontMaker. It is a custom file format that contains contents of view window, data of the four fonts, selected colors, tile set information and couple more Atari FontMaker settings.
 
@@ -274,7 +274,7 @@ Note: Upon loading of atrview file, user is prompted if character sets should be
 }
 ```
 
-## Keyboard controls ##
+## Keyboard controls
 
 - **, .** – previous/next character
 - **Mousewheel** – previous/next character (left/right)
@@ -365,6 +365,13 @@ ALT + Mouse Wheel - Select the next/previous tile for drawing/pasting. This sele
 Double Click on a tile in the horizontal tile set viewer to select it for drawing.
 
 ## Changes/History
+
+V1.6.17.1
+Fixed the font bitmap exporter.
+Font and view data can now be exported in a compressed format.
+The ZX0 compressor is used. More details and decompression routines can be found here:
+https://github.com/einar-saukas/ZX0
+https://xxl.atari.pl/zx0-decompressor/
 
 V1.6.17.0
 The view area can now be set to any size (1024x1024 is max).
