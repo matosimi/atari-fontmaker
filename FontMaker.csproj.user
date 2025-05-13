@@ -19,6 +19,9 @@
     <Compile Update="FontAnalysisWindow.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="FontMakerConfigurationWindow.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Update="FontMakerForm.cs">
       <SubType>Form</SubType>
     </Compile>

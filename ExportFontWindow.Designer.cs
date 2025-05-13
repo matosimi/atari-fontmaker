@@ -39,7 +39,7 @@
 			ComboBoxFontNumber = new ComboBox();
 			ButtonCopyClipboard = new Button();
 			saveDialog = new SaveFileDialog();
-			checkZX0 = new CheckBox();
+			withCompression = new CheckBox();
 			labelSizeInfo = new Label();
 			SuspendLayout();
 			// 
@@ -147,14 +147,14 @@
 			// 
 			// checkZX0
 			// 
-			checkZX0.AutoSize = true;
-			checkZX0.Location = new Point(104, 108);
-			checkZX0.Name = "checkZX0";
-			checkZX0.Size = new Size(169, 17);
-			checkZX0.TabIndex = 7;
-			checkZX0.Text = "Compress the data with ZX0";
-			checkZX0.UseVisualStyleBackColor = true;
-			checkZX0.CheckedChanged += checkZX0_CheckedChanged;
+			withCompression.AutoSize = true;
+			withCompression.Location = new Point(104, 108);
+			withCompression.Name = "withCompression";
+			withCompression.Size = new Size(169, 17);
+			withCompression.TabIndex = 7;
+			withCompression.Text = "Compress the data with ZX0";
+			withCompression.UseVisualStyleBackColor = true;
+			withCompression.CheckedChanged += WithCompressionCheckedChanged;
 			// 
 			// labelSizeInfo
 			// 
@@ -173,7 +173,7 @@
 			CancelButton = Button_Cancel;
 			ClientSize = new Size(416, 516);
 			Controls.Add(labelSizeInfo);
-			Controls.Add(checkZX0);
+			Controls.Add(withCompression);
 			Controls.Add(Label1);
 			Controls.Add(Label2);
 			Controls.Add(Label3);
@@ -207,7 +207,7 @@
 		private System.Windows.Forms.ComboBox ComboBoxFontNumber;
 		private System.Windows.Forms.Button ButtonCopyClipboard;
 		private System.Windows.Forms.SaveFileDialog saveDialog;
-		private CheckBox checkZX0;
+		private CheckBox withCompression;
 		private Label labelSizeInfo;
 	}
 }

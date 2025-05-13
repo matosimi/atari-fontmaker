@@ -38,6 +38,9 @@ namespace FontMaker
 			MadPascalArray
 		};
 
+		private static Compressors.CompressorType _compressorId = Compressors.CompressorType.ZX0;
+		private static string _compressorName = string.Empty;
+
 		public enum SelectionStatusFlags
 		{
 			None, Selecting, Selected
@@ -56,6 +59,16 @@ namespace FontMaker
 		{
 			InitializeComponent();
 			RememberSelection = true;
+		}
+
+		public void Setup(bool inColorMode, int whichColorMode, Compressors.CompressorType whichCompressor)
+		{
+			InColorMode = inColorMode;
+			WhichColorMode = whichColorMode;
+			_compressorId = whichCompressor;
+			_compressorName = Compressors.GetName(whichCompressor);
+
+			withCompression.Text = $"Compress the data with {_compressorName}";
 		}
 
 		#region Load/Save the current configuration
@@ -354,7 +367,7 @@ namespace FontMaker
 
 			if (withCompression)
 			{
-				var compressedViewData = Compressors.Compress(exportBytes);
+				var compressedViewData = Compressors.Compress(exportBytes, _compressorId);
 				if (compressedViewData.Length < exportBytes.Length)
 				{
 					exportBytes = compressedViewData;
@@ -385,7 +398,7 @@ namespace FontMaker
 				if (inputSize != dataSize)
 				{
 					sb.AppendLine($"\t; Original size: {inputSize} bytes");
-					sb.AppendLine($"\t; ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"\t; {_compressorName} compressed size: {dataSize} bytes");
 				}
 				else
 					sb.AppendLine($"\t; Size: {inputSize} bytes");
@@ -397,7 +410,7 @@ namespace FontMaker
 				if (inputSize != dataSize)
 				{
 					sb.AppendLine($"; Original size: {inputSize} bytes");
-					sb.AppendLine($"; ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"; {_compressorName} compressed size: {dataSize} bytes");
 				}
 				else
 					sb.AppendLine($"; Size: {inputSize} bytes");
@@ -409,7 +422,7 @@ namespace FontMaker
 			{
 				sb.AppendLine("10000 REM *** DATA VIEW ***");
 				if (inputSize != dataSize)
-					sb.AppendLine($"10001 REM Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"10001 REM Original size: {inputSize} bytes : {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"10001 REM Size: {inputSize} bytes");
 				sb.Append("10010 DATA ");
@@ -420,7 +433,7 @@ namespace FontMaker
 				if (inputSize != dataSize)
 				{
 					sb.AppendLine($"` Original size: {inputSize} bytes");
-					sb.AppendLine($"` ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"` {_compressorName} compressed size: {dataSize} bytes");
 				}
 				else
 					sb.AppendLine($"` Size: {inputSize} bytes");
@@ -432,7 +445,7 @@ namespace FontMaker
 				if (inputSize != dataSize)
 				{
 					sb.AppendLine($"\t; Original size: {inputSize} bytes");
-					sb.AppendLine($"\t; ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"\t; {_compressorName} compressed size: {dataSize} bytes");
 				}
 				else
 					sb.AppendLine($"\t; Size: {inputSize} bytes");
@@ -444,7 +457,7 @@ namespace FontMaker
 				if (inputSize != dataSize)
 				{
 					sb.AppendLine($"// Original size: {inputSize}");
-					sb.AppendLine($"// ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"// {_compressorName} compressed size: {dataSize} bytes");
 				}
 				else
 					sb.AppendLine($"// Size: {inputSize} bytes");
@@ -456,7 +469,7 @@ namespace FontMaker
 				if (inputSize != dataSize)
 				{
 					sb.AppendLine($"// Original size: {inputSize} bytes");
-					sb.AppendLine($"// ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"// {_compressorName} compressed size: {dataSize} bytes");
 				}
 				else
 					sb.AppendLine($"// Size: {inputSize} bytes");
@@ -861,7 +874,7 @@ namespace FontMaker
 					(FormatTypes)ComboBoxExportType.SelectedIndex, 
 					ComboBoxDataType.SelectedIndex == 1, 
 					checkBoxTranspose.Checked,
-					checkZX0.Checked);
+					withCompression.Checked);
 				File.WriteAllText(saveDialog.FileName, text);
 			}
 
@@ -1017,7 +1030,7 @@ namespace FontMaker
 			ShowSelectionRubberBand();
 		}
 
-		private void checkZX0_CheckedChanged(object sender, EventArgs e)
+		private void WithCompressionCheckedChanged(object sender, EventArgs e)
 		{
 			UpdatePreviewData();
 		}
@@ -1028,7 +1041,7 @@ namespace FontMaker
 			{
 				case FormatTypes.BinaryData:
 				{
-					var (viewBytes, originalSize, dataSize) = GetExportData(_exportRegion, checkBoxTranspose.Checked, checkZX0.Checked);
+					var (viewBytes, originalSize, dataSize) = GetExportData(_exportRegion, checkBoxTranspose.Checked, withCompression.Checked);
 
 					labelSizeInfo.Text = originalSize != dataSize ? $"Original export size: {originalSize} bytes  Compressed export size: {dataSize} bytes" : $"export Size:{originalSize} bytes";
 
@@ -1042,7 +1055,7 @@ namespace FontMaker
 						(FormatTypes)ComboBoxExportType.SelectedIndex,
 						ComboBoxDataType.SelectedIndex == 1,
 						checkBoxTranspose.Checked,
-						checkZX0.Checked);
+						withCompression.Checked);
 
 					MemoExport.Text = newText;
 

@@ -60,6 +60,8 @@ public class PageData
 	public PageData(PageData from) :
 		this(from.Nr, from.Name, from.View, from.SelectedFont, from.Index)
 	{
+		Width = from.Width;
+		Height = from.Height;
 	}
 
 	/// <summary>

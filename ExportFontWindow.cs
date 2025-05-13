@@ -20,13 +20,24 @@ namespace FontMaker
 			BasicListingFile, // 10
 		};
 
+		private static Compressors.CompressorType _compressorId = Compressors.CompressorType.ZX0;
+		private static string _compressorName = string.Empty;
+
 		public ExportFontWindow()
 		{
 			InitializeComponent();
 			Load += FormCreate!;
 		}
 
-		public void FormCreate(object _, EventArgs __)
+		public void Setup(Compressors.CompressorType whichCompressor)
+		{
+			_compressorId = whichCompressor;
+			_compressorName = Compressors.GetName(whichCompressor);
+
+			withCompression.Text = $"Compress the data with {_compressorName}";
+		}
+
+		private void FormCreate(object _, EventArgs __)
 		{
 			DoubleBuffered = true;
 			ClearMemo();
@@ -37,7 +48,7 @@ namespace FontMaker
 			ComboBoxExportType.SelectedIndex = 0;   // This will fire the export type handler and setup the rest of the GUI
 		}
 
-		public void ComboBoxExportTypeChange(object _, EventArgs __)
+		private void ComboBoxExportTypeChange(object _, EventArgs __)
 		{
 			if (ComboBoxExportType.SelectedIndex >= 0)
 			{
@@ -47,7 +58,7 @@ namespace FontMaker
 				/* bmp mono, bmp color, assembler, action, basic, fastbasic, mads_dta, binary data, basic LST */
 				MemoExport.Enabled = true;
 
-				checkZX0.Enabled = true;
+				withCompression.Enabled = true;
 
 				switch ((FormatTypes)ComboBoxExportType.SelectedIndex)
 				{
@@ -58,7 +69,7 @@ namespace FontMaker
 						ComboBoxDataType.Items.Add("Binary");
 						ComboBoxDataType.SelectedIndex = 0;
 						ComboBoxDataType.Enabled = false;
-						checkZX0.Enabled = false;
+						withCompression.Enabled = false;
 						MemoExport.Text = string.Empty;
 					}
 					break;
@@ -70,7 +81,7 @@ namespace FontMaker
 						ComboBoxDataType.Items.Add("Binary");
 						ComboBoxDataType.SelectedIndex = 0;
 						ComboBoxDataType.Enabled = false;
-						checkZX0.Enabled = false;
+						withCompression.Enabled = false;
 						MemoExport.Text = string.Empty;
 					}
 					break;
@@ -168,7 +179,7 @@ namespace FontMaker
 						ComboBoxDataType.Items.Add("Basic listing");
 						ComboBoxDataType.SelectedIndex = 0;
 						ComboBoxDataType.Enabled = false;
-						checkZX0.Enabled = false;
+						withCompression.Enabled = false;
 						MemoExport.Text =
 							"This export option generates basic .LST file that can be easily incorporated to your " +
 							"own basic source with ENTER \"D:filename.LST\". Export file contains Basic lines 0 to 11 " +
@@ -181,7 +192,7 @@ namespace FontMaker
 			}
 		}
 
-		public void ComboBoxDataTypeChange(object _, EventArgs __)
+		private void ComboBoxDataTypeChange(object _, EventArgs __)
 		{
 			if (ComboBoxExportType.SelectedIndex >= 0)
 			{
@@ -212,7 +223,7 @@ namespace FontMaker
 						ComboBoxFontNumber.SelectedIndex,
 						(FormatTypes)ComboBoxExportType.SelectedIndex,
 						ComboBoxDataType.SelectedIndex,
-						checkZX0.Enabled && checkZX0.Checked);
+						withCompression.Enabled && withCompression.Checked);
 
 					MemoExport.Text = newText;
 
@@ -221,7 +232,7 @@ namespace FontMaker
 				}
 				case FormatTypes.BinaryData:
 				{
-					var (_, originalSize, dataSize) = GetFontData(ComboBoxFontNumber.SelectedIndex, checkZX0.Enabled && checkZX0.Checked);
+					var (_, originalSize, dataSize) = GetFontData(ComboBoxFontNumber.SelectedIndex, withCompression.Enabled && withCompression.Checked);
 					labelSizeInfo.Text = originalSize != dataSize ? $"Original font size: {originalSize} bytes Compressed font size: {dataSize} bytes" : $"Font Size:{originalSize} bytes";
 					break;
 				}
@@ -278,7 +289,7 @@ namespace FontMaker
 			return (fontStartByte, fontEndByte);
 		}
 
-		public void ButtonSaveAsClick(object sender, EventArgs e)
+		private void ButtonSaveAsClick(object sender, EventArgs e)
 		{
 			if ((FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.ImageBmpMono ||
 				(FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.ImageBmpColor)
@@ -302,7 +313,7 @@ namespace FontMaker
 
 				if (saveDialog.ShowDialog() == DialogResult.OK)
 				{
-					SaveBinaryData(ComboBoxFontNumber.SelectedIndex, saveDialog.FileName, checkZX0.Enabled && checkZX0.Checked);
+					SaveBinaryData(ComboBoxFontNumber.SelectedIndex, saveDialog.FileName, withCompression.Enabled && withCompression.Checked);
 				}
 
 				return;
@@ -333,18 +344,18 @@ namespace FontMaker
 
 			if (saveDialog.ShowDialog() == DialogResult.OK)
 			{
-				var (text, _, __) = GenerateFileAsText(ComboBoxFontNumber.SelectedIndex, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex, checkZX0.Enabled && checkZX0.Checked);
+				var (text, _, __) = GenerateFileAsText(ComboBoxFontNumber.SelectedIndex, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex, withCompression.Enabled && withCompression.Checked);
 
 				File.WriteAllText(saveDialog.FileName, text);
 			}
 		}
 
-		public void Button_CancelClick(object sender, EventArgs e)
+		private void Button_CancelClick(object sender, EventArgs e)
 		{
 			Close();
 		}
 
-		public void MemoExportKeyPress(object sender, KeyPressEventArgs e)
+		private void MemoExportKeyPress(object sender, KeyPressEventArgs e)
 		{
 			if (e.KeyChar == 'A')
 			{
@@ -353,13 +364,13 @@ namespace FontMaker
 			}
 		}
 
-		public void ButtonCopyClipboardClick(object sender, EventArgs e)
+		private void ButtonCopyClipboardClick(object sender, EventArgs e)
 		{
 			if (MemoExport.Text.Length > 0)
 				Clipboard.SetText(MemoExport.Text);
 		}
 
-		public void ClearMemo()
+		private void ClearMemo()
 		{
 			MemoExport.Clear();
 		}
@@ -500,7 +511,7 @@ namespace FontMaker
 		/// <param name="dataType"></param>
 		/// <param name="withCompression"></param>
 		/// <returns>Text string with the output and the size of the date used to generate the output</returns>
-		public static (string, int, int) GenerateFileAsText(int fontNr, FormatTypes exportType, int dataType, bool withCompression)
+		private static (string, int, int) GenerateFileAsText(int fontNr, FormatTypes exportType, int dataType, bool withCompression)
 		{
 			var sb = new StringBuilder();
 
@@ -512,7 +523,7 @@ namespace FontMaker
 			if (exportType == FormatTypes.Assembler)
 			{
 				if (inputSize != dataSize)
-					sb.AppendLine($"\t; Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"\t; Original size: {inputSize} bytes : {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"\t; Size: {inputSize} bytes");
 				sb.Append("\t.BYTE ");
@@ -521,7 +532,7 @@ namespace FontMaker
 			if (exportType == FormatTypes.Action)
 			{
 				if (inputSize != dataSize)
-					sb.AppendLine($"; Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"; Original size: {inputSize} bytes : {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"; Size: {inputSize} bytes");
 				sb.AppendLine("PROC FONT=*()");
@@ -532,7 +543,7 @@ namespace FontMaker
 			{
 				sb.AppendLine("10000 REM *** DATA FONT ***");
 				if (inputSize != dataSize)
-					sb.AppendLine($"10001 REM Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"10001 REM Original size: {inputSize} bytes : {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"10001 REM Size: {inputSize} bytes");
 				sb.Append("10010 DATA ");
@@ -541,7 +552,7 @@ namespace FontMaker
 			if (exportType == FormatTypes.FastBasic)
 			{
 				if (inputSize != dataSize)
-					sb.AppendLine($"` Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"` Original size: {inputSize} bytes : {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"` Size: {inputSize} bytes");
 				sb.Append("data font() byte = ");
@@ -550,7 +561,7 @@ namespace FontMaker
 			if (exportType == FormatTypes.MADSdta)
 			{
 				if (inputSize != dataSize)
-					sb.AppendLine($"\t; Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"\t; Original size: {inputSize} bytes : {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"\t; Size: {inputSize} bytes");
 				sb.Append("\tdta ");
@@ -559,7 +570,7 @@ namespace FontMaker
 			if (exportType == FormatTypes.CDataArray)
 			{
 				if (inputSize != dataSize)
-					sb.AppendLine($"// Original size: {inputSize} ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"// Original size: {inputSize} {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"// Size: {inputSize} bytes");
 				sb.Append("{\n\t");
@@ -568,7 +579,7 @@ namespace FontMaker
 			if (exportType == FormatTypes.MadPascalArray)
 			{
 				if (inputSize != dataSize)
-					sb.AppendLine($"// Original size: {inputSize} bytes : ZX0 compressed size: {dataSize} bytes");
+					sb.AppendLine($"// Original size: {inputSize} bytes : {_compressorName} compressed size: {dataSize} bytes");
 				else
 					sb.AppendLine($"// Size: {inputSize} bytes");
 				sb.Append($"font: array [0..{fontData.Length - 1}] of byte = (\n\t");
@@ -668,7 +679,7 @@ namespace FontMaker
 			return (sb.ToString(), inputSize, fontData.Length);
 		}
 
-		private void checkZX0_CheckedChanged(object sender, EventArgs e)
+		private void WithCompressionCheckedChanged(object sender, EventArgs e)
 		{
 			ComboBoxDataTypeChange(null!, EventArgs.Empty);
 		}
@@ -688,7 +699,7 @@ namespace FontMaker
 
 			if (withCompression)
 			{
-				var compressedFontData = Compressors.Compress(fontData);
+				var compressedFontData = Compressors.Compress(fontData, _compressorId);
 				if (compressedFontData.Length < fontData.Length)
 				{
 					fontData = compressedFontData;

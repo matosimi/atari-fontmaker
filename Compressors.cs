@@ -1,12 +1,24 @@
 ﻿using System.Diagnostics;
 
 namespace FontMaker;
+
 public static class Compressors
 {
-	public static bool IsCompressorAvailable { get; set;}
+	public enum CompressorType
+	{
+		ZX0 = 0,
+		ZX1 = 1,
+		ZX2 = 2
+	}
+
+	private static bool IsCompressor0Available { get; set;}
+	private static bool IsCompressor1Available { get; set; }
+	private static bool IsCompressor2Available { get; set; }
 
 	private static string TempPath { get; set; }
 	private static string Zx0Exe { get; set; }
+	private static string Zx1Exe { get; set; }
+	private static string Zx2Exe { get; set; }
 
 	// ==========================================================================
 	// ZX0 compressor interface
@@ -15,7 +27,7 @@ public static class Compressors
 	{
 		try
 		{
-			TempPath = Path.Combine(Directory.GetCurrentDirectory(), "temp");
+			TempPath = Path.Combine(Path.GetTempPath(), "afm2025");
 			Directory.CreateDirectory(TempPath);
 
 			Zx0Exe = Path.Combine(TempPath, "zx0.exe");
@@ -28,21 +40,52 @@ public static class Compressors
 				fs.Close();
 			}
 
-			IsCompressorAvailable = File.Exists(Zx0Exe);
+			Zx1Exe = Path.Combine(TempPath, "zx1.exe");
+			if (!File.Exists(Zx1Exe))
+			{
+				// Create the zx0.exe file
+				var buffer = Helpers.GetResource<byte[]>("zx1.exe");
+				using var fs = new FileStream(Zx1Exe, FileMode.Create, FileAccess.Write);
+				fs.Write(buffer, 0, buffer.Length);
+				fs.Close();
+			}
+
+			Zx2Exe = Path.Combine(TempPath, "zx2.exe");
+			if (!File.Exists(Zx2Exe))
+			{
+				// Create the zx0.exe file
+				var buffer = Helpers.GetResource<byte[]>("zx2.exe");
+				using var fs = new FileStream(Zx2Exe, FileMode.Create, FileAccess.Write);
+				fs.Write(buffer, 0, buffer.Length);
+				fs.Close();
+			}
+
+			IsCompressor0Available = File.Exists(Zx0Exe);
+			IsCompressor1Available = File.Exists(Zx1Exe);
+			IsCompressor2Available = File.Exists(Zx2Exe);
 		}
 		catch (Exception ex)
 		{
-			IsCompressorAvailable = false;
+			IsCompressor0Available = false;
+			IsCompressor1Available = false;
+			IsCompressor2Available = false;
 		}
 	}
 
-	public static byte[] Compress(byte[] data)
+	public static byte[] Compress(byte[] data, CompressorType which)
 	{
-		if (!IsCompressorAvailable) return data;
+		var (available, exe) = which switch
+		{
+			CompressorType.ZX0 => (IsCompressor0Available, Zx0Exe),
+			CompressorType.ZX1 => (IsCompressor1Available, Zx1Exe),
+			CompressorType.ZX2 => (IsCompressor2Available, Zx2Exe),
+			_ => (false, null)
+		};
+		if (!available) return data;
 
 		try
 		{
-			var tempFile = Path.Combine(TempPath, "temp.zx0");
+			var tempFile = Path.Combine(TempPath, "temp.zx");
 			using (var fs = new FileStream(tempFile, FileMode.Create, FileAccess.Write))
 			{
 				fs.Write(data, 0, data.Length);
@@ -50,7 +93,7 @@ public static class Compressors
 			}
 
 			// Make sure the output file doesn't exist
-			var outputPath = Path.Combine(TempPath, "output.zx0");
+			var outputPath = Path.Combine(TempPath, "output.zx");
 			if (File.Exists(outputPath))
 				File.Delete(outputPath);
 
@@ -58,7 +101,7 @@ public static class Compressors
 			{
 				StartInfo = new ProcessStartInfo
 				{
-					FileName = Zx0Exe,
+					FileName = exe,
 					Arguments = $"-f {tempFile} {outputPath}",
 					CreateNoWindow = true,
 					UseShellExecute = false,
@@ -77,5 +120,17 @@ public static class Compressors
 			// Handle the exception as needed
 			return data;
 		}
+	}
+
+	public static string GetName(CompressorType which)
+	{
+		return which switch
+		{
+			CompressorType.ZX0 => "ZX0",
+			CompressorType.ZX1 => "ZX1",
+			CompressorType.ZX2 => "ZX2",
+			_ => "Unknown"
+		};
+
 	}
 }

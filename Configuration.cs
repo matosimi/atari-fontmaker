@@ -32,6 +32,8 @@ namespace FontMaker
 		public int ImportWidth { get; set; }
 		public int ImportHeight { get; set; }
 
+		public int CompressorId { get; set; }	// 0 = zx0, 1 = zx1, 2 = zx2
+
 	}
 	public static class Configuration
 	{
@@ -146,6 +148,8 @@ namespace FontMaker
 				Configuration.Values.ImportWidth,
 				Configuration.Values.ImportHeight
 			);
+
+			CompressorId = (Compressors.CompressorType)Configuration.Values.CompressorId;
 		}
 
 		public void SaveConfiguration()
@@ -183,6 +187,8 @@ namespace FontMaker
 				Configuration.Values.ImportWidth,
 				Configuration.Values.ImportHeight
 			) = ImportViewWindowForm.SaveConfiguration();
+
+			Configuration.Values.CompressorId = (int)CompressorId;
 
 			Configuration.Save();
 		}

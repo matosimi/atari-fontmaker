@@ -75,7 +75,7 @@ Tip: Recolor button can have focus, so its function can be executed by pressing 
 
 The fonts can also be exported as black+white or color bitmaps.
 
-If the export format supports it, then the output can be compressed using the ZX0 compression tool.
+If the export format supports it, then the output can be compressed using the ZX0,ZX1 or ZX2 compression tools.
 
 **View editor window** is basically an area where you can test your fonts by drawing with characters. You can draw with characters by left clicking in the view window area. Right-click on view window selects the character that has been clicked on.
 
@@ -365,6 +365,10 @@ ALT + Mouse Wheel - Select the next/previous tile for drawing/pasting. This sele
 Double Click on a tile in the horizontal tile set viewer to select it for drawing.
 
 ## Changes/History
+
+V1.6.17.2
+Fixed a bug in the page editor. It reset each page size to 40x26.
+Added support for ZX0, ZX1 and ZX2 compression.
 
 V1.6.17.1
 Fixed the font bitmap exporter.

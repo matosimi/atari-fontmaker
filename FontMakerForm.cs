@@ -137,6 +137,8 @@ namespace FontMaker
 
 		private Rectangle CopyPasteRange;
 
+		public Compressors.CompressorType CompressorId { get; set; }	// 0 = zx0, 1 = zx1, 2 = zx2
+
 		#endregion
 
 
@@ -980,6 +982,7 @@ namespace FontMaker
 
 		public void ExportFont_Click(object _, EventArgs __)
 		{
+			ExportFontWindowForm.Setup(CompressorId);
 			ExportFontWindowForm.ShowDialog();
 		}
 
@@ -1037,8 +1040,7 @@ namespace FontMaker
 
 		private void ViewEditor_ExportView_Click(object sender, EventArgs e)
 		{
-			ExportViewWindowForm.InColorMode = InColorMode;
-			ExportViewWindowForm.WhichColorMode = WhichColorMode;
+			ExportViewWindowForm.Setup(InColorMode, WhichColorMode, CompressorId);
 			ExportViewWindowForm.ShowDialog();
 		}
 
@@ -1248,6 +1250,16 @@ namespace FontMaker
 		private void buttonConfigurePage_Click(object sender, EventArgs e)
 		{
 			ActionConfigurePage();
+		}
+
+		private void buttonConfigure_Click(object sender, EventArgs e)
+		{
+			var configWindow = new FontMakerConfigurationWindow(CompressorId);
+			var action = configWindow.ShowDialog();
+			if (action == DialogResult.OK)
+			{
+				CompressorId = configWindow.CompressorId;
+			}
 		}
 
 		private void scrollBar_ValueChanged(object sender, EventArgs e)
@@ -1629,9 +1641,6 @@ namespace FontMaker
 		}
 
 		#endregion
-
-
-		
 
 	}
 }

@@ -163,6 +163,7 @@
 			hScrollBar = new HScrollBar();
 			vScrollBar = new VScrollBar();
 			labelOffsets = new Label();
+			buttonConfigure = new Button();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -1334,7 +1335,7 @@
 			// checkBox40Bytes
 			// 
 			checkBox40Bytes.AutoSize = true;
-			checkBox40Bytes.Location = new Point(823, 547);
+			checkBox40Bytes.Location = new Point(815, 547);
 			checkBox40Bytes.Name = "checkBox40Bytes";
 			checkBox40Bytes.Size = new Size(68, 17);
 			checkBox40Bytes.TabIndex = 10;
@@ -1707,7 +1708,7 @@
 			// checkBoxStayInPasteMode
 			// 
 			checkBoxStayInPasteMode.AutoSize = true;
-			checkBoxStayInPasteMode.Location = new Point(823, 527);
+			checkBoxStayInPasteMode.Location = new Point(815, 527);
 			checkBoxStayInPasteMode.Name = "checkBoxStayInPasteMode";
 			checkBoxStayInPasteMode.Size = new Size(123, 17);
 			checkBoxStayInPasteMode.TabIndex = 33;
@@ -1743,12 +1744,25 @@
 			labelOffsets.TabIndex = 36;
 			labelOffsets.Text = "TL: [0,0]-[39,25]";
 			// 
+			// buttonConfigure
+			// 
+			buttonConfigure.BackgroundImageLayout = ImageLayout.Center;
+			buttonConfigure.Image = (Image)resources.GetObject("buttonConfigure.Image");
+			buttonConfigure.Location = new Point(990, 452);
+			buttonConfigure.Margin = new Padding(0);
+			buttonConfigure.Name = "buttonConfigure";
+			buttonConfigure.Size = new Size(28, 28);
+			buttonConfigure.TabIndex = 37;
+			buttonConfigure.UseMnemonic = false;
+			buttonConfigure.Click += buttonConfigure_Click;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1194, 572);
+			Controls.Add(buttonConfigure);
 			Controls.Add(labelOffsets);
 			Controls.Add(vScrollBar);
 			Controls.Add(hScrollBar);
@@ -1977,5 +1991,6 @@
 		private HScrollBar hScrollBar;
 		private VScrollBar vScrollBar;
 		private Label labelOffsets;
+		private Button buttonConfigure;
 	}
 }

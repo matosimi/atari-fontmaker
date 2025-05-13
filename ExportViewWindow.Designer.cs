@@ -62,7 +62,7 @@
 			labelOffsetX = new Label();
 			groupBox1 = new GroupBox();
 			labelSizeInfo = new Label();
-			checkZX0 = new CheckBox();
+			withCompression = new CheckBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariViewSmall).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxViewEditorRubberBand).BeginInit();
 			((System.ComponentModel.ISupportInitialize)numericFromX).BeginInit();
@@ -378,7 +378,7 @@
 			// groupBox1
 			// 
 			groupBox1.Controls.Add(labelSizeInfo);
-			groupBox1.Controls.Add(checkZX0);
+			groupBox1.Controls.Add(withCompression);
 			groupBox1.Location = new Point(568, 6);
 			groupBox1.Name = "groupBox1";
 			groupBox1.Size = new Size(434, 72);
@@ -396,14 +396,14 @@
 			// 
 			// checkZX0
 			// 
-			checkZX0.AutoSize = true;
-			checkZX0.Location = new Point(14, 22);
-			checkZX0.Name = "checkZX0";
-			checkZX0.Size = new Size(169, 17);
-			checkZX0.TabIndex = 43;
-			checkZX0.Text = "Compress the data with ZX0";
-			checkZX0.UseVisualStyleBackColor = true;
-			checkZX0.CheckedChanged += checkZX0_CheckedChanged;
+			withCompression.AutoSize = true;
+			withCompression.Location = new Point(14, 22);
+			withCompression.Name = "withCompression";
+			withCompression.Size = new Size(169, 17);
+			withCompression.TabIndex = 43;
+			withCompression.Text = "Compress the data with ZX0";
+			withCompression.UseVisualStyleBackColor = true;
+			withCompression.CheckedChanged += WithCompressionCheckedChanged;
 			// 
 			// ExportViewWindow
 			// 
@@ -500,6 +500,6 @@
 		private Label labelOffsetX;
 		private GroupBox groupBox1;
 		private Label labelSizeInfo;
-		private CheckBox checkZX0;
+		private CheckBox withCompression;
 	}
 }
