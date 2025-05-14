@@ -1,5 +1,7 @@
 using System.Drawing.Drawing2D;
 using System.Media;
+using System.Windows.Forms;
+
 #pragma warning disable WFO1000
 
 namespace FontMaker
@@ -137,8 +139,9 @@ namespace FontMaker
 
 		private Rectangle CopyPasteRange;
 
-		public Compressors.CompressorType CompressorId { get; set; }	// 0 = zx0, 1 = zx1, 2 = zx2
+		public Compressors.CompressorType CompressorId { get; set; }    // 0 = zx0, 1 = zx1, 2 = zx2
 
+		public int[] AppWidth = new[] { 1210 - 8 * 16, 1210, 1353 + 8 * 16 };
 		#endregion
 
 
@@ -268,7 +271,7 @@ namespace FontMaker
 
 				// If no input file set upon start, then show splash screen
 				timerAutoCloseAboutBox.Enabled = true;
-				pictureBoxAbout.Left = pictureBoxAtariView.Left + (checkBox40Bytes.Checked ? (pictureBoxAtariView.Width - pictureBoxAbout.Width) / 2 : 0);
+				pictureBoxAbout.Left = pictureBoxAtariView.Left; // + (pictureBoxAtariView.Width - pictureBoxAbout.Width) / 2;
 				pictureBoxAbout.Visible = true;
 			}
 
@@ -1052,23 +1055,44 @@ namespace FontMaker
 			RedrawView();
 		}
 
-		public void ViewEditor_CheckBox40Bytes_Click(object sender, EventArgs e)
+		private void comboBoxBytes_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (checkBox40Bytes.Checked)
+			 // Set the width of the window based on which view we want
+			var wantedView = comboBoxBytes.SelectedIndex;
+
+			switch (wantedView)
 			{
-				// 40 bytes mode
-				Width = 1210;
-				vScrollBar.Location = new Point(1176, 0);
-				hScrollBar.Width = 673;
-				//Width += (checkBox40Bytes.Checked ? (130 + 16) : (-130 - 16));
+				case 0:
+				{
+					// 32 bytes
+					Width = 1210 - 8 * 16;
+					vScrollBar.Location = new Point(1210 - 8 * 16 - 16 - vScrollBar.Width, 0);
+					hScrollBar.Width = 673 - 8 * 16;
+					break;
+				}
+
+				default:
+				case 1:
+				{
+					// 40 bytes
+					Width = 1210;
+					vScrollBar.Location = new Point(1177, 0);
+					hScrollBar.Width = 673;
+					break;
+				}
+
+				case 2:
+				{
+					// 48 bytes
+					Width = 1341;
+					vScrollBar.Location = new Point(1306, 0);
+					hScrollBar.Width = 673 + 8 * 16;
+					break;
+				}
 			}
-			else
-			{
-				// 32 bytes mode
-				Width = 1210 - 8 * 16;
-				vScrollBar.Location = new Point(1176 - 8 * 16, 0);
-				hScrollBar.Width = 673 - 8 * 16;
-			}
+
+			UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
+
 		}
 
 		public void ViewEditor_ClearView_Click(object sender, EventArgs e)
@@ -1639,8 +1663,6 @@ namespace FontMaker
 				pictureBoxDuplicateIndicator.Visible = true;
 			}
 		}
-
 		#endregion
-
 	}
 }

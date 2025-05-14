@@ -14,13 +14,13 @@ public partial class FontMakerConfigurationWindow : Form
 
 		switch (compressorId)
 		{
+			case Compressors.CompressorType.APULTRA: radioButtonApultra.Checked = true; break;
 			case Compressors.CompressorType.ZX2: radioButtonZX2.Checked = true; break;
 			case Compressors.CompressorType.ZX1: radioButtonZX1.Checked = true; break;
 			case Compressors.CompressorType.ZX0:
 			default:
 				radioButtonZX0.Checked = true; break;
 		}
-
 	}
 
 	private void buttonOk_Click(object sender, EventArgs e)
@@ -31,6 +31,8 @@ public partial class FontMakerConfigurationWindow : Form
 			CompressorId = Compressors.CompressorType.ZX1;
 		else if (radioButtonZX2.Checked)
 			CompressorId = Compressors.CompressorType.ZX2;
+		else if (radioButtonApultra.Checked)
+			CompressorId = Compressors.CompressorType.APULTRA;
 		else
 		{
 			CompressorId = Compressors.CompressorType.ZX0;

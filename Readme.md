@@ -366,6 +366,11 @@ Double Click on a tile in the horizontal tile set viewer to select it for drawin
 
 ## Changes/History
 
+V1.6.17.3
+Added apultra compression.
+https://github.com/emmanuel-marty/apultra
+Added option to show 32, 40 or 48 byte wide editing view.
+
 V1.6.17.2
 Fixed a bug in the page editor. It reset each page size to 40x26.
 Added support for ZX0, ZX1 and ZX2 compression.

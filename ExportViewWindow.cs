@@ -11,6 +11,9 @@ namespace FontMaker
 		private const int BITMAP_WIDTH = 640;
 		private const int BITMAP_HEIGHT = 416;
 
+		private const int EXPORT_WIDTH = 40;
+		private const int EXPORT_HEIGHT = 26;
+
 		private const int CHAR_PIXEL_WIDTH = 16;
 
 		private int PreviousExportType { get; set; } = -1;
@@ -223,9 +226,9 @@ namespace FontMaker
 					Height = 16,
 				};
 
-				for (var y = 0; y < AtariView.VIEW_HEIGHT; y++)
+				for (var y = 0; y < EXPORT_HEIGHT; y++)
 				{
-					for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
+					for (var x = 0; x < EXPORT_WIDTH; x++)
 					{
 						var charFromView = AtariView.ViewBytes[OffsetX + x, OffsetY + y];
 						var rx = charFromView % 32;
@@ -816,7 +819,7 @@ namespace FontMaker
 			var rect = new Rectangle(_exportRegion.X, _exportRegion.Y, _exportRegion.Width, _exportRegion.Height);
 			rect.Offset(-OffsetX, -OffsetY);
 
-			var targetRect = new Rectangle(0, 0, AtariView.VIEW_WIDTH, AtariView.VIEW_HEIGHT);
+			var targetRect = new Rectangle(0, 0, EXPORT_WIDTH, EXPORT_HEIGHT);
 			rect.Intersect(targetRect);
 
 			if (rect.IsEmpty)

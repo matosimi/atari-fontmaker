@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Security.Cryptography;
 using System.Text;
 using TinyJson;
 #pragma warning disable WFO1000
@@ -89,7 +90,9 @@ public partial class FontMakerForm
 		var rx = e.X / 16;
 		var ry = e.Y / CellHeight;
 
-		if (rx < 0 || rx >= AtariView.VIEW_WIDTH || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
+		var viewWidth = Math.Min(GetActualViewWidth(), AtariView.Width);
+
+		if (rx < 0 || rx >= viewWidth || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
 		{
 			// Note: This should not happen but when running on Mac things get funky
 			return;
@@ -219,7 +222,9 @@ public partial class FontMakerForm
 
 			var rx = e.X / 16;
 			var ry = e.Y / CellHeight;
-			if (rx < 0 || rx >= AtariView.VIEW_WIDTH || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
+
+			var viewWidth = Math.Min(GetActualViewWidth(), AtariView.Width);
+			if (rx < 0 || rx >= viewWidth || ry < 0 || ry >= AtariView.VIEW_HEIGHT)
 			{
 				// Note: This should not happen but when running on Mac things get funky
 				return;
@@ -397,9 +402,10 @@ public partial class FontMakerForm
 				Height = 16,
 			};
 
+			var viewWidth = Math.Min(GetActualViewWidth(), AtariView.Width);
 			for (var y = 0; y < ViewHeight; y++)
 			{
-				for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
+				for (var x = 0; x < viewWidth; x++)
 				{
 					var charFromView = AtariView.ViewBytes[AtariView.OffsetX + x, AtariView.OffsetY + y];
 					var rx = charFromView % 32;
@@ -449,6 +455,8 @@ public partial class FontMakerForm
 				Height = 16,
 			};
 
+			var viewWidth = Math.Min(GetActualViewWidth(), AtariView.Width);
+
 			for (var y = 0; y < ViewHeight; y++)
 			{
 				var fontYOffset = Constants.FontPageOffset[AtariView.UseFontOnLine[AtariView.OffsetY + y] - 1] + colorOffset;
@@ -464,7 +472,8 @@ public partial class FontMakerForm
 				var ep = (rx + ry * 32) % 256;
 				var dp = (rx + ny * 32) % 256;
 
-				for (var x = 0; x < AtariView.VIEW_WIDTH; x++)
+
+				for (var x = 0; x < viewWidth; x++) // Check
 				{
 					destRect.X = x * 16;
 					destRect.Y = y * CellHeight;
@@ -534,7 +543,13 @@ public partial class FontMakerForm
 
 	public int GetActualViewWidth()
 	{
-		return checkBox40Bytes.Checked ? 40 : 32;
+		return comboBoxBytes.SelectedIndex switch
+		{
+			0 => 32,
+			1 => 40,
+			2 => 48,
+			_ => 40
+		};
 	}
 
 	/// <summary>
@@ -621,13 +636,14 @@ public partial class FontMakerForm
 					UpdateUndoButtons(false);
 				}
 
-				// 40 bytes width
-				if ((FortyBytes == "1" && !checkBox40Bytes.Checked)
-				    || (FortyBytes == "0" && !checkBox40Bytes.Checked))
+				comboBoxBytes.SelectedIndex = FortyBytes switch
 				{
-					checkBox40Bytes.Checked = !checkBox40Bytes.Checked;
-					ViewEditor_CheckBox40Bytes_Click(0, EventArgs.Empty);
-				}
+					// 40 bytes width
+					"0" => 0,
+					"1" => 1,
+					"2" => 2,
+					_ => 1
+				};
 
 				// Load the page information
 				if (jsonObj.Pages?.Count > 0)
@@ -728,7 +744,13 @@ public partial class FontMakerForm
 		jo.Data = Convert.ToHexString(AtariFont.FontBytes);
 
 		// Width selection
-		jo.FortyBytes = GetActualViewWidth() == 40 ? "1" : "0";
+		jo.FortyBytes = GetActualViewWidth() switch
+		{
+			32 => "0",
+			40 => "1",
+			48 => "2",
+			_ => "1"
+		};
 
 		// Save the page information
 		jo.Pages = [];
@@ -822,7 +844,6 @@ public partial class FontMakerForm
 
 		if (ok == DialogResult.OK)
 		{
-			var viewWidth = GetActualViewWidth();
 			var ext = Path.GetExtension(dialogOpenFile.FileName).ToLower();
 
 			if (ext == ".atrview")
@@ -841,10 +862,11 @@ public partial class FontMakerForm
 			if (ext == ".dat")
 			{
 				using var fsDat = new FileStream(dialogOpenFile.FileName, FileMode.Open, FileAccess.Read, FileShare.None);
-				var loadSize = (int)Math.Min(fsDat.Length, AtariView.VIEW_HEIGHT * viewWidth);
+				var loadSize = (int)Math.Min(fsDat.Length, AtariView.Height * AtariView.Width);
 
 				try
 				{
+					buf = new byte[loadSize];
 					fsDat.ReadExactly(buf, 0, loadSize);
 				}
 				finally
@@ -853,13 +875,13 @@ public partial class FontMakerForm
 				}
 
 				// Copy the bytes into the screen
-				for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
+				for (var a = 0; a < AtariView.Height; a++)
 				{
-					for (var b = 0; b < viewWidth; b++)
+					for (var b = 0; b < AtariView.Width; b++)
 					{
-						if (a * viewWidth + b < loadSize)
+						if (a * AtariView.Width + b < loadSize)
 						{
-							AtariView.ViewBytes[b, a] = buf[a * viewWidth + b];
+							AtariView.ViewBytes[b, a] = buf[a * AtariView.Width + b];
 						}
 					}
 				}
@@ -1060,12 +1082,14 @@ public partial class FontMakerForm
 
 			if (ext == ".dat")
 			{
-				var data = new byte[AtariView.VIEW_HEIGHT * GetActualViewWidth()];
-				for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
+				var viewWidth = Math.Min(AtariView.Height, AtariView.Width);
+
+				var data = new byte[AtariView.Height * AtariView.Width];
+				for (var a = 0; a < AtariView.Height; a++)
 				{
-					for (var b = 0; b < GetActualViewWidth(); b++)
+					for (var b = 0; b < AtariView.Width; b++)
 					{
-						data[b + a * GetActualViewWidth()] = AtariView.ViewBytes[b, a];
+						data[b + a * AtariView.Width] = AtariView.ViewBytes[b, a];
 					}
 				}
 
@@ -1089,14 +1113,14 @@ public partial class FontMakerForm
 		{
 			PushState();
 
-			for (var a = 0; a < AtariView.VIEW_HEIGHT; a++)
+			for (var a = 0; a < AtariView.Height; a++)
 			{
 				AtariView.UseFontOnLine[a] = 1;
 			}
 
-			for (var a = 0; a < AtariView.VIEW_WIDTH; a++)
+			for (var a = 0; a < AtariView.Width; a++)
 			{
-				for (var b = 0; b < AtariView.VIEW_HEIGHT; b++)
+				for (var b = 0; b < AtariView.Height; b++)
 				{
 					AtariView.ViewBytes[a, b] = 0;
 				}
@@ -1588,7 +1612,8 @@ public partial class FontMakerForm
 			var rect = new Rectangle(CopyPasteRange.X, CopyPasteRange.Y, CopyPasteRange.Width + 1, CopyPasteRange.Height + 1);
 			rect.Offset(-AtariView.OffsetX, -AtariView.OffsetY);
 
-			var targetRect = new Rectangle(0,0, AtariView.VIEW_WIDTH, AtariView.VIEW_HEIGHT);
+			var viewWidth = Math.Min(GetActualViewWidth(), AtariView.Width);
+			var targetRect = new Rectangle(0,0, viewWidth, AtariView.VIEW_HEIGHT);
 			rect.Intersect(targetRect);
 
 			if (rect.IsEmpty)
@@ -1609,8 +1634,12 @@ public partial class FontMakerForm
 	public void UpdateHVScrollBars(int offsetX = 0, int offsetY = 0)
 	{
 		PreventScrollProcessing = true;
-		hScrollBar.Maximum = AtariView.Width - 40;
+		var maxHorizontal = Math.Max(0, AtariView.Width - GetActualViewWidth());
+		hScrollBar.Maximum = maxHorizontal;
+		if (offsetX > maxHorizontal)
+			offsetX = maxHorizontal;
 		hScrollBar.Value = offsetX;
+
 		vScrollBar.Maximum = AtariView.Height - (CellHeight == 16 ? 26 : 13);
 		if (offsetY > vScrollBar.Maximum)
 			offsetY = vScrollBar.Maximum;

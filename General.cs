@@ -218,7 +218,7 @@
 
 		public void ActionShowAbout()
 		{
-			pictureBoxAbout.Left = pictureBoxAtariView.Left + (checkBox40Bytes.Checked ? (pictureBoxAtariView.Width - pictureBoxAbout.Width)/2 : 0);
+			pictureBoxAbout.Left = pictureBoxAtariView.Left;
 			pictureBoxAbout.Visible = !pictureBoxAbout.Visible;
 
 		}

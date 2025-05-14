@@ -122,7 +122,6 @@
 			listBoxRecolorSource = new ListBox();
 			listBoxRecolorTarget = new ListBox();
 			buttonEnterText = new Button();
-			checkBox40Bytes = new CheckBox();
 			dialogOpenFile = new OpenFileDialog();
 			dialogSaveFile = new SaveFileDialog();
 			timerAutoCloseAboutBox = new System.Windows.Forms.Timer(components);
@@ -164,6 +163,7 @@
 			vScrollBar = new VScrollBar();
 			labelOffsets = new Label();
 			buttonConfigure = new Button();
+			comboBoxBytes = new ComboBox();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -203,7 +203,7 @@
 			pictureBoxAtariView.BackColor = Color.Transparent;
 			pictureBoxAtariView.Location = new Point(536, 0);
 			pictureBoxAtariView.Name = "pictureBoxAtariView";
-			pictureBoxAtariView.Size = new Size(640, 416);
+			pictureBoxAtariView.Size = new Size(768, 416);
 			pictureBoxAtariView.TabIndex = 0;
 			pictureBoxAtariView.TabStop = false;
 			pictureBoxAtariView.MouseDoubleClick += ViewEditor_DoubleClick;
@@ -1332,18 +1332,6 @@
 			buttonEnterText.UseVisualStyleBackColor = true;
 			buttonEnterText.Click += ViewEditor_EnterText_Click;
 			// 
-			// checkBox40Bytes
-			// 
-			checkBox40Bytes.AutoSize = true;
-			checkBox40Bytes.Location = new Point(815, 547);
-			checkBox40Bytes.Name = "checkBox40Bytes";
-			checkBox40Bytes.Size = new Size(68, 17);
-			checkBox40Bytes.TabIndex = 10;
-			checkBox40Bytes.Text = "40 Bytes";
-			toolTips.SetToolTip(checkBox40Bytes, "Switch between 32 and 40 byte screen width");
-			checkBox40Bytes.UseVisualStyleBackColor = true;
-			checkBox40Bytes.Click += ViewEditor_CheckBox40Bytes_Click;
-			// 
 			// dialogOpenFile
 			// 
 			dialogOpenFile.FileName = "Default";
@@ -1534,7 +1522,7 @@
 			lblInMegaCopyMode.AutoSize = true;
 			lblInMegaCopyMode.BackColor = SystemColors.ActiveCaption;
 			lblInMegaCopyMode.Font = new Font("Segoe UI", 14.25F, FontStyle.Bold);
-			lblInMegaCopyMode.Location = new Point(1008, 547);
+			lblInMegaCopyMode.Location = new Point(1139, 547);
 			lblInMegaCopyMode.Name = "lblInMegaCopyMode";
 			lblInMegaCopyMode.Size = new Size(188, 25);
 			lblInMegaCopyMode.TabIndex = 23;
@@ -1708,7 +1696,7 @@
 			// checkBoxStayInPasteMode
 			// 
 			checkBoxStayInPasteMode.AutoSize = true;
-			checkBoxStayInPasteMode.Location = new Point(815, 527);
+			checkBoxStayInPasteMode.Location = new Point(812, 527);
 			checkBoxStayInPasteMode.Name = "checkBoxStayInPasteMode";
 			checkBoxStayInPasteMode.Size = new Size(123, 17);
 			checkBoxStayInPasteMode.TabIndex = 33;
@@ -1721,14 +1709,14 @@
 			hScrollBar.Location = new Point(520, 417);
 			hScrollBar.Maximum = 0;
 			hScrollBar.Name = "hScrollBar";
-			hScrollBar.Size = new Size(673, 17);
+			hScrollBar.Size = new Size(803, 17);
 			hScrollBar.TabIndex = 34;
 			hScrollBar.ValueChanged += scrollBar_ValueChanged;
 			// 
 			// vScrollBar
 			// 
 			vScrollBar.LargeChange = 1;
-			vScrollBar.Location = new Point(1176, 0);
+			vScrollBar.Location = new Point(1306, 0);
 			vScrollBar.Maximum = 0;
 			vScrollBar.Name = "vScrollBar";
 			vScrollBar.Size = new Size(17, 416);
@@ -1756,12 +1744,25 @@
 			buttonConfigure.UseMnemonic = false;
 			buttonConfigure.Click += buttonConfigure_Click;
 			// 
+			// comboBoxBytes
+			// 
+			comboBoxBytes.DropDownStyle = ComboBoxStyle.DropDownList;
+			comboBoxBytes.FormattingEnabled = true;
+			comboBoxBytes.Items.AddRange(new object[] { "32 Bytes", "40 Bytes", "48 Bytes" });
+			comboBoxBytes.Location = new Point(810, 546);
+			comboBoxBytes.MaxDropDownItems = 3;
+			comboBoxBytes.Name = "comboBoxBytes";
+			comboBoxBytes.Size = new Size(67, 21);
+			comboBoxBytes.TabIndex = 38;
+			comboBoxBytes.SelectedIndexChanged += comboBoxBytes_SelectedIndexChanged;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
-			ClientSize = new Size(1194, 572);
+			ClientSize = new Size(1325, 572);
+			Controls.Add(comboBoxBytes);
 			Controls.Add(buttonConfigure);
 			Controls.Add(labelOffsets);
 			Controls.Add(vScrollBar);
@@ -1800,7 +1801,6 @@
 			Controls.Add(buttonSaveView);
 			Controls.Add(p_status);
 			Controls.Add(buttonEnterText);
-			Controls.Add(checkBox40Bytes);
 			Controls.Add(panel1);
 			FormBorderStyle = FormBorderStyle.FixedSingle;
 			Icon = (Icon)resources.GetObject("$this.Icon");
@@ -1914,7 +1914,6 @@
 		private System.Windows.Forms.ListBox listBoxRecolorSource;
 		private System.Windows.Forms.ListBox listBoxRecolorTarget;
 		private System.Windows.Forms.Button buttonEnterText;
-		private System.Windows.Forms.CheckBox checkBox40Bytes;
 		private System.Windows.Forms.CheckBox checkBoxShowDuplicates;
 		private System.Windows.Forms.OpenFileDialog dialogOpenFile;
 		private System.Windows.Forms.SaveFileDialog dialogSaveFile;
@@ -1992,5 +1991,6 @@
 		private VScrollBar vScrollBar;
 		private Label labelOffsets;
 		private Button buttonConfigure;
+		private ComboBox comboBoxBytes;
 	}
 }

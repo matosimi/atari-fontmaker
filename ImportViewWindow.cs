@@ -3,6 +3,9 @@
 namespace FontMaker;
 public partial class ImportViewWindow : Form
 {
+
+	private const int PREVIEW_WIDTH = 40;
+	private const int PREVIEW_HEIGHT = 26;
 	public bool InColorMode { get; set; }
 	public int WhichColorMode { get; set; }
 
@@ -208,9 +211,9 @@ public partial class ImportViewWindow : Form
 				Height = 1,
 			};
 
-			for (var y = 0; y < AtariView.VIEW_HEIGHT_LIMIT; y++)
+			for (var y = 0; y < PREVIEW_HEIGHT; y++)
 			{
-				for (var x = 0; x < AtariView.VIEW_WIDTH_LIMIT; x++)
+				for (var x = 0; x < PREVIEW_WIDTH; x++)
 				{
 					var rx = ImportedViewBytes[x, y] % 32;
 					var ry = ImportedViewBytes[x, y] / 32;

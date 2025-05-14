@@ -8,17 +8,20 @@ public static class Compressors
 	{
 		ZX0 = 0,
 		ZX1 = 1,
-		ZX2 = 2
+		ZX2 = 2,
+		APULTRA = 3,
 	}
 
 	private static bool IsCompressor0Available { get; set;}
 	private static bool IsCompressor1Available { get; set; }
 	private static bool IsCompressor2Available { get; set; }
+	private static bool IsCompressor3Available { get; set; }
 
 	private static string TempPath { get; set; }
 	private static string Zx0Exe { get; set; }
 	private static string Zx1Exe { get; set; }
 	private static string Zx2Exe { get; set; }
+	private static string ApultraExe { get; set; }
 
 	// ==========================================================================
 	// ZX0 compressor interface
@@ -43,7 +46,7 @@ public static class Compressors
 			Zx1Exe = Path.Combine(TempPath, "zx1.exe");
 			if (!File.Exists(Zx1Exe))
 			{
-				// Create the zx0.exe file
+				// Create the zx1.exe file
 				var buffer = Helpers.GetResource<byte[]>("zx1.exe");
 				using var fs = new FileStream(Zx1Exe, FileMode.Create, FileAccess.Write);
 				fs.Write(buffer, 0, buffer.Length);
@@ -53,9 +56,19 @@ public static class Compressors
 			Zx2Exe = Path.Combine(TempPath, "zx2.exe");
 			if (!File.Exists(Zx2Exe))
 			{
-				// Create the zx0.exe file
+				// Create the zx2.exe file
 				var buffer = Helpers.GetResource<byte[]>("zx2.exe");
 				using var fs = new FileStream(Zx2Exe, FileMode.Create, FileAccess.Write);
+				fs.Write(buffer, 0, buffer.Length);
+				fs.Close();
+			}
+
+			ApultraExe = Path.Combine(TempPath, "apultra.exe");
+			if (!File.Exists(ApultraExe))
+			{
+				// Create the apultra.exe file
+				var buffer = Helpers.GetResource<byte[]>("apultra.exe");
+				using var fs = new FileStream(ApultraExe, FileMode.Create, FileAccess.Write);
 				fs.Write(buffer, 0, buffer.Length);
 				fs.Close();
 			}
@@ -63,23 +76,26 @@ public static class Compressors
 			IsCompressor0Available = File.Exists(Zx0Exe);
 			IsCompressor1Available = File.Exists(Zx1Exe);
 			IsCompressor2Available = File.Exists(Zx2Exe);
+			IsCompressor3Available = File.Exists(ApultraExe);
 		}
 		catch (Exception ex)
 		{
 			IsCompressor0Available = false;
 			IsCompressor1Available = false;
 			IsCompressor2Available = false;
+			IsCompressor3Available = false;
 		}
 	}
 
 	public static byte[] Compress(byte[] data, CompressorType which)
 	{
-		var (available, exe) = which switch
+		var (available, exe, cmdLine) = which switch
 		{
-			CompressorType.ZX0 => (IsCompressor0Available, Zx0Exe),
-			CompressorType.ZX1 => (IsCompressor1Available, Zx1Exe),
-			CompressorType.ZX2 => (IsCompressor2Available, Zx2Exe),
-			_ => (false, null)
+			CompressorType.ZX0 => (IsCompressor0Available, Zx0Exe, "-f"),
+			CompressorType.ZX1 => (IsCompressor1Available, Zx1Exe, "-f"),
+			CompressorType.ZX2 => (IsCompressor2Available, Zx2Exe, "-f"),
+			CompressorType.APULTRA => (IsCompressor2Available, ApultraExe, string.Empty),
+			_ => (false, null, string.Empty)
 		};
 		if (!available) return data;
 
@@ -102,7 +118,7 @@ public static class Compressors
 				StartInfo = new ProcessStartInfo
 				{
 					FileName = exe,
-					Arguments = $"-f {tempFile} {outputPath}",
+					Arguments = $"{cmdLine} {tempFile} {outputPath}",
 					CreateNoWindow = true,
 					UseShellExecute = false,
 					RedirectStandardOutput = true,
@@ -129,6 +145,7 @@ public static class Compressors
 			CompressorType.ZX0 => "ZX0",
 			CompressorType.ZX1 => "ZX1",
 			CompressorType.ZX2 => "ZX2",
+			CompressorType.APULTRA => "apultra",
 			_ => "Unknown"
 		};
 
