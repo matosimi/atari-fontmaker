@@ -23,7 +23,7 @@ public class PageData
 		UndoBuffer = new AtariViewUndoBuffer();
 	}
 
-	public PageData(SavedPageData? pageSrc, int index, int viewWidth)
+	public PageData(SavedPageData? pageSrc, int index)
 	{
 		// Init the page from saved json
 
@@ -39,7 +39,7 @@ public class PageData
 
 		for (var y = 0; y < pageSrc.Height; ++y)
 		{
-			for (var x = 0; x < viewWidth; ++x)
+			for (var x = 0; x < pageSrc.Width; ++x)
 			{
 				viewData[x, y] = bytes[idx];
 				++idx;

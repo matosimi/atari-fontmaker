@@ -651,7 +651,7 @@ public partial class FontMakerForm
 					Pages = [];
 					for (var pageIndex = 0; pageIndex < jsonObj.Pages.Count; ++pageIndex)
 					{
-						Pages.Add(new PageData(jsonObj.Pages[pageIndex], pageIndex, viewWidth));
+						Pages.Add(new PageData(jsonObj.Pages[pageIndex], pageIndex));
 					}
 
 					SwopPageAction(0);
