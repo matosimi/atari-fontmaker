@@ -3,9 +3,9 @@ using TinyJson;
 
 namespace FontMaker
 {
-	public class ConfigurationJSON
+	public class ConfigurationJson
 	{
-		public List<string> ColorSets { get; set; }
+		public List<string>? ColorSets { get; set; } = [];
 		public int AnalysisColor { get; set; }
 		public int AnalysisAlpha { get; set; }
 
@@ -20,25 +20,38 @@ namespace FontMaker
 		public int ExportViewRegionY { get; set; }
 		public int ExportViewRegionW { get; set; }
 		public int ExportViewRegionH { get; set; }
+		public int ExportViewOffsetX { get; set; }
+		public int ExportViewOffsetY { get; set; }
+
 		public bool ExportViewTranspose { get; set; }
+
+		public bool ImportViewRemember { get; set; }
+		public int ImportLineWidth { get; set; }
+		public int ImportSkipX { get; set; }
+		public int ImportSkipY { get; set; }
+		public int ImportWidth { get; set; }
+		public int ImportHeight { get; set; }
+
+		public int CompressorId { get; set; }	// 0 = zx0, 1 = zx1, 2 = zx2
 
 	}
 	public static class Configuration
 	{
-		public static string Filename = Path.Join(AppContext.BaseDirectory, "FontMaker.json");
 
-		public static ConfigurationJSON Values { get; set; }
+		private static readonly string Filename = Path.Join(AppContext.BaseDirectory, "FontMaker.json");
+
+		public static ConfigurationJson Values { get; set; } = new ConfigurationJson();
 
 		public static void Load()
 		{
 			try
 			{
-				var jsonText = File.ReadAllText(Filename);                  // Load JSON configuration file
-				Values = jsonText.FromJson<ConfigurationJSON>();       // Parse the JSON into an object
+				var jsonText = File.ReadAllText(Filename);				// Load JSON configuration file
+				Values = jsonText.FromJson<ConfigurationJson>();		// Parse the JSON into an object
 			}
 			catch
 			{
-
+				// ignored
 			}
 
 			VerifyDefaults();
@@ -54,18 +67,15 @@ namespace FontMaker
 			}
 			catch
 			{
+				// ignored
 			}
 		}
 
 		public static void VerifyDefaults()
 		{
-			if (Values == null)
-			{
-				Values = new ConfigurationJSON();
-			}
+			Values ??= new ConfigurationJson();
 			// Make sure that there are 6 color sets
-			if (Values.ColorSets == null)
-				Values.ColorSets = new List<string>();
+			Values.ColorSets ??= [];
 
 			if (Values.ColorSets.Count < 6)
 			{
@@ -94,10 +104,14 @@ namespace FontMaker
 				Values.AnalysisDupAlpha = FontAnalysisWindow.AnalysisMinAlpha + (FontAnalysisWindow.AnalysisMaxAlpha - FontAnalysisWindow.AnalysisMinAlpha) / 2;
 			}
 
-			if (Values.ExportViewRegionX < 0 || Values.ExportViewRegionX >= 40) Values.ExportViewRegionX = 0;
-			if (Values.ExportViewRegionY < 0 || Values.ExportViewRegionY >= 26) Values.ExportViewRegionY = 0;
+			if (Values.ExportViewRegionX is < 0 or >= 40) Values.ExportViewRegionX = 0;
+			if (Values.ExportViewRegionY is < 0 or >= 26) Values.ExportViewRegionY = 0;
 			if (Values.ExportViewRegionX + Values.ExportViewRegionW >= 40) Values.ExportViewRegionW = 1;
 			if (Values.ExportViewRegionY + Values.ExportViewRegionH >= 26) Values.ExportViewRegionH = 1;
+
+			if (Values.ImportLineWidth is < 1) Values.ImportLineWidth = 1;
+			if (Values.ImportWidth is < 1) Values.ImportWidth = 1;
+			if (Values.ImportHeight is < 1) Values.ImportHeight = 1;
 		}
 	}
 
@@ -122,8 +136,20 @@ namespace FontMaker
 				Configuration.Values.ExportViewExportType,
 				Configuration.Values.ExportViewDataType,
 				new Rectangle(Configuration.Values.ExportViewRegionX, Configuration.Values.ExportViewRegionY, Configuration.Values.ExportViewRegionW, Configuration.Values.ExportViewRegionH),
+				new Point(Configuration.Values.ExportViewOffsetX, Configuration.Values.ExportViewOffsetY),
 				Configuration.Values.ExportViewTranspose
 			);
+
+			ImportViewWindowForm.LoadConfiguration(
+				Configuration.Values.ImportViewRemember,
+				Configuration.Values.ImportLineWidth,
+				Configuration.Values.ImportSkipX,
+				Configuration.Values.ImportSkipY,
+				Configuration.Values.ImportWidth,
+				Configuration.Values.ImportHeight
+			);
+
+			CompressorId = (Compressors.CompressorType)Configuration.Values.CompressorId;
 		}
 
 		public void SaveConfiguration()
@@ -137,12 +163,32 @@ namespace FontMaker
 			Configuration.Values.AnalysisDupColor = FontAnalysisWindowForm.GetDuplicateColor;
 			Configuration.Values.AnalysisDupAlpha = FontAnalysisWindowForm.GetDuplicateAlpha;
 
-			(Configuration.Values.ExportViewRemember, Configuration.Values.ExportViewExportType, Configuration.Values.ExportViewDataType, var exportRegion, Configuration.Values.ExportViewTranspose)
-				= ExportViewWindowForm.SaveConfiguration();
+			(
+				Configuration.Values.ExportViewRemember, 
+				Configuration.Values.ExportViewExportType, 
+				Configuration.Values.ExportViewDataType, 
+				var exportRegion, 
+				var exportOffset,
+				Configuration.Values.ExportViewTranspose
+			) = ExportViewWindowForm.SaveConfiguration();
+
 			Configuration.Values.ExportViewRegionX = exportRegion.X;
 			Configuration.Values.ExportViewRegionY = exportRegion.Y;
 			Configuration.Values.ExportViewRegionW = exportRegion.Width;
 			Configuration.Values.ExportViewRegionH = exportRegion.Height;
+			Configuration.Values.ExportViewOffsetX = exportOffset.X;
+			Configuration.Values.ExportViewOffsetY = exportOffset.Y;
+
+			(
+				Configuration.Values.ImportViewRemember, 
+				Configuration.Values.ImportLineWidth, 
+				Configuration.Values.ImportSkipX, 
+				Configuration.Values.ImportSkipY,
+				Configuration.Values.ImportWidth,
+				Configuration.Values.ImportHeight
+			) = ImportViewWindowForm.SaveConfiguration();
+
+			Configuration.Values.CompressorId = (int)CompressorId;
 
 			Configuration.Save();
 		}

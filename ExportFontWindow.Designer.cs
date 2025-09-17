@@ -39,35 +39,34 @@
 			ComboBoxFontNumber = new ComboBox();
 			ButtonCopyClipboard = new Button();
 			saveDialog = new SaveFileDialog();
+			withCompression = new CheckBox();
+			labelSizeInfo = new Label();
 			SuspendLayout();
 			// 
 			// Label1
 			// 
 			Label1.AutoSize = true;
-			Label1.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
 			Label1.Location = new Point(8, 46);
 			Label1.Name = "Label1";
-			Label1.Size = new Size(76, 13);
+			Label1.Size = new Size(85, 13);
 			Label1.TabIndex = 0;
 			Label1.Text = "Export font to :";
 			// 
 			// Label2
 			// 
 			Label2.AutoSize = true;
-			Label2.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
 			Label2.Location = new Point(8, 78);
 			Label2.Name = "Label2";
-			Label2.Size = new Size(59, 13);
+			Label2.Size = new Size(62, 13);
 			Label2.TabIndex = 1;
 			Label2.Text = "Data type :";
 			// 
 			// Label3
 			// 
 			Label3.AutoSize = true;
-			Label3.Font = new Font("Microsoft Sans Serif", 8.25F, FontStyle.Regular, GraphicsUnit.Point);
 			Label3.Location = new Point(8, 13);
 			Label3.Name = "Label3";
-			Label3.Size = new Size(64, 13);
+			Label3.Size = new Size(68, 13);
 			Label3.TabIndex = 2;
 			Label3.Text = "Select font :";
 			// 
@@ -75,10 +74,10 @@
 			// 
 			ComboBoxExportType.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxExportType.FormattingEnabled = true;
-			ComboBoxExportType.Items.AddRange(new object[] { "Image BMP Mono", "Image BMP Color", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "Basic listing file" });
+			ComboBoxExportType.Items.AddRange(new object[] { "Image BMP Mono", "Image BMP Color", "Assembler", "Action! ", "Atari Basic", "FastBasic", "MADS dta", "C data {}", "MadPascal Array", "Binary Data", "Basic listing file" });
 			ComboBoxExportType.Location = new Point(104, 43);
 			ComboBoxExportType.Name = "ComboBoxExportType";
-			ComboBoxExportType.Size = new Size(145, 21);
+			ComboBoxExportType.Size = new Size(216, 21);
 			ComboBoxExportType.TabIndex = 0;
 			ComboBoxExportType.SelectedIndexChanged += ComboBoxExportTypeChange;
 			// 
@@ -88,13 +87,13 @@
 			ComboBoxDataType.FormattingEnabled = true;
 			ComboBoxDataType.Location = new Point(104, 75);
 			ComboBoxDataType.Name = "ComboBoxDataType";
-			ComboBoxDataType.Size = new Size(145, 21);
+			ComboBoxDataType.Size = new Size(216, 21);
 			ComboBoxDataType.TabIndex = 1;
 			ComboBoxDataType.SelectedIndexChanged += ComboBoxDataTypeChange;
 			// 
 			// Button_SaveAs
 			// 
-			Button_SaveAs.Location = new Point(269, 8);
+			Button_SaveAs.Location = new Point(326, 8);
 			Button_SaveAs.Name = "Button_SaveAs";
 			Button_SaveAs.Size = new Size(81, 25);
 			Button_SaveAs.TabIndex = 2;
@@ -104,7 +103,7 @@
 			// 
 			// Button_Cancel
 			// 
-			Button_Cancel.Location = new Point(269, 73);
+			Button_Cancel.Location = new Point(326, 73);
 			Button_Cancel.Name = "Button_Cancel";
 			Button_Cancel.Size = new Size(81, 25);
 			Button_Cancel.TabIndex = 3;
@@ -114,9 +113,9 @@
 			// 
 			// MemoExport
 			// 
-			MemoExport.Location = new Point(8, 104);
+			MemoExport.Location = new Point(8, 154);
 			MemoExport.Name = "MemoExport";
-			MemoExport.Size = new Size(342, 324);
+			MemoExport.Size = new Size(399, 353);
 			MemoExport.TabIndex = 4;
 			MemoExport.Text = "";
 			MemoExport.KeyPress += MemoExportKeyPress;
@@ -125,16 +124,16 @@
 			// 
 			ComboBoxFontNumber.DropDownStyle = ComboBoxStyle.DropDownList;
 			ComboBoxFontNumber.FormattingEnabled = true;
-			ComboBoxFontNumber.Items.AddRange(new object[] { "1", "2", "3", "4" });
+			ComboBoxFontNumber.Items.AddRange(new object[] { "1", "2", "3", "4", "1+2", "3+4", "1+2+3+4" });
 			ComboBoxFontNumber.Location = new Point(104, 8);
 			ComboBoxFontNumber.Name = "ComboBoxFontNumber";
-			ComboBoxFontNumber.Size = new Size(145, 21);
+			ComboBoxFontNumber.Size = new Size(216, 21);
 			ComboBoxFontNumber.TabIndex = 5;
 			ComboBoxFontNumber.SelectedIndexChanged += ComboBoxFontNumber_SelectedIndexChanged;
 			// 
 			// ButtonCopyClipboard
 			// 
-			ButtonCopyClipboard.Location = new Point(269, 42);
+			ButtonCopyClipboard.Location = new Point(326, 42);
 			ButtonCopyClipboard.Name = "ButtonCopyClipboard";
 			ButtonCopyClipboard.Size = new Size(81, 25);
 			ButtonCopyClipboard.TabIndex = 6;
@@ -144,7 +143,27 @@
 			// 
 			// saveDialog
 			// 
-			saveDialog.FileName = "saveDialog";
+			saveDialog.FileName = "font-export";
+			// 
+			// checkZX0
+			// 
+			withCompression.AutoSize = true;
+			withCompression.Location = new Point(104, 108);
+			withCompression.Name = "withCompression";
+			withCompression.Size = new Size(169, 17);
+			withCompression.TabIndex = 7;
+			withCompression.Text = "Compress the data with ZX0";
+			withCompression.UseVisualStyleBackColor = true;
+			withCompression.CheckedChanged += WithCompressionCheckedChanged;
+			// 
+			// labelSizeInfo
+			// 
+			labelSizeInfo.Location = new Point(8, 132);
+			labelSizeInfo.Name = "labelSizeInfo";
+			labelSizeInfo.Size = new Size(399, 17);
+			labelSizeInfo.TabIndex = 8;
+			labelSizeInfo.Text = "...";
+			labelSizeInfo.TextAlign = ContentAlignment.MiddleCenter;
 			// 
 			// ExportFontWindow
 			// 
@@ -152,7 +171,9 @@
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			CancelButton = Button_Cancel;
-			ClientSize = new Size(360, 443);
+			ClientSize = new Size(416, 516);
+			Controls.Add(labelSizeInfo);
+			Controls.Add(withCompression);
 			Controls.Add(Label1);
 			Controls.Add(Label2);
 			Controls.Add(Label3);
@@ -186,5 +207,7 @@
 		private System.Windows.Forms.ComboBox ComboBoxFontNumber;
 		private System.Windows.Forms.Button ButtonCopyClipboard;
 		private System.Windows.Forms.SaveFileDialog saveDialog;
+		private CheckBox withCompression;
+		private Label labelSizeInfo;
 	}
 }

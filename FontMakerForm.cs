@@ -1,5 +1,8 @@
 using System.Drawing.Drawing2D;
 using System.Media;
+using System.Windows.Forms;
+
+#pragma warning disable WFO1000
 
 namespace FontMaker
 {
@@ -39,17 +42,28 @@ namespace FontMaker
 
 		public enum MegaCopyStatusFlags
 		{
-			None, Selecting, Selected, Pasting
+			None,
+			Selecting,
+			Selected,
+			Pasting,        // Can paste into view and font
+			PastingView,    // Can only paste into the view
+			PastingFont,    // Can only paste into the font
 		}
 
-		internal MegaCopyStatusFlags megaCopyStatus = MegaCopyStatusFlags.None;
+		public enum DirectionFlags
+		{
+			Left, Right, Up, Down
+		}
 
-		private static readonly SolidBrush BlackBrush = new(Color.Black);
-		private static readonly SolidBrush WhiteBrush = new(Color.White);
-		private static readonly SolidBrush CyanBrush = new(Color.Cyan);
-		private static readonly SolidBrush RedBrush = new(Color.Red);
-		private static readonly SolidBrush YellowBrush = new(Color.Yellow);
-		private static readonly SolidBrush GreenBrush = new(Color.Green);
+		internal MegaCopyStatusFlags megaCopyStatus { get; set; } = MegaCopyStatusFlags.None;
+
+		public static readonly SolidBrush BlackBrush = new(Color.Black);
+		public static readonly SolidBrush WhiteBrush = new(Color.White);
+		public static readonly SolidBrush CyanBrush = new(Color.Cyan);
+		public static readonly SolidBrush RedBrush = new(Color.Red);
+		public static readonly SolidBrush YellowBrush = new(Color.Yellow);
+		public static readonly SolidBrush GreenBrush = new(Color.Green);
+		public static readonly SolidBrush TransparentBrush = new(Color.Transparent);
 
 		private readonly List<Button> ActionListNormalModeOnly = new();
 
@@ -57,22 +71,50 @@ namespace FontMaker
 		public AtariColorSelectorForm AtariColorSelector { get; set; } = new();
 		public ExportFontWindow ExportFontWindowForm { get; set; } = new();
 		public ExportViewWindow ExportViewWindowForm { get; set; } = new();
+
+		public ImportViewWindow ImportViewWindowForm { get; set; } = new();
 		public FontAnalysisWindow FontAnalysisWindowForm { get; set; } = new();
+
+		public ViewActionsWindow? ViewActionsWindowForm { get; set; } = null;
+
+		public TileSetEditorWindow? TileSetEditorForm { get; set; } = null;
 
 		/// <summary>
 		/// The Atari color palette. Loaded from "altirraPAL.pal"
 		/// </summary>
 		internal Color[] AtariPalette { get; set; } = new Color[256];
-		internal bool InColorMode { get; set; } = false;
-		internal int ActiveColorNr { get; set; }
-		/// <summary>
-		/// The 6 active colors: These are indexes into the Atari color palette
-		/// 2 for mono (index 0 + 1)
-		/// 5 for color (index 1, 2, 3, 4, 5 [inverse of 4])
-		/// </summary>
-		internal byte[] SetOfSelectedColors { get; set; } = new byte[9];
-		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[9];
+		public bool InColorMode { get; set; } = false;
+		private bool _inMode5 = false;
+		internal bool InMode5
+		{
+			get => _inMode5;
+			set
+			{
+				_inMode5 = value;
+				CellHeight = _inMode5 ? 32 : 16;
+				CursorHeight = _inMode5 ? 36 : 20;
+				CharXWidth = _inMode5 ? 20 : 40;
+				ViewHeight = _inMode5 ? AtariView.VIEW_HEIGHT_TALL : AtariView.VIEW_HEIGHT;
+			}
+		}
 
+		internal int CellHeight { get; set; } = 16;
+		internal int CursorHeight { get; set; } = 20;
+		internal int CharXWidth { get; set; } = 40;
+		internal int ViewHeight { get; set; } = AtariView.VIEW_HEIGHT;
+
+		internal bool PastingToView { get; set; }
+		internal int ActiveColorNr { get; set; }
+		internal int Active4BitColorNr { get; set; }
+		/// <summary>
+		/// The X active colors: These are indexes into the Atari color palette
+		/// B&W : 2 for mono (index 0 + 1)
+		/// Mode 4 & 5 : 5 for color (index 1, 2, 3, 4, 5 [inverse of 4])
+		/// Mode 10 : 9 colors
+		/// </summary>
+		internal byte[] SetOfSelectedColors { get; set; } = new byte[10];
+		internal SolidBrush[] BrushCache { get; set; } = new SolidBrush[10];
+		internal SolidBrush? EmptyBrush { get; set; }
 
 		internal string CurrentDataFolder { get; set; } = string.Empty;
 		internal string Font1Filename { get; set; } = string.Empty;
@@ -97,6 +139,9 @@ namespace FontMaker
 
 		private Rectangle CopyPasteRange;
 
+		public Compressors.CompressorType CompressorId { get; set; }    // 0 = zx0, 1 = zx1, 2 = zx2
+
+		public int[] AppWidth = new[] { 1210 - 8 * 16, 1210, 1353 + 8 * 16 };
 		#endregion
 
 
@@ -122,8 +167,15 @@ namespace FontMaker
 			ActionListNormalModeOnly.Add(buttonFontShiftRightRotate);
 			ActionListNormalModeOnly.Add(buttonFontShiftLeftRotate);
 			ActionListNormalModeOnly.Add(buttonFontShiftLeftInsert);
+			ActionListNormalModeOnly.Add(buttonFontDeleteCharShiftRight);
+			ActionListNormalModeOnly.Add(buttonFontDeleteCharShiftLeft);
+
+			ViewActionsWindowForm = new ViewActionsWindow(this);
+			TileSetEditorForm = new TileSetEditorWindow(this);
 
 			this.Load += FormCreate!;
+
+			Compressors.Prepare();
 		}
 
 		private void FormCreate(object sender, EventArgs e)
@@ -131,17 +183,28 @@ namespace FontMaker
 			// Init the gui
 			DoubleBuffered = true;
 			ActiveColorNr = 2;
+			Active4BitColorNr = 2;
 			SelectedCharacterIndex = 0;
 			comboBoxWriteMode.SelectedIndex = 0;
 			comboBoxPasteIntoFontNr.SelectedIndex = 0;
 
 			CurrentDataFolder = AppContext.BaseDirectory;
 
-			UndoBuffer.Setup();
+			// Position fix
+			panelColorSwitcherMode10.Location = panelColorSwitcher.Location;
+
+			AtariFontUndoBuffer.Setup();
 			AtariView.Setup();
+			TileSet.Setup();
 			LoadPalette();
 
 			LoadConfiguration();
+
+			BuildColorModeList();
+
+			BuildColorSelector();
+
+			UpdateViewActions();
 
 			string? ext;
 			if (Environment.GetCommandLineArgs().Length - 1 == 1)
@@ -153,37 +216,37 @@ namespace FontMaker
 				switch (ext)
 				{
 					case ".fn2":
-						{
-							// TODO: Load a .fn2 file
-							// It has 2048 bytes and effectively contains two fonts
-							//Load_font(Environment.GetCommandLineArgs()[1], 0, true);
-							//tempstring = Environment.GetCommandLineArgs()[1].Substring(-1, Environment.GetCommandLineArgs()[1].Length - 4);
-							//Font1Filename = tempstring + "1.fnt";
-							//Font2Filename = tempstring + "2.fnt";
-						}
-						break;
+					{
+						// TODO: Load a .fn2 file
+						// It has 2048 bytes and effectively contains two fonts
+						//Load_font(Environment.GetCommandLineArgs()[1], 0, true);
+						//tempstring = Environment.GetCommandLineArgs()[1].Substring(-1, Environment.GetCommandLineArgs()[1].Length - 4);
+						//Font1Filename = tempstring + "1.fnt";
+						//Font2Filename = tempstring + "2.fnt";
+					}
+					break;
 
 					case ".fnt":
-						{
-							Font1Filename = Environment.GetCommandLineArgs()[1];
-						}
-						break;
+					{
+						Font1Filename = Environment.GetCommandLineArgs()[1];
+					}
+					break;
 
 					case ".atrview":
-						{
-							LoadViewFile(Environment.GetCommandLineArgs()[1], true);
-							UpdateFormCaption();
-							RedrawFonts();
-							RedrawLineTypes();
-							RedrawView();
-							RedrawPal();
-							RedrawViewChar();
-							RedrawChar();
-							if (string.IsNullOrWhiteSpace(Font2Filename)) Font2Filename = Path.Join(loadPath, "Default.fnt");
-							if (string.IsNullOrWhiteSpace(Font3Filename)) Font3Filename = Path.Join(loadPath, "Default.fnt");
-							if (string.IsNullOrWhiteSpace(Font4Filename)) Font4Filename = Path.Join(loadPath, "Default.fnt");
-						}
-						break;
+					{
+						LoadViewFile(Environment.GetCommandLineArgs()[1], true);
+						UpdateFormCaption();
+						RedrawFonts();
+						RedrawLineTypes();
+						RedrawView();
+						RedrawPal();
+						RedrawViewChar();
+						RedrawChar();
+						if (string.IsNullOrWhiteSpace(Font2Filename)) Font2Filename = Path.Join(loadPath, "Default.fnt");
+						if (string.IsNullOrWhiteSpace(Font3Filename)) Font3Filename = Path.Join(loadPath, "Default.fnt");
+						if (string.IsNullOrWhiteSpace(Font4Filename)) Font4Filename = Path.Join(loadPath, "Default.fnt");
+					}
+					break;
 					default:
 						Font1Filename = Environment.GetCommandLineArgs()[1];
 						break;
@@ -208,7 +271,7 @@ namespace FontMaker
 
 				// If no input file set upon start, then show splash screen
 				timerAutoCloseAboutBox.Enabled = true;
-				pictureBoxAbout.Left = pictureBoxAtariView.Left + (checkBox40Bytes.Checked ? (pictureBoxAtariView.Width - pictureBoxAbout.Width) / 2 : 0);
+				pictureBoxAbout.Left = pictureBoxAtariView.Left; // + (pictureBoxAtariView.Width - pictureBoxAbout.Width) / 2;
 				pictureBoxAbout.Visible = true;
 			}
 
@@ -252,10 +315,15 @@ namespace FontMaker
 
 			listBoxRecolorSource.SelectedIndex = 0;
 			listBoxRecolorTarget.SelectedIndex = 0;
+			listBoxRecolorSourceMode10.SelectedIndex = 0;
+			listBoxRecolorTargetMode10.SelectedIndex = 0;
+
 			RedrawRecolorSource();
 			RedrawRecolorTarget();
+			RedrawRecolorMode10Source();
+			RedrawRecolorMode10Target();
 
-			UndoBuffer.Add2UndoInitial(); // initial undo buffer entry
+			AtariFontUndoBuffer.Add2UndoInitial(); // initial undo buffer entry
 			UpdateUndoButtons(false);
 
 			MakeSomeColoredBlocks();
@@ -273,7 +341,7 @@ namespace FontMaker
 			{
 				gr.FillRectangle(RedBrush, new Rectangle(0, 0, img.Width, img.Height));
 			}
-			GraphicsPath graphicsPath = new GraphicsPath();
+			var graphicsPath = new GraphicsPath();
 			graphicsPath.AddRectangle(new Rectangle(0, 0, 20, 2));
 			graphicsPath.AddRectangle(new Rectangle(18, 0, 2, 20));
 			graphicsPath.AddRectangle(new Rectangle(0, 18, 20, 2));
@@ -366,18 +434,149 @@ namespace FontMaker
 
 		private void Form_KeyDown(object sender, KeyEventArgs e)
 		{
+			if (e.Alt)
+			{
+				e.Handled = true;
+				return;
+			}
+			if (e.Control)
+			{
+				// Handle all the CTRL+... shortcuts here
+
+				// CTRL+M = Switch Mega Copy mode on/off
+				if (e.KeyCode == Keys.M)
+				{
+					buttonMegaCopy.Checked = !buttonMegaCopy.Checked;
+					MegaCopy_Click(0, EventArgs.Empty);
+					return;
+				}
+
+				// CTRL+Tab | CTRL+Shift+Tab = Switch between color modes
+				if (e.KeyCode == Keys.Tab)
+				{
+					// CTRL+TAB = Switch between color modes
+					ActionNextPage(e.Shift ? -1 : 1);
+					return;
+				}
+
+				// Ctrl + C = Copy to clipboard
+				if (e.KeyCode == Keys.C)
+				{
+					ExecuteCopyToClipboard(false);
+					return;
+				}
+
+				// Ctrl + V = Paste from clipboard
+				if (e.KeyCode == Keys.V)
+				{
+					ExecutePasteFromClipboard();
+					return;
+				}
+
+				// Ctrl + Z = Undo font change
+				if (e.Shift == false && e.KeyCode == Keys.Z)
+				{
+					var (_, undoEnabled) = AtariFontUndoBuffer.GetRedoUndoButtonState(CharacterEdited());
+					if (undoEnabled)
+						Undo_Click(0, EventArgs.Empty);
+					return;
+				}
+				// Ctrl + Y = Redo font change
+				if (e.Shift == false && e.KeyCode == Keys.Y)
+				{
+					var (redoEnabled, _) = AtariFontUndoBuffer.GetRedoUndoButtonState(CharacterEdited());
+					if (redoEnabled)
+						Redo_Click(0, EventArgs.Empty);
+					return;
+				}
+
+				// View editor undo/redo
+				// Ctrl + Z = Undo view change
+				if (e.Shift && e.KeyCode == Keys.Z)
+				{
+					ExecuteViewUndo();
+					return;
+				}
+				// Ctrl + Y = Redo view change
+				if (e.Shift && e.KeyCode == Keys.Y)
+				{
+					ExecuteViewRedo();
+					return;
+				}
+
+				// Switch to page X
+				// CTRL + 1-9 = Switch to page 1-9
+				if (e.KeyCode == Keys.D1)
+				{
+					SavePageSwitch(0);
+					return;
+				}
+				if (e.KeyCode == Keys.D2)
+				{
+					SavePageSwitch(1);
+					return;
+				}
+				if (e.KeyCode == Keys.D3)
+				{
+					SavePageSwitch(2);
+					return;
+				}
+				if (e.KeyCode == Keys.D4)
+				{
+					SavePageSwitch(3);
+					return;
+				}
+				if (e.KeyCode == Keys.D5)
+				{
+					SavePageSwitch(4);
+					return;
+				}
+				if (e.KeyCode == Keys.D6)
+				{
+					SavePageSwitch(5);
+					return;
+				}
+				if (e.KeyCode == Keys.D7)
+				{
+					SavePageSwitch(6);
+					return;
+				}
+				if (e.KeyCode == Keys.D8)
+				{
+					SavePageSwitch(7);
+					return;
+				}
+				if (e.KeyCode == Keys.D9)
+				{
+					SavePageSwitch(8);
+					return;
+				}
+				if (e.KeyCode == Keys.D0)
+				{
+					SavePageSwitch(9);
+					return;
+				}
+
+
+				return;
+			}
+			// ----------------------------------
+			// The next handlers will only work in normal mode
+			// If CTRL is pressed, then the above handlers will be used
+
+			// Move character selection with , and .
 			if (e.KeyCode == Keys.Oemcomma)
 			{
 				ExecuteSelectPreviousCharacter();
 				return;
 			}
-
 			if (e.KeyCode == Keys.OemPeriod)
 			{
 				ExecuteSelectNextCharacter();
 				return;
 			}
 
+			// R and Shift+R rotate left and right
 			if (e.KeyCode == Keys.R)
 			{
 				if (e.Shift)
@@ -387,6 +586,7 @@ namespace FontMaker
 				return;
 			}
 
+			// M and Shift+M mirror horizontal and vertical
 			if (e.KeyCode == Keys.M)
 			{
 				if (e.Shift)
@@ -396,6 +596,15 @@ namespace FontMaker
 				return;
 			}
 
+			// B = Switch font bank
+			if (e.KeyCode == Keys.B)
+			{
+				checkBoxFontBank.Checked = !checkBoxFontBank.Checked;
+				SwitchFontBank();
+				return;
+			}
+
+			// Quick color selection with 0-8
 			if (e.KeyCode == Keys.D1)
 			{
 				SetColor(2);
@@ -411,42 +620,51 @@ namespace FontMaker
 				SetColor(4);
 				return;
 			}
+			if (e.KeyCode == Keys.D4)
+			{
+				SetColor(5);
+				return;
+			}
+			if (e.KeyCode == Keys.D5)
+			{
+				SetColor(6);
+				return;
+			}
+			if (e.KeyCode == Keys.D6)
+			{
+				SetColor(7);
+				return;
+			}
+			if (e.KeyCode == Keys.D7)
+			{
+				SetColor(8);
+				return;
+			}
+			if (e.KeyCode == Keys.D8)
+			{
+				SetColor(9);
+				return;
+			}
+			if (e.KeyCode == Keys.D0)
+			{
+				SetColor(1);
+				return;
+			}
 
+			// I - Invert character
 			if (e.KeyCode == Keys.I)
 			{
 				ExecuteInvertCharacter();
 				return;
 			}
 
+			// Esc - cancel selection
 			if (e.KeyCode == Keys.Escape)
 			{
 				ExecuteEscapeKeyPressed();
 				return;
 			}
 
-			if (e.Control && e.KeyCode == Keys.C)
-			{
-				ExecuteCopyToClipboard(false);
-				return;
-			}
-
-			if (e.Control && e.KeyCode == Keys.V)
-			{
-				ExecutePasteFromClipboard();
-				return;
-			}
-
-			if (e.Control && e.KeyCode == Keys.Z)
-			{
-				Undo_Click(0, EventArgs.Empty);
-				return;
-			}
-			// Ctrl + Y = Redo font change
-			if (e.Control && e.KeyCode == Keys.Y)
-			{
-				Redo_Click(0, EventArgs.Empty);
-				return;
-			}
 		}
 		#endregion
 
@@ -454,21 +672,46 @@ namespace FontMaker
 
 		private void Form_MouseWheel(object sender, MouseEventArgs e)
 		{
+			if (Control.ModifierKeys == Keys.Alt)
+			{
+				// In MegaCopy mode with ALT held down switch to the next/previous tile
+				TileSetEditorForm?.Form_MouseWheel(sender, e);
+			}
+
 			if (!buttonMegaCopy.Checked)
 			{
 				if (Control.ModifierKeys == Keys.Shift)
 				{
-					if (e.Delta > 0)
+					// Change the current color when the Shift key is held down and the mouse wheel is moved
+					switch (WhichColorMode)
 					{
-						ActionCharacterEditorColor1MouseDown();
-					}
-					else
-					{
-						ActionCharacterEditorColor2MouseDown();
+						case 4:
+						case 5:
+						default:
+						{
+							if (e.Delta > 0)
+							{
+								ActionCharacterEditorColor1MouseDown();
+							}
+							else
+							{
+								ActionCharacterEditorColor2MouseDown();
+							}
+							break;
+						}
+						case 10:
+						{
+							var nextColor = (cmbColor9Menu.SelectedIndex + (e.Delta > 0 ? 1 : -1));
+							if (nextColor < 0) nextColor = cmbColor9Menu.Items.Count - 1;
+							if (nextColor >= cmbColor9Menu.Items.Count) nextColor = 0;
+							cmbColor9Menu.SelectedIndex = nextColor;
+							break;
+						}
 					}
 				}
 				else
 				{
+					// Change the selected character when the mouse wheel is moved
 					var step = e.Delta > 0 ? -1 : 1;
 					if (Control.ModifierKeys == Keys.Control)
 					{
@@ -547,6 +790,12 @@ namespace FontMaker
 		{
 			e.Cancel = true;
 			ActionExitApplication();
+		}
+
+		private void buttonTileSetEditor_Click(object sender, EventArgs e)
+		{
+			TileSetEditorForm?.Show();
+			TileSetEditorForm?.Focus();
 		}
 		#endregion
 
@@ -644,6 +893,18 @@ namespace FontMaker
 		}
 		#endregion // Right button column
 
+		#region Bottom/Below character editor
+		private void CharacterEditor_Color9Menu_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			ActionCharacterEditorColor9Selected();
+		}
+
+		private void CharacterEditor_Color9Menu_DrawItem(object sender, DrawItemEventArgs e)
+		{
+			Color9Menu_DrawItem(e);
+		}
+		#endregion
+
 		#endregion
 
 		// ==========================================================================
@@ -654,7 +915,24 @@ namespace FontMaker
 
 		public void SwitchGraphicsMode_Click(object sender, EventArgs e)
 		{
-			SwitchGfxMode();
+			SwitchGfxMode();    // Switch between Mode 2 and color (which color depends on the drop-down)
+		}
+
+		private void SwitchColorMode_SelectedIndexChanged(object _, EventArgs __)
+		{
+			if (InColorSetSetup) return;
+			ColorMode_Change(); // The color mode drop down has changed!
+		}
+
+		/// <summary>
+		/// Tell the control that the keypress has already been handled.
+		/// This prevents CTRL+M switching between various modes.
+		/// </summary>
+		/// <param name="sender"></param>
+		/// <param name="e"></param>
+		private void cmbColorMode_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			e.Handled = true;
 		}
 
 		/// <summary>
@@ -667,19 +945,51 @@ namespace FontMaker
 
 		public void Recolor_Click(object _, EventArgs __)
 		{
-			ColorSwitch(listBoxRecolorSource.SelectedIndex, listBoxRecolorTarget.SelectedIndex);
+			switch (WhichColorMode)
+			{
+				case 4:
+				case 5:
+				default:
+					ColorSwitch2Bit(listBoxRecolorSource.SelectedIndex, listBoxRecolorTarget.SelectedIndex);
+					break;
+				case 10:
+					ColorSwitch4Bit(listBoxRecolorSourceMode10.SelectedIndex, listBoxRecolorTargetMode10.SelectedIndex);
+					break;
+			}
 		}
 
 		public void ShowColorSwitchSetup_Click(object _, EventArgs __)
 		{
-			panelColorSwitcher.Visible = !panelColorSwitcher.Visible;
+			ShowColorSwitcher = !ShowColorSwitcher;
+
+			if (ShowColorSwitcher)
+			{
+				switch (WhichColorMode)
+				{
+					case 4:
+					case 5:
+					default:
+						panelColorSwitcher.Visible = true;
+						break;
+					case 10:
+						panelColorSwitcherMode10.Visible = true;
+						break;
+				}
+			}
+			else
+			{
+				panelColorSwitcher.Visible = false;
+				panelColorSwitcherMode10.Visible = false;
+			}
 		}
 
 		public void ExportFont_Click(object _, EventArgs __)
 		{
+			ExportFontWindowForm.Setup(CompressorId);
 			ExportFontWindowForm.ShowDialog();
 		}
 
+		#region Recolor interactions
 		public void RecolorSource_Click(object _, EventArgs __)
 		{
 			RedrawRecolorSource();
@@ -689,6 +999,18 @@ namespace FontMaker
 		{
 			RedrawRecolorTarget();
 		}
+
+		private void RecolorSourceMode10_Click(object sender, EventArgs e)
+		{
+			RedrawRecolorMode10Source();
+
+		}
+		private void RecolorTargetMode10_Click(object sender, EventArgs e)
+		{
+			RedrawRecolorMode10Target();
+		}
+
+		#endregion
 
 		private void comboBoxColorSets_SelectedIndexChanged(object sender, EventArgs e)
 		{
@@ -721,13 +1043,56 @@ namespace FontMaker
 
 		private void ViewEditor_ExportView_Click(object sender, EventArgs e)
 		{
-			ExportViewWindowForm.InColorMode = InColorMode;
+			ExportViewWindowForm.Setup(InColorMode, WhichColorMode, CompressorId);
 			ExportViewWindowForm.ShowDialog();
 		}
 
-		public void ViewEditor_CheckBox40Bytes_Click(object sender, EventArgs e)
+		private void ViewEditor_ImportView_Click(object sender, EventArgs e)
 		{
-			Width += (checkBox40Bytes.Checked ? 130 : -130);
+			ImportViewWindowForm.InColorMode = InColorMode;
+			ImportViewWindowForm.WhichColorMode = WhichColorMode;
+			ImportViewWindowForm.ShowDialog();
+			RedrawView();
+		}
+
+		private void comboBoxBytes_SelectedIndexChanged(object sender, EventArgs e)
+		{
+			 // Set the width of the window based on which view we want
+			var wantedView = comboBoxBytes.SelectedIndex;
+
+			switch (wantedView)
+			{
+				case 0:
+				{
+					// 32 bytes
+					Width = 1210 - 8 * 16;
+					vScrollBar.Location = new Point(1210 - 8 * 16 - 16 - vScrollBar.Width, 0);
+					hScrollBar.Width = 673 - 8 * 16;
+					break;
+				}
+
+				default:
+				case 1:
+				{
+					// 40 bytes
+					Width = 1210;
+					vScrollBar.Location = new Point(1177, 0);
+					hScrollBar.Width = 673;
+					break;
+				}
+
+				case 2:
+				{
+					// 48 bytes
+					Width = 1341;
+					vScrollBar.Location = new Point(1306, 0);
+					hScrollBar.Width = 673 + 8 * 16;
+					break;
+				}
+			}
+
+			UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
+
 		}
 
 		public void ViewEditor_ClearView_Click(object sender, EventArgs e)
@@ -753,8 +1118,8 @@ namespace FontMaker
 			if (InPagesSetup) return;
 
 			SwopPage(saveCurrent: true);
-
 			UpdatePageDisplay();
+			TransferPageSelectionToViewActions();
 		}
 
 		public void ViewEditor_AddPage_Click(object sender, EventArgs e)
@@ -794,7 +1159,7 @@ namespace FontMaker
 
 		public void ViewEditor_MegaCopyImage_MouseDown(object sender, MouseEventArgs e)
 		{
-			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorMegaCopyImage.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorMegaCopyImage.Top - pictureBoxAtariView.Top, 0));
+			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorMegaCopyImage.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorMegaCopyImage.Top - pictureBoxAtariView.Top, -1000));
 		}
 		public void ViewEditor_MegaCopyImage_MouseMove(object sender, MouseEventArgs e)
 		{
@@ -810,9 +1175,15 @@ namespace FontMaker
 			}
 		}
 
+		private void ViewEditor_RubberBand_VisibleChanged(object sender, EventArgs e)
+		{
+			// Rubber band visibility has changed
+			UpdateViewActions();
+		}
+
 		public void ViewEditor_RubberBand_MouseDown(object sender, MouseEventArgs e)
 		{
-			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorRubberBand.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorRubberBand.Top - pictureBoxAtariView.Top, 0));
+			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, e.X + pictureBoxViewEditorRubberBand.Left - pictureBoxAtariView.Left, e.Y + pictureBoxViewEditorRubberBand.Top - pictureBoxAtariView.Top, -1000));
 		}
 		public void ViewEditor_RubberBand_MouseMove(object sender, MouseEventArgs e)
 		{
@@ -849,7 +1220,7 @@ namespace FontMaker
 
 		public void ViewEditor_PasteCursor_MouseDown(object sender, MouseEventArgs e)
 		{
-			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, pictureBoxViewEditorPasteCursor.Left + e.X - pictureBoxAtariView.Left, pictureBoxViewEditorPasteCursor.Top + e.Y - pictureBoxAtariView.Top, 0));
+			ActionAtariViewEditorMouseDown(new MouseEventArgs(e.Button, 0, pictureBoxViewEditorPasteCursor.Left + e.X - pictureBoxAtariView.Left, pictureBoxViewEditorPasteCursor.Top + e.Y - pictureBoxAtariView.Top, -1000));
 		}
 		public void ViewEditor_PasteCursor_MouseLeave(object sender, EventArgs e)
 		{
@@ -871,6 +1242,55 @@ namespace FontMaker
 			FontAnalysisWindowForm.InColorMode = InColorMode;
 			FontAnalysisWindowForm.Pages = Pages;
 			FontAnalysisWindowForm.ShowDialog();
+		}
+
+		private void ViewEditor_ViewActions_Click(object sender, EventArgs e)
+		{
+			SaveCurrentPage();
+			UpdateViewActions();
+
+			ViewActionsWindowForm?.Show();
+			ViewActionsWindowForm?.Focus();
+
+			TransferPagesToViewActions();
+			//TransferPageSelectionToViewActions();
+		}
+
+		private void ViewUndo_Click(object sender, EventArgs e)
+		{
+			ExecuteViewUndo();
+		}
+
+		private void ViewRedo_Click(object sender, EventArgs e)
+		{
+			ExecuteViewRedo();
+		}
+
+		private void trackBarSkipCharX_Scroll(object sender, EventArgs e)
+		{
+			checkBoxSkipChar0.Text = $"Skip char #{trackBarSkipCharX.Value} on paste";
+		}
+
+		private void buttonConfigurePage_Click(object sender, EventArgs e)
+		{
+			ActionConfigurePage();
+		}
+
+		private void buttonConfigure_Click(object sender, EventArgs e)
+		{
+			var configWindow = new FontMakerConfigurationWindow(CompressorId);
+			var action = configWindow.ShowDialog();
+			if (action == DialogResult.OK)
+			{
+				CompressorId = configWindow.CompressorId;
+			}
+		}
+
+		private void scrollBar_ValueChanged(object sender, EventArgs e)
+		{
+			if (PreventScrollProcessing)
+				return;
+			ActionAtariViewOffsetChanged();
 		}
 
 		#endregion
@@ -921,7 +1341,7 @@ namespace FontMaker
 			pictureBoxClipboardPreview.Visible = on;
 
 			// Hide recolor if in mega copy mode
-			if (on && panelColorSwitcher.Visible)
+			if (on && ShowColorSwitcher)
 			{
 				ShowColorSwitchSetup_Click(0, EventArgs.Empty);
 			}
@@ -978,6 +1398,8 @@ namespace FontMaker
 				checkBoxShowDuplicates.Enabled = true;
 				CheckDuplicate();
 			}
+
+			UpdateViewActions();
 		}
 
 		public void FontBank_Click(object sender, EventArgs e)
@@ -1016,7 +1438,7 @@ namespace FontMaker
 			RedrawFonts();
 			UpdateCharacterViews();
 			RedrawView();
-			UndoBuffer.Add2UndoFullDifferenceScan();
+			AtariFontUndoBuffer.Add2UndoFullDifferenceScan();
 			UpdateUndoButtons(false);
 		}
 
@@ -1110,7 +1532,7 @@ namespace FontMaker
 
 		private void comboBoxPasteIntoFontNr_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			buttonPasteInPlace.Text = $"Paste in location {comboBoxPasteIntoFontNr.SelectedIndex + 1}";
+			buttonPasteInPlace.Text = $"Paste to Font {comboBoxPasteIntoFontNr.SelectedIndex + 1}";
 		}
 
 		#endregion
@@ -1241,7 +1663,6 @@ namespace FontMaker
 				pictureBoxDuplicateIndicator.Visible = true;
 			}
 		}
-
 		#endregion
 	}
 }

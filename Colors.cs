@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿#pragma warning disable WFO1000
+
+using System.Drawing;
 
 namespace FontMaker
 {
@@ -7,16 +9,50 @@ namespace FontMaker
 	{
 	}
 
+	public class ColorModesDef
+	{
+		public int Key { get; set; }
+		public string Value { get; set; }
+	}
+	
 	public partial class FontMakerForm
 	{
-		public List<string> ColorSets;
+		public List<ColorModesDef> ColorModesList =
+		[
+			new ColorModesDef() { Key = 4, Value = "Mode 4 (5 cols)" },
+			new ColorModesDef() { Key = 5, Value = "Mode 5 (5 cols)" },
+			new ColorModesDef() { Key = 10, Value = "Mode 10 (9 cols)" },
+		];
+
+		/// <summary>
+		/// Are we showing one of the color switchers
+		/// </summary>
+		public bool ShowColorSwitcher { get; set; }
+
+		public List<string> ColorSets { get; set; } = [];
 
 		/// <summary>
 		/// The index in the combo box that is currently selected
 		/// </summary>
 		public int CurrentColorSetIndex { get; set; } = -1;
 
+		/// <summary>
+		/// Which color mode is to be used?
+		/// 4 - 5 colors (4x8 pixels per char)
+		/// 5 - 5 colors / tall pixels (4x8 pixels per char)
+		/// 10 - 9 colors / double color clock (2x8 pixels per char)
+		/// </summary>
+		private int _whichColorMode = 4;
+		public int WhichColorMode { get => _whichColorMode;
+			set
+			{
+				_whichColorMode = value;
+				AtariFontRenderer.WhichColorMode = value;
+			}
+		}
+
 		public bool InColorSetSetup { get; set; }
+
 
 		/// <summary>
 		/// Load the color AtariPalette 
@@ -35,11 +71,87 @@ namespace FontMaker
 			AtariFontRenderer.SetPalette(AtariPalette);
 		}
 
+		/// <summary>
+		/// Switch the GUI into the correct mode
+		/// 0 - B/W
+		/// 1 - mode 4
+		/// 2 - mode 5
+		/// 3 - mode 10
+		/// </summary>
+		/// <param name="targetMode"></param>
+		private void SetupColorMode(int targetMode)
+		{
+			if (targetMode == 0 && !InColorMode)
+				return;		// Already in B/W, nothing to do
 
+			if (targetMode == 0 && InColorMode)
+			{
+				// Switch to B/W mode, ignore what the color mode setting is!
+				SwitchGfxMode();
+				return;
+			}
+
+			// Target of B/W is done.
+			// Can only be color now!
+
+			// Switch into the correct color mode: 4,5,10
+			InColorSetSetup = true;
+			switch (targetMode)
+			{
+				default:
+					cmbColorMode.SelectedValue = 4;
+					break;
+				case 2:
+					cmbColorMode.SelectedValue = 5;
+					break;
+				case 3:
+					cmbColorMode.SelectedValue = 10;
+					break;
+			}
+
+			WhichColorMode = (int)cmbColorMode.SelectedValue;
+			InColorSetSetup = false;
+
+			if (!InColorMode)
+			{
+				// Switch from B/W to the correct color mode
+				SwitchGfxMode();
+			}
+			else
+			{
+				// Change into the correct color mode
+				ColorMode_Change();
+			}
+		}
+
+		private int WhatColorModeToSave()
+		{
+			if (!InColorMode)
+				return 0;
+			switch (WhichColorMode)
+			{
+				case 4:
+				default:
+					return 1;
+				case 5:
+					return 2;
+				case 10:
+					return 3;
+			}
+		}
+
+		/// <summary>
+		/// Switch graphics mode
+		/// B/W -> Color -> B/W
+		/// </summary>
 		private void SwitchGfxMode()
 		{
+			// Toggle between B/W and color mode
 			InColorMode = !InColorMode;
-			ShowCorrectFontBank();
+
+			// Switch into the correct color mode
+			ColorMode_Change();
+
 			RedrawView();
 
 			// Now simulate a mouse click in the font selector. The idea is to get the
@@ -64,7 +176,7 @@ namespace FontMaker
 				RevalidateClipboard();
 			}
 
-			if (!InColorMode && panelColorSwitcher.Visible)
+			if (!InColorMode && ShowColorSwitcher)
 			{
 				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
 			}
@@ -86,7 +198,7 @@ namespace FontMaker
 			CheckDuplicate();
 		}
 
-
+		#region Recolor actions
 		public void RedrawRecolorSource()
 		{
 			var img = Helpers.GetImage(pictureBoxRecolorSourceColor);
@@ -111,6 +223,32 @@ namespace FontMaker
 			pictureBoxRecolorTargetColor.Refresh();
 		}
 
+
+		public void RedrawRecolorMode10Source()
+		{
+			var idx = listBoxRecolorSourceMode10.SelectedIndex;
+			var img = Helpers.GetImage(pictureBoxRecolorSourceColorMode10);
+			using var gr = Graphics.FromImage(img);
+			var brush = BrushCache[listBoxRecolorSourceMode10.SelectedIndex + 1];
+			gr.FillRectangle(brush, 0, 0, 49, 17);
+			gr.DrawString($"Color {idx}", this.Font, brush.Color.G > 128 ? BlackBrush : WhiteBrush, 1, 2);
+
+			pictureBoxRecolorSourceColorMode10.Refresh();
+		}
+
+		public void RedrawRecolorMode10Target()
+		{
+			var idx = listBoxRecolorTargetMode10.SelectedIndex;
+			var img = Helpers.GetImage(pictureBoxRecolorTargetColorMode10);
+			using var gr = Graphics.FromImage(img);
+			var brush = BrushCache[idx + 1];
+			gr.FillRectangle(brush, 0, 0, 49, 17);
+			gr.DrawString($"Color {idx}", this.Font, brush.Color.G > 128 ? BlackBrush : WhiteBrush, 1, 2);
+
+			pictureBoxRecolorTargetColorMode10.Refresh();
+		}
+		#endregion
+
 		public void RedrawPal()
 		{
 			var img = Helpers.GetImage(pictureBoxPalette);
@@ -126,12 +264,13 @@ namespace FontMaker
 					UpdateBrushCache(0);
 				}
 
-				for (var a = 0; a < 3; a++)
+				var numLinesOfColors = WhichColorMode == 10 ? 5 : 3;
+				for (var a = 0; a < numLinesOfColors; a++)
 				{
 					for (var b = 0; b < 2; b++)
 					{
 						gr.FillRectangle(BrushCache[b + a * 2], b * 45, a * 18, 45, 22);
-						DrawColorLabels(gr, b * 45, a * 18+2, b + a * 2, b + a * 2);
+						DrawColorLabels(gr, b * 45, a * 18 + 2, b + a * 2, b + a * 2);
 					}
 				}
 			}
@@ -144,7 +283,6 @@ namespace FontMaker
 				var tagVal = (int)pictureBoxCharacterEditorColor1.Tag;
 				FillColorSelectorBackground(gr, tagVal);
 				DrawColorLabelsEx(gr, 1, 2, tagVal, tagVal);
-
 			}
 
 			pictureBoxCharacterEditorColor1.Refresh();
@@ -199,17 +337,30 @@ namespace FontMaker
 		/// <summary>
 		/// Draw the palette name into the color box.
 		/// </summary>
-		/// <param name="ic">Graohics object to draw into</param>
+		/// <param name="ic">Graphics object to draw into</param>
 		/// <param name="x">X offset of text in box</param>
 		/// <param name="y">Y offset of text in box</param>
 		/// <param name="num">Palette entry</param>
 		/// <param name="color"></param>
-		private static string[] labels = new[] { "LUM", "BAK - 00", "PF0 - 01", "PF1 - 10", "PF2 - 11", "PF3 - 11" };
+		private static string[] labels = [
+			"LUM", "BAK - 00", 
+			"PF0 - 01", "PF1 - 10", 
+			"PF2 - 11", "PF3 - 11",
+			"", "",
+			"", "",
+		];
+		private static string[] mode10Labels = [
+			"LUM", "0",
+			"1", "2",
+			"3", "4",
+			"5", "6",
+			"7", "8",
+		];
 
 		public void DrawColorLabels(Graphics ic, int x, int y, int num, int colorNr)
 		{
 			var color = AtariPalette[SetOfSelectedColors[colorNr]];
-			ic.DrawString(labels[num], this.Font, color.G > 128 ? BlackBrush : WhiteBrush, x, y);
+			ic.DrawString(WhichColorMode == 10 ? mode10Labels[num] : labels[num], this.Font, color.G > 128 ? BlackBrush : WhiteBrush, x, y);
 		}
 
 		public void DrawColorLabelsEx(Graphics ic, int x, int y, int num, int colorNr)
@@ -238,6 +389,10 @@ namespace FontMaker
 			}
 		}
 
+		/// <summary>
+		/// Mouse down in the color palette box
+		/// </summary>
+		/// <param name="e"></param>
 		public void InteractWithTheColorPalette(MouseEventArgs e)
 		{
 			if (Control.ModifierKeys == Keys.Shift)
@@ -294,7 +449,7 @@ namespace FontMaker
 		}
 
 
-		public void ColorSwitch(int idx1, int idx2)
+		public void ColorSwitch2Bit(int idx1, int idx2)
 		{
 			var src = AtariFont.Get5ColorCharacter(SelectedCharacterIndex, checkBoxFontBank.Checked);
 
@@ -314,6 +469,32 @@ namespace FontMaker
 			}
 
 			AtariFont.Set5ColorCharacter(src, SelectedCharacterIndex, checkBoxFontBank.Checked);
+
+			DoChar();
+			RedrawChar();
+			RedrawView();
+		}
+
+		public void ColorSwitch4Bit(int idx1, int idx2)
+		{
+			var src = AtariFont.Get4BitColorCharacter(SelectedCharacterIndex, checkBoxFontBank.Checked);
+
+			for (var y = 0; y < 8; y++)
+			{
+				for (var x = 0; x < 4; x++)
+				{
+					if (src[x, y] == (byte)idx1)
+					{
+						src[x, y] = (byte)idx2;
+					}
+					else if (src[x, y] == idx2)
+					{
+						src[x, y] = (byte)idx1;
+					}
+				}
+			}
+
+			AtariFont.Set4BitCharacter(src, SelectedCharacterIndex, checkBoxFontBank.Checked);
 
 			DoChar();
 			RedrawChar();
@@ -358,6 +539,8 @@ namespace FontMaker
 				BrushCache[i] = new SolidBrush(AtariPalette[SetOfSelectedColors[i]]);
 			}
 			
+			EmptyBrush ??= new SolidBrush(Color.FromKnownColor(KnownColor.DarkGray));
+
 			AtariFontRenderer.RebuildPalette(SetOfSelectedColors);
 		}
 
@@ -368,6 +551,21 @@ namespace FontMaker
 
 			BrushCache[index]?.Dispose();
 			BrushCache[index] = new SolidBrush(AtariPalette[SetOfSelectedColors[index]]);
+		}
+
+		public void BuildColorModeList()
+		{
+			InColorSetSetup = true;
+			cmbColorMode.Items.Clear();
+			cmbColorMode.ResetText();
+
+			cmbColorMode.DataSource = ColorModesList;
+			cmbColorMode.ValueMember = "Key";
+			cmbColorMode.DisplayMember = "Value";
+
+			cmbColorMode.SelectedValue = 4;
+			WhichColorMode = (int)cmbColorMode.SelectedValue;
+			InColorSetSetup = false;
 		}
 
 		public void BuildColorSetList()
@@ -413,7 +611,7 @@ namespace FontMaker
 			var colors = ColorSets[nextColorSetIndex];
 
 			// Load the AtariPalette selection
-			SetOfSelectedColors = Convert.FromHexString(colors);
+			SetOfSelectedColors = Convert.FromHexString(FixColorHexString(colors));
 			BuildBrushCache();
 
 			CurrentColorSetIndex = nextColorSetIndex;
@@ -430,6 +628,75 @@ namespace FontMaker
 		{
 			// Save the current color data
 			ColorSets[CurrentColorSetIndex] = Convert.ToHexString(SetOfSelectedColors);
+		}
+
+
+		private void ColorMode_Change()
+		{
+			// Note: Color mode can cause Y-Offset issues.
+			// Mode 2,4 and 10 have 26 lines
+			// Mode 5 only has 13.
+			// When switching away from mode 5 then make sure that the view Y-offset is set correctly.
+			
+			InMode5 = false;
+
+			if (!InColorMode)
+			{
+				UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
+				RedrawLineTypes();
+				ShowCorrectFontBank();
+				ShowColorSelectors();
+				TileSetEditorForm?.SwitchColorMode();
+				UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
+				return;
+			}
+
+			WhichColorMode = (int)(cmbColorMode.SelectedValue ?? 4);		// Fallback to mode 4
+			RedrawPal();
+
+			InMode5 = WhichColorMode == 5;
+			AtariFontRenderer.RebuildFontCache(WhichColorMode);
+
+			UpdateHVScrollBars(AtariView.OffsetX, AtariView.OffsetY);
+			RedrawLineTypes();
+			ShowCorrectFontBank();
+			RedrawView();
+			RedrawChar();
+
+			ShowColorSelectors();
+			if (ShowColorSwitcher)
+			{
+				// Make sure that the correct color switcher is shown
+				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
+				ShowColorSwitchSetup_Click(null!, EventArgs.Empty);
+			}
+			TileSetEditorForm?.SwitchColorMode();
+		}
+
+		/// <summary>
+		/// Which color selectors:
+		/// B/W, Mode 4 & 5 => 3x picture box
+		/// Mode 10 => drop down list
+		/// </summary>
+		public void ShowColorSelectors()
+		{
+			var inManyColorMode = InColorMode && WhichColorMode == 10;
+
+			pictureBoxActionColor.Visible = !inManyColorMode;
+			pictureBoxCharacterEditorColor1.Visible = !inManyColorMode;
+			pictureBoxCharacterEditorColor2.Visible = !inManyColorMode;
+			cmbColor9Menu.Visible = inManyColorMode;
+			if (inManyColorMode)
+				cmbColor9Menu.Refresh();
+		}
+
+		public string FixColorHexString(string inputHexString)
+		{
+			if (inputHexString.Length == 12)
+			{
+				return $"{inputHexString}161AB4BA";
+			}
+			return inputHexString;
 		}
 	}
 }

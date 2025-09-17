@@ -58,7 +58,7 @@
 			if (ok == DialogResult.OK)
 			{
 				var fontBankOffset = checkBoxFontBank.Checked ? 2 : 0;
-				var dual = Path.GetExtension(dialogOpenFile.FileName) == ".fn2";
+				var dual = Path.GetExtension(dialogOpenFile.FileName).ToLowerInvariant() == ".fn2";
 
 				AtariFont.LoadFont(dialogOpenFile.FileName, fontBankOffset, dual);
 
@@ -69,15 +69,22 @@
 					var tempString = dialogOpenFile.FileName.Substring(0, dialogOpenFile.FileName.Length - 4);
 					if (checkBoxFontBank.Checked == false)
 					{
-						Font1Filename = tempString + "1.fnt";
-						Font2Filename = tempString + "2.fnt";
-					}
+						Font1Filename = tempString + "-fn2-1.fnt";
+						Font2Filename = tempString + "-fn2-2.fnt";
+
+                        AtariFont.SaveFont(Font1Filename, 0);
+                        AtariFont.SaveFont(Font2Filename, 1);
+                    }
 					else
 					{
-						Font3Filename = tempString + "3.fnt";
-						Font4Filename = tempString + "4.fnt";
-					}
-				}
+						Font3Filename = tempString + "-fn2-3.fnt";
+						Font4Filename = tempString + "-fn2-4.fnt";
+
+                        AtariFont.SaveFont(Font3Filename, 2);
+                        AtariFont.SaveFont(Font4Filename, 3);
+                    }
+           
+                }
 				else
 				{
 					if (checkBoxFontBank.Checked == false)
@@ -92,7 +99,7 @@
 				SimulateSafeLeftMouseButtonClick();
 
 				RedrawView();
-				UndoBuffer.Add2UndoFullDifferenceScan(); // Full font scan
+				AtariFontUndoBuffer.Add2UndoFullDifferenceScan(); // Full font scan
 				UpdateUndoButtons(false);
 			}
 
@@ -127,7 +134,7 @@
 				RedrawFonts();
 				SimulateSafeLeftMouseButtonClick();
 				RedrawView();
-				UndoBuffer.Add2UndoFullDifferenceScan(); //full font scan
+				AtariFontUndoBuffer.Add2UndoFullDifferenceScan(); //full font scan
 				UpdateUndoButtons(false);
 			}
 
@@ -211,7 +218,7 @@
 
 		public void ActionShowAbout()
 		{
-			pictureBoxAbout.Left = pictureBoxAtariView.Left + (checkBox40Bytes.Checked ? (pictureBoxAtariView.Width - pictureBoxAbout.Width)/2 : 0);
+			pictureBoxAbout.Left = pictureBoxAtariView.Left;
 			pictureBoxAbout.Visible = !pictureBoxAbout.Visible;
 
 		}
@@ -252,6 +259,28 @@
 			timerAutoCloseAboutBox.Enabled = false;
 			pictureBoxAbout.Visible = false;
 			Environment.Exit(Environment.ExitCode);
+		}
+
+		public void SwitchToTileDrawing()
+		{
+			// The font and characters have been copied to the clipboard
+			// Enabled specific clipboard modification/action buttons
+			if (buttonMegaCopy.Checked == false)
+			{
+				// Switch into MegaCopy mode
+				buttonMegaCopy.Checked = true;
+				MegaCopy_Click(0, EventArgs.Empty);
+			}
+
+
+			ConfigureClipboardActionButtons();
+
+			UpdateClipboardInformation();
+			PastingToView = true;
+			RevalidateClipboard();
+			ExecutePasteFromClipboard();
+
+			pictureBoxAtariView.Focus();
 		}
 	}
 }

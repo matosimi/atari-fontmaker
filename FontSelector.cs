@@ -9,6 +9,8 @@ namespace FontMaker
 	// All functions that interact with the four fonts can be found here
 	public partial class FontMakerForm
 	{
+		public const int FONT_SELECTOR_WIDTH = 512;
+		public const int FONT_SELECTOR_HEIGHT = 256;
 
 		/// <summary>
 		/// Redraws whole font area: font banks and the pictureBoxFontSelector view into the bank (either page 0 or page 1)
@@ -60,7 +62,7 @@ namespace FontMaker
 		{
 			if (CharacterEdited())
 			{
-				UndoBuffer.Add2Undo(true);
+				AtariFontUndoBuffer.Add2Undo(true);
 			}
 
 			SelectedCharacterIndex = SelectedCharacterIndex % 512;
@@ -129,14 +131,7 @@ namespace FontMaker
 
 		public bool IsMousePositionValidForPasting(int x, int y)
 		{
-			if ((x >= pictureBoxFontSelector.Width - (CopyPasteRange.Width) * 16) || (y >= pictureBoxFontSelector.Height - (CopyPasteRange.Height) * 16))
-			{
-				return false;
-			}
-			else
-			{
-				return true;
-			}
+			return (x < FONT_SELECTOR_WIDTH - (CopyPasteRange.Width) * 16) && (y < FONT_SELECTOR_HEIGHT - (CopyPasteRange.Height) * 16);
 		}
 
 		public void ActionFontSelectorMouseDown(MouseEventArgs e)
@@ -144,7 +139,7 @@ namespace FontMaker
 			int fontChar;
 			int fontNr;
 
-			if (e.X < 0 || e.X >= pictureBoxFontSelector.Width || e.Y < 0 || e.Y >= pictureBoxFontSelector.Height)
+			if (e.X < 0 || e.X >= FONT_SELECTOR_WIDTH || e.Y < 0 || e.Y >= FONT_SELECTOR_HEIGHT)
 			{
 				return;
 			}
@@ -153,7 +148,7 @@ namespace FontMaker
 			{
 				if (CharacterEdited())
 				{
-					UndoBuffer.Add2Undo(true);
+					AtariFontUndoBuffer.Add2Undo(true);
 				}
 			}
 
@@ -203,6 +198,7 @@ namespace FontMaker
 						break;
 
 					case MegaCopyStatusFlags.Pasting:
+					case MegaCopyStatusFlags.PastingFont:
 						{
 							if (!IsMousePositionValidForPasting(e.X, e.Y))
 							{
@@ -212,7 +208,7 @@ namespace FontMaker
 							if (e.Button == MouseButtons.Left)
 							{
 								CopyPasteTargetLocation = new Point(rx, ry);
-								UndoBuffer.Add2UndoFullDifferenceScan();
+								AtariFontUndoBuffer.Add2UndoFullDifferenceScan();
 								UpdateUndoButtons(false);
 								ExecutePasteFromClipboard(false);
 								ResetMegaCopyStatus();
@@ -231,7 +227,7 @@ namespace FontMaker
 				CopyPasteRange.Width = 0;
 				CopyPasteRange.Height = 0;
 
-				labelEditCharInfo.Text = $@"Char: Font {fontNr} ${fontChar:X2} #{fontChar}";
+				labelEditCharInfo.Text = $"Font {fontNr}\n${fontChar:X2} #{fontChar}";
 				RedrawChar();
 				CheckDuplicate();
 			}
@@ -239,7 +235,7 @@ namespace FontMaker
 
 		public void ActionFontSelectorMouseUp(MouseEventArgs e)
 		{
-			if ((e.X >= pictureBoxFontSelector.Width) || (e.Y >= pictureBoxFontSelector.Height))
+			if (e.X < 0 || e.X >= FONT_SELECTOR_WIDTH || e.Y < 0 || e.Y >= FONT_SELECTOR_HEIGHT)
 			{
 				return;
 			}
@@ -278,6 +274,12 @@ namespace FontMaker
 			}
 		}
 
+		/// <summary>
+		/// The mouse is moving inside the font selector.
+		/// If we are in MegaCopy mode then process the movement.
+		/// 
+		/// </summary>
+		/// <param name="e"></param>
 		public void ActionFontSelectorMouseMove(MouseEventArgs e)
 		{
 			if (buttonMegaCopy.Checked)
@@ -286,7 +288,7 @@ namespace FontMaker
 				{
 					case MegaCopyStatusFlags.Selecting:
 						{
-							if (e.X < 0 || e.X >= pictureBoxFontSelector.Width || e.Y < 0 || e.Y >= pictureBoxFontSelector.Height)
+							if (e.X < 0 || e.X >= FONT_SELECTOR_WIDTH || e.Y < 0 || e.Y >= FONT_SELECTOR_HEIGHT)
 							{
 								return;
 							}
@@ -315,6 +317,7 @@ namespace FontMaker
 						break;
 
 					case MegaCopyStatusFlags.Pasting:
+					case MegaCopyStatusFlags.PastingFont:
 						{
 							if (!IsMousePositionValidForPasting(e.X, e.Y))
 							{
@@ -322,8 +325,14 @@ namespace FontMaker
 								pictureBoxFontSelectorMegaCopyImage.Visible = false;
 								return;
 							}
+                            
+							if (PastingToView)
+                            {
+                                PastingToView = false;
+                                RevalidateClipboard();
+                            }
 
-							pictureBoxFontSelectorPasteCursor.Left = pictureBoxFontSelector.Left + e.X - e.X % 16 - 2;
+                            pictureBoxFontSelectorPasteCursor.Left = pictureBoxFontSelector.Left + e.X - e.X % 16 - 2;
 							pictureBoxFontSelectorPasteCursor.Top = pictureBoxFontSelector.Top + e.Y - e.Y % 16 - 2;
 							pictureBoxFontSelectorMegaCopyImage.Left = pictureBoxFontSelectorPasteCursor.Left + 2;
 							pictureBoxFontSelectorMegaCopyImage.Top = pictureBoxFontSelectorPasteCursor.Top + 2;
