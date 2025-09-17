@@ -134,6 +134,7 @@
 			buttonEditPage = new Button();
 			labelCurrentPageIndex = new Label();
 			buttonExportView = new Button();
+			lblInMegaCopyMode = new Label();
 			((System.ComponentModel.ISupportInitialize)pictureBoxAtariView).BeginInit();
 			((System.ComponentModel.ISupportInitialize)pictureBoxFontSelector).BeginInit();
 			pictureBoxFontSelector.SuspendLayout();
@@ -1398,12 +1399,27 @@
 			buttonExportView.UseVisualStyleBackColor = true;
 			buttonExportView.Click += ViewEditor_ExportView_Click;
 			// 
+			// lblInMegaCopyMode
+			// 
+			lblInMegaCopyMode.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+			lblInMegaCopyMode.AutoSize = true;
+			lblInMegaCopyMode.BackColor = SystemColors.ActiveCaption;
+			lblInMegaCopyMode.Font = new Font("Microsoft Sans Serif", 16F, FontStyle.Bold, GraphicsUnit.Point);
+			lblInMegaCopyMode.Location = new Point(836, 464);
+			lblInMegaCopyMode.Name = "lblInMegaCopyMode";
+			lblInMegaCopyMode.Size = new Size(217, 26);
+			lblInMegaCopyMode.TabIndex = 23;
+			lblInMegaCopyMode.Text = "In MegaCopy Mode";
+			lblInMegaCopyMode.UseMnemonic = false;
+			lblInMegaCopyMode.Visible = false;
+			// 
 			// FontMakerForm
 			// 
 			AutoScaleDimensions = new SizeF(6F, 13F);
 			AutoScaleMode = AutoScaleMode.Font;
 			BackgroundImageLayout = ImageLayout.None;
 			ClientSize = new Size(1048, 491);
+			Controls.Add(lblInMegaCopyMode);
 			Controls.Add(buttonFontAnalysis);
 			Controls.Add(buttonExportView);
 			Controls.Add(labelCurrentPageIndex);
@@ -1584,5 +1600,6 @@
 		private Button buttonFontDeleteCharShiftRight;
 		private ComboBox comboBoxColorSets;
 		private Button buttonFontAnalysis;
+		private Label lblInMegaCopyMode;
 	}
 }

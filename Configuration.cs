@@ -20,6 +20,7 @@ namespace FontMaker
 		public int ExportViewRegionY { get; set; }
 		public int ExportViewRegionW { get; set; }
 		public int ExportViewRegionH { get; set; }
+		public bool ExportViewTranspose { get; set; }
 
 	}
 	public static class Configuration
@@ -120,7 +121,8 @@ namespace FontMaker
 				Configuration.Values.ExportViewRemember,
 				Configuration.Values.ExportViewExportType,
 				Configuration.Values.ExportViewDataType,
-				new Rectangle(Configuration.Values.ExportViewRegionX, Configuration.Values.ExportViewRegionY, Configuration.Values.ExportViewRegionW, Configuration.Values.ExportViewRegionH)
+				new Rectangle(Configuration.Values.ExportViewRegionX, Configuration.Values.ExportViewRegionY, Configuration.Values.ExportViewRegionW, Configuration.Values.ExportViewRegionH),
+				Configuration.Values.ExportViewTranspose
 			);
 		}
 
@@ -135,7 +137,7 @@ namespace FontMaker
 			Configuration.Values.AnalysisDupColor = FontAnalysisWindowForm.GetDuplicateColor;
 			Configuration.Values.AnalysisDupAlpha = FontAnalysisWindowForm.GetDuplicateAlpha;
 
-			(Configuration.Values.ExportViewRemember, Configuration.Values.ExportViewExportType, Configuration.Values.ExportViewDataType, var exportRegion)
+			(Configuration.Values.ExportViewRemember, Configuration.Values.ExportViewExportType, Configuration.Values.ExportViewDataType, var exportRegion, Configuration.Values.ExportViewTranspose)
 				= ExportViewWindowForm.SaveConfiguration();
 			Configuration.Values.ExportViewRegionX = exportRegion.X;
 			Configuration.Values.ExportViewRegionY = exportRegion.Y;

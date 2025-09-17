@@ -10,6 +10,7 @@ namespace FontMaker
 
 		private Rectangle FullViewRegion = new(0, 0, 40, 26);
 
+		private bool PreviousTransposeFlag { get; set; } = false;
 		private bool RememberSelection { get; set; }
 
 		public bool InColorMode { get; set; }
@@ -41,7 +42,7 @@ namespace FontMaker
 			RememberSelection = true;
 		}
 
-		public void LoadConfiguration(bool rememberSelection, int exportType, int dataType, Rectangle box)
+		public void LoadConfiguration(bool rememberSelection, int exportType, int dataType, Rectangle box, bool transpose)
 		{
 			if (rememberSelection)
 			{
@@ -60,9 +61,9 @@ namespace FontMaker
 			}
 		}
 
-		public (bool, int, int, Rectangle) SaveConfiguration()
+		public (bool, int, int, Rectangle, bool) SaveConfiguration()
 		{
-			return (RememberSelection, PreviousExportType, PreviousDataType, _exportRegion);
+			return (RememberSelection, PreviousExportType, PreviousDataType, _exportRegion, PreviousTransposeFlag);
 		}
 
 		private void ExportViewWindow_Load(object sender, EventArgs e)
@@ -81,6 +82,7 @@ namespace FontMaker
 				if (PreviousDataType < 0 || PreviousDataType >= ComboBoxDataType.Items.Count)
 					PreviousDataType = 0;
 				ComboBoxDataType.SelectedIndex = PreviousDataType != -1 ? PreviousDataType : 0;
+				checkBoxTranspose.Checked = PreviousTransposeFlag;
 			}
 			else
 			{
@@ -103,6 +105,7 @@ namespace FontMaker
 			{
 				PreviousExportType = ComboBoxExportType.SelectedIndex;
 				PreviousDataType = ComboBoxDataType.SelectedIndex;
+				PreviousTransposeFlag = checkBoxTranspose.Checked;
 				RememberSelection = true;
 			}
 			else
@@ -272,7 +275,8 @@ namespace FontMaker
 				MemoExport.Text = GenerateFileAsText(
 					_exportRegion,
 					(FormatTypes)ComboBoxExportType.SelectedIndex,
-					ComboBoxDataType.SelectedIndex);
+					ComboBoxDataType.SelectedIndex,
+					checkBoxTranspose.Checked);
 			}
 		}
 
@@ -282,7 +286,7 @@ namespace FontMaker
 		/// <param name="exportType"></param>
 		/// <param name="dataType"></param>
 		/// <returns></returns>
-		public static string GenerateFileAsText(Rectangle exportRegion, FormatTypes exportType, int dataType)
+		public static string GenerateFileAsText(Rectangle exportRegion, FormatTypes exportType, int dataType, bool transpose)
 		{
 			var sb = new StringBuilder();
 
@@ -320,12 +324,21 @@ namespace FontMaker
 			var exportSize = exportRegion.Width * exportRegion.Height;
 			var viewBytes = new byte[exportSize];
 			var writeIndex = 0;
-			for (var y = exportRegion.Y; y < exportRegion.Y + exportRegion.Height; ++y)
+			if (!transpose)
+			{
+				for (var y = exportRegion.Y; y < exportRegion.Y + exportRegion.Height; ++y)
+				{
+					for (var x = exportRegion.X; x < exportRegion.X + exportRegion.Width; ++x)
+					{
+						viewBytes[writeIndex++] = AtariView.ViewBytes[x, y];
+					}
+				}
+			}
+			else
 			{
 				for (var x = exportRegion.X; x < exportRegion.X + exportRegion.Width; ++x)
-				{
-					viewBytes[writeIndex++] = AtariView.ViewBytes[x, y];
-				}
+					for (var y = exportRegion.Y; y < exportRegion.Y + exportRegion.Height; ++y)
+						viewBytes[writeIndex++] = AtariView.ViewBytes[x, y];
 			}
 
 			var bytesLeft = exportSize;
@@ -622,7 +635,8 @@ namespace FontMaker
 				MemoExport.Text = GenerateFileAsText(
 					_exportRegion,
 					(FormatTypes)ComboBoxExportType.SelectedIndex,
-					ComboBoxDataType.SelectedIndex);
+					ComboBoxDataType.SelectedIndex,
+					checkBoxTranspose.Checked);
 			}
 		}
 
@@ -647,7 +661,7 @@ namespace FontMaker
 				}
 			}
 		}
-	
+
 		private void ButtonExport_Click(object sender, EventArgs e)
 		{
 			if ((FormatTypes)ComboBoxExportType.SelectedIndex == FormatTypes.BinaryData)
@@ -658,7 +672,7 @@ namespace FontMaker
 
 				if (saveDialog.ShowDialog() == DialogResult.OK)
 				{
-					SaveAsBinaryData(saveDialog.FileName, _exportRegion);
+					SaveAsBinaryData(saveDialog.FileName, _exportRegion, checkBoxTranspose.Checked);
 				}
 
 				return;
@@ -670,23 +684,32 @@ namespace FontMaker
 
 			if (saveDialog.ShowDialog() == DialogResult.OK)
 			{
-				var text = GenerateFileAsText(_exportRegion, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex);
+				var text = GenerateFileAsText(_exportRegion, (FormatTypes)ComboBoxExportType.SelectedIndex, ComboBoxDataType.SelectedIndex, checkBoxTranspose.Checked);
 				File.WriteAllText(saveDialog.FileName, text);
 			}
 
 		}
 
-		private void SaveAsBinaryData(string fileName, Rectangle exportRegion)
+		private void SaveAsBinaryData(string fileName, Rectangle exportRegion, bool transpose)
 		{
 			var exportSize = exportRegion.Width * exportRegion.Height;
 			var viewBytes = new byte[exportSize];
 			var writeIndex = 0;
-			for (var y = exportRegion.Y; y < exportRegion.Y + exportRegion.Height; ++y)
+			if (!transpose)
+			{
+				for (var y = exportRegion.Y; y < exportRegion.Y + exportRegion.Height; ++y)
+				{
+					for (var x = exportRegion.X; x < exportRegion.X + exportRegion.Width; ++x)
+					{
+						viewBytes[writeIndex++] = AtariView.ViewBytes[x, y];
+					}
+				}
+			}
+			else
 			{
 				for (var x = exportRegion.X; x < exportRegion.X + exportRegion.Width; ++x)
-				{
-					viewBytes[writeIndex++] = AtariView.ViewBytes[x, y];
-				}
+					for (var y = exportRegion.Y; y < exportRegion.Y + exportRegion.Height; ++y)
+						viewBytes[writeIndex++] = AtariView.ViewBytes[x, y];
 			}
 
 			try
@@ -759,6 +782,18 @@ namespace FontMaker
 			pictureBoxViewEditorRubberBand.SetBounds(pictureBoxAtariViewSmall.Left + _exportRegion.X * 8 - 2, pictureBoxAtariViewSmall.Top + _exportRegion.Y * 8 - 2, _exportRegion.Width * 8 + 4, _exportRegion.Height * 8 + 4);
 			pictureBoxViewEditorRubberBand.Visible = true;
 
+		}
+
+		private void CheckBoxTranspose_CheckedChanged(object sender, EventArgs e)
+		{
+			if ((FormatTypes)ComboBoxExportType.SelectedIndex > FormatTypes.BinaryData)
+			{
+				MemoExport.Text = GenerateFileAsText(
+					_exportRegion,
+					(FormatTypes)ComboBoxExportType.SelectedIndex,
+					ComboBoxDataType.SelectedIndex,
+					checkBoxTranspose.Checked);
+			}
 		}
 	}
 }

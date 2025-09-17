@@ -43,7 +43,7 @@
 			btnCancel.Location = new Point(152, 222);
 			btnCancel.Name = "btnCancel";
 			btnCancel.Size = new Size(75, 23);
-			btnCancel.TabIndex = 3;
+			btnCancel.TabIndex = 4;
 			btnCancel.Text = "Cancel";
 			btnCancel.UseVisualStyleBackColor = true;
 			btnCancel.Click += btnCancel_Click;
@@ -64,13 +64,16 @@
 			txtPageName.Size = new Size(180, 20);
 			txtPageName.TabIndex = 1;
 			txtPageName.TextChanged += txtPageName_TextChanged;
+			txtPageName.Enter += txtPageName_Enter;
+			txtPageName.KeyDown += txtPageName_KeyDown;
+			txtPageName.Leave += txtPageName_Leave;
 			// 
 			// btnUpdate
 			// 
 			btnUpdate.Location = new Point(22, 222);
 			btnUpdate.Name = "btnUpdate";
 			btnUpdate.Size = new Size(75, 23);
-			btnUpdate.TabIndex = 2;
+			btnUpdate.TabIndex = 3;
 			btnUpdate.Text = "Update";
 			btnUpdate.UseVisualStyleBackColor = true;
 			btnUpdate.Click += btnUpdate_Click;
@@ -81,8 +84,11 @@
 			lbPages.Location = new Point(5, 38);
 			lbPages.Name = "lbPages";
 			lbPages.Size = new Size(222, 173);
-			lbPages.TabIndex = 10;
+			lbPages.TabIndex = 2;
 			lbPages.SelectedIndexChanged += lbPages_SelectedIndexChanged;
+			lbPages.Enter += lbPages_Enter;
+			lbPages.KeyDown += lbPages_KeyDown;
+			lbPages.Leave += lbPages_Leave;
 			// 
 			// btnUp
 			// 
@@ -90,7 +96,8 @@
 			btnUp.Location = new Point(235, 74);
 			btnUp.Name = "btnUp";
 			btnUp.Size = new Size(21, 23);
-			btnUp.TabIndex = 11;
+			btnUp.TabIndex = 3;
+			btnUp.TabStop = false;
 			btnUp.UseVisualStyleBackColor = true;
 			btnUp.Click += btnUp_Click;
 			// 
@@ -100,7 +107,8 @@
 			btnDown.Location = new Point(235, 103);
 			btnDown.Name = "btnDown";
 			btnDown.Size = new Size(21, 23);
-			btnDown.TabIndex = 12;
+			btnDown.TabIndex = 4;
+			btnDown.TabStop = false;
 			btnDown.UseVisualStyleBackColor = true;
 			btnDown.Click += btnDown_Click;
 			// 

@@ -914,6 +914,7 @@ namespace FontMaker
 			// Enable/disable actions between modes
 			var on = buttonMegaCopy.Checked;
 			buttonEnterText.Enabled = on;
+			lblInMegaCopyMode.Visible = on;
 
 			// Hide character edit window
 			pictureBoxCharacterEditor.Visible = !on;
@@ -1242,8 +1243,5 @@ namespace FontMaker
 		}
 
 		#endregion
-
-
-
 	}
 }

@@ -1,4 +1,6 @@
-﻿namespace FontMaker
+﻿using System.Drawing;
+
+namespace FontMaker
 {
 	// Section C - Color management
 	internal class Colors
@@ -90,9 +92,8 @@
 			var img = Helpers.GetImage(pictureBoxRecolorSourceColor);
 			using (var gr = Graphics.FromImage(img))
 			{
-				var brush = BrushCache[listBoxRecolorSource.SelectedIndex + 1];
-				gr.FillRectangle(brush, 0, 0, 49, 17);
-				DrawColorLabels(gr, 1, 1, listBoxRecolorSource.SelectedIndex + 2, AtariPalette[SetOfSelectedColors[listBoxRecolorSource.SelectedIndex + 1]]);
+				FillColorSelectorBackground(gr, listBoxRecolorSource.SelectedIndex + 1);
+				DrawColorLabelsEx(gr, 1, 2, listBoxRecolorSource.SelectedIndex + 2, listBoxRecolorSource.SelectedIndex + 1);
 			}
 
 			pictureBoxRecolorSourceColor.Refresh();
@@ -103,9 +104,8 @@
 			var img = Helpers.GetImage(pictureBoxRecolorTargetColor);
 			using (var gr = Graphics.FromImage(img))
 			{
-				var brush = BrushCache[listBoxRecolorTarget.SelectedIndex + 1];
-				gr.FillRectangle(brush, 0, 0, 49, 17);
-				DrawColorLabels(gr, 1, 1, listBoxRecolorTarget.SelectedIndex + 2, AtariPalette[SetOfSelectedColors[listBoxRecolorTarget.SelectedIndex + 1]]);
+				FillColorSelectorBackground(gr, listBoxRecolorTarget.SelectedIndex + 1);
+				DrawColorLabelsEx(gr, 1, 2, listBoxRecolorTarget.SelectedIndex + 2, listBoxRecolorTarget.SelectedIndex + 1);
 			}
 
 			pictureBoxRecolorTargetColor.Refresh();
@@ -131,7 +131,7 @@
 					for (var b = 0; b < 2; b++)
 					{
 						gr.FillRectangle(BrushCache[b + a * 2], b * 45, a * 18, 45, 22);
-						DrawColorLabels(gr, b * 45, a * 18, b + a * 2, AtariPalette[SetOfSelectedColors[b + a * 2]]);
+						DrawColorLabels(gr, b * 45, a * 18+2, b + a * 2, b + a * 2);
 					}
 				}
 			}
@@ -142,9 +142,8 @@
 			using (var gr = Graphics.FromImage(img))
 			{
 				var tagVal = (int)pictureBoxCharacterEditorColor1.Tag;
-				var brush = BrushCache[tagVal];
-				gr.FillRectangle(brush, 0, 0, 49, 17);
-				DrawColorLabels(gr, 1, 1, tagVal, AtariPalette[SetOfSelectedColors[tagVal]]);
+				FillColorSelectorBackground(gr, tagVal);
+				DrawColorLabelsEx(gr, 1, 2, tagVal, tagVal);
 
 			}
 
@@ -154,9 +153,8 @@
 			using (var gr = Graphics.FromImage(img))
 			{
 				var tagVal = (int)pictureBoxCharacterEditorColor2.Tag;
-				var brush = BrushCache[tagVal];
-				gr.FillRectangle(brush, 0, 0, 49, 17);
-				DrawColorLabels(gr, 1, 1, tagVal, AtariPalette[SetOfSelectedColors[tagVal]]);
+				FillColorSelectorBackground(gr, tagVal);
+				DrawColorLabelsEx(gr, 1, 2, tagVal, tagVal);
 			}
 
 			pictureBoxCharacterEditorColor2.Refresh();
@@ -164,18 +162,80 @@
 			img = Helpers.GetImage(pictureBoxActionColor);
 			using (var gr = Graphics.FromImage(img))
 			{
-				var brush = BrushCache[ActiveColorNr];
-				gr.FillRectangle(brush, 0, 0, 49, 17);
-				DrawColorLabels(gr, 1, 1, ActiveColorNr, AtariPalette[SetOfSelectedColors[ActiveColorNr]]);
+				FillColorSelectorBackground(gr, ActiveColorNr);
+				DrawColorLabelsEx(gr, 1, 2, ActiveColorNr, ActiveColorNr);
 			}
 
 			pictureBoxActionColor.Refresh();
 		}
 
-		public void DrawColorLabels(Graphics ic, int x, int y, int num, Color color)
+		/// <summary>
+		/// There are two color selection boxes and one active color indicator.
+		/// This functions sets the background color of the graphics object.
+		/// In the case of color 3 (which is index 4 in the palette) draw the
+		/// two possible colors. 
+		/// </summary>
+		/// <param name="gr"></param>
+		/// <param name="colorNr"></param>
+		private void FillColorSelectorBackground(Graphics gr, int colorNr)
 		{
-			var labels = new[] { "LUM", "BAK - 00", "PF0 - 01", "PF1 - 10", "PF2 - 11", "PF3 - 11" };
+			if (colorNr == 4)
+			{
+				// Special case for color 3.
+				// In graphics mode it can be one of two colors.
+				// The color depends on the index of the character >=128 then its the alternative color
+				var brush = BrushCache[colorNr];
+				gr.FillRectangle(brush, 0, 0, 25, 17);
+				brush = BrushCache[colorNr + 1];
+				gr.FillRectangle(brush, 25, 0, 49, 17);
+			}
+			else
+			{
+				var brush = BrushCache[colorNr];
+				gr.FillRectangle(brush, 0, 0, 49, 17);
+			}
+		}
+
+		/// <summary>
+		/// Draw the palette name into the color box.
+		/// </summary>
+		/// <param name="ic">Graohics object to draw into</param>
+		/// <param name="x">X offset of text in box</param>
+		/// <param name="y">Y offset of text in box</param>
+		/// <param name="num">Palette entry</param>
+		/// <param name="color"></param>
+		private static string[] labels = new[] { "LUM", "BAK - 00", "PF0 - 01", "PF1 - 10", "PF2 - 11", "PF3 - 11" };
+
+		public void DrawColorLabels(Graphics ic, int x, int y, int num, int colorNr)
+		{
+			var color = AtariPalette[SetOfSelectedColors[colorNr]];
 			ic.DrawString(labels[num], this.Font, color.G > 128 ? BlackBrush : WhiteBrush, x, y);
+		}
+
+		public void DrawColorLabelsEx(Graphics ic, int x, int y, int num, int colorNr)
+		{
+			if (colorNr == 4)
+			{
+				// PF2 - 11
+				// Special processing for this color. It has two colors allocated to it so the string needs to be split in two
+				// 4 chars and then the rest
+				var leftText = "PF2 ";
+				var color = AtariPalette[SetOfSelectedColors[colorNr]];
+				ic.DrawString(leftText, this.Font, color.G > 128 ? BlackBrush : WhiteBrush, x, y);
+
+				var sz = ic.MeasureString(leftText, this.Font);
+
+				var rightText = "- 11";
+				color = AtariPalette[SetOfSelectedColors[colorNr+1]];
+				ic.DrawString(rightText, this.Font, color.G > 128 ? BlackBrush : WhiteBrush, x + sz.Width, y);
+
+			}
+			else
+			{
+				// Draw the palette entry name into the graphic using ONE color
+				var color = AtariPalette[SetOfSelectedColors[colorNr]];
+				ic.DrawString(labels[num], this.Font, color.G > 128 ? BlackBrush : WhiteBrush, x, y);
+			}
 		}
 
 		public void InteractWithTheColorPalette(MouseEventArgs e)
