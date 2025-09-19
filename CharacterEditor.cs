@@ -284,6 +284,8 @@ namespace FontMaker
 							};
 							var col = charline5col[rx];
 							if (col == 4 && shiftColor3) ++col;
+							if (ry % 2 == 1)
+								col = translate[col];   //altercolors
 							gr.FillRectangle(BrushCache[col], rx * CharXWidth, ry * 20, CharXWidth, 20);
 
 							// Recode to byte and save to charset
