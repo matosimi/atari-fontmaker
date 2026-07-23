@@ -416,7 +416,7 @@ namespace FontMaker
 		#region Draw font character
 
 
-		public byte[] translate = { 0, 1, 6, 3, 7, 8 };
+		public byte[] translate = { 0, 1, 6, 9, 7, 8 }; // BAK, PF0→PF0a, PF1→PF1a, PF2→PF2a, PF3→PF3a
 		// redraws character that is being edited/selected in character edit window
 		public void RedrawChar()
 		{

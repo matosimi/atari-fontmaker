@@ -612,7 +612,7 @@ public partial class FontMakerForm
 
 				// Load the AtariPalette selection
 				InColorSetSetup = true;
-				SetOfSelectedColors = Convert.FromHexString(FixColorHexString(colors));
+				ApplyColorsFromHex(colors);
 				SetPrimaryColorSetData();
 				BuildBrushCache();
 				InColorSetSetup = false;
@@ -972,6 +972,11 @@ public partial class FontMakerForm
 				SetOfSelectedColors[a] = Helpers.FindClosest(rr, gg, bb, AtariPalette);
 				UpdateBrushCache(a);
 			}
+
+			// Older .vf2/.vfn only store 6 colors; fill altercolors from matching PF registers
+			FillMissingAlterColors(6);
+			for (var a = 6; a < SetOfSelectedColors.Length; a++)
+				UpdateBrushCache(a);
 
 			if (ext == ".vf2")
 			{

@@ -4,7 +4,7 @@
 	{
 		public const int NumColors = 10;        // The # of colors we can set at a maximum (1 lumo, 9 colors)
 
-		public static readonly string Title = "Atari FontMaker";
+		public static readonly string Title = "Atari FontMaker ALPA";
 
 		public static Rectangle[] WhereAreTheFontBanksComingFrom =
 		[

@@ -249,6 +249,17 @@ namespace FontMaker
 		}
 		#endregion
 
+		/// <summary>
+		/// Mode 4/5 palette cell order: LUM, BAK, PF0-PF3, then PF0a, PF1a, PF2a, PF3a.
+		/// Storage keeps PF0a/PF2a/PF3a at 6/7/8 (compat) and PF1a at 9.
+		/// </summary>
+		private static readonly int[] Mode45PaletteColorIndex = [0, 1, 2, 3, 4, 5, 6, 9, 7, 8];
+
+		private int PaletteCellToColorIndex(int cell)
+		{
+			return WhichColorMode == 10 ? cell : Mode45PaletteColorIndex[cell];
+		}
+
 		public void RedrawPal()
 		{
 			var img = Helpers.GetImage(pictureBoxPalette);
@@ -264,13 +275,15 @@ namespace FontMaker
 					UpdateBrushCache(0);
 				}
 
-				var numLinesOfColors = WhichColorMode == 10 ? 5 : 3;
-				for (var a = 0; a < numLinesOfColors; a++)
+				// Always show 5 rows: Mode 10 colors 0-8, or Mode 4/5 + altercolors PF0a-PF3a
+				for (var a = 0; a < 5; a++)
 				{
 					for (var b = 0; b < 2; b++)
 					{
-						gr.FillRectangle(BrushCache[b + a * 2], b * 45, a * 18, 45, 22);
-						DrawColorLabels(gr, b * 45, a * 18 + 2, b + a * 2, b + a * 2);
+						var cell = b + a * 2;
+						var colorNr = PaletteCellToColorIndex(cell);
+						gr.FillRectangle(BrushCache[colorNr], b * 45, a * 18, 45, 22);
+						DrawColorLabels(gr, b * 45, a * 18 + 2, cell, colorNr);
 					}
 				}
 			}
@@ -343,11 +356,11 @@ namespace FontMaker
 		/// <param name="num">Palette entry</param>
 		/// <param name="color"></param>
 		private static string[] labels = [
-			"LUM", "BAK - 00", 
-			"PF0 - 01", "PF1 - 10", 
+			"LUM", "BAK - 00",
+			"PF0 - 01", "PF1 - 10",
 			"PF2 - 11", "PF3 - 11",
-			"", "",
-			"", "",
+			"PF0a", "PF1a",
+			"PF2a", "PF3a",
 		];
 		private static string[] mode10Labels = [
 			"LUM", "0",
@@ -409,7 +422,11 @@ namespace FontMaker
 			}
 			else
 			{
-				var wh = e.X / 45 + (e.Y / 18) * 2;
+				var cell = e.X / 45 + (e.Y / 18) * 2;
+				if (cell is < 0 or > 9)
+					return;
+
+				var wh = PaletteCellToColorIndex(cell);
 				AtariColorSelector.SetSelectedColorIndex(SetOfSelectedColors[wh]);
 				AtariColorSelector.ShowDialog();
 
@@ -512,27 +529,71 @@ namespace FontMaker
 		/// </summary>
 		public void SetupDefaultPalColors()
 		{
+			EnsureColorArraySize();
 			SetOfSelectedColors[0] = 14;
 			SetOfSelectedColors[1] = 0;
 			SetOfSelectedColors[2] = 40;
 			SetOfSelectedColors[3] = 202;
 			SetOfSelectedColors[4] = 148;
 			SetOfSelectedColors[5] = 70;
-            SetOfSelectedColors[6] = 0x14;
-            SetOfSelectedColors[7] = 0x48;
-            SetOfSelectedColors[8] = 0xb6;
+			SetOfSelectedColors[6] = 0x14; // PF0a
+			SetOfSelectedColors[7] = 0x48; // PF2a
+			SetOfSelectedColors[8] = 0xb6; // PF3a
+			SetOfSelectedColors[9] = SetOfSelectedColors[3]; // PF1a defaults to PF1 / Mode 10 color 8
 
-            BuildBrushCache();
+			BuildBrushCache();
+		}
+
+		/// <summary>
+		/// Ensure SetOfSelectedColors has NumColors entries.
+		/// Older .atrview files only stored 6 colors (before Mode 10 / altercolors);
+		/// missing altercolor slots are filled from the matching normal PF register.
+		/// </summary>
+		public void EnsureColorArraySize()
+		{
+			if (SetOfSelectedColors.Length >= Constants.NumColors)
+				return;
+
+			var originalLength = SetOfSelectedColors.Length;
+			var padded = new byte[Constants.NumColors];
+			Array.Copy(SetOfSelectedColors, padded, originalLength);
+			SetOfSelectedColors = padded;
+			FillMissingAlterColors(originalLength);
+		}
+
+		/// <summary>
+		/// Load color registers from a hex string, padding missing altercolors from their normal PF colors.
+		/// Storage: 6=PF0a←PF0, 7=PF2a←PF2, 8=PF3a←PF3, 9=PF1a←PF1
+		/// </summary>
+		public void ApplyColorsFromHex(string inputHexString)
+		{
+			var originalCount = string.IsNullOrEmpty(inputHexString)
+				? 0
+				: Math.Min(inputHexString.Length / 2, Constants.NumColors);
+
+			SetOfSelectedColors = Convert.FromHexString(FixColorHexString(inputHexString));
+			FillMissingAlterColors(originalCount);
+		}
+
+		/// <summary>
+		/// When altercolor slots were not present in saved data, copy from the matching normal register.
+		/// </summary>
+		public void FillMissingAlterColors(int originalLength)
+		{
+			if (originalLength <= 6)
+				SetOfSelectedColors[6] = SetOfSelectedColors[2]; // PF0a ← PF0
+			if (originalLength <= 7)
+				SetOfSelectedColors[7] = SetOfSelectedColors[4]; // PF2a ← PF2
+			if (originalLength <= 8)
+				SetOfSelectedColors[8] = SetOfSelectedColors[5]; // PF3a ← PF3
+			if (originalLength <= 9)
+				SetOfSelectedColors[9] = SetOfSelectedColors[3]; // PF1a ← PF1
 		}
 
 		public void BuildBrushCache()
 		{
 			// Create the solid brushes to use for drawing the GUI and bitmaps
-			if (SetOfSelectedColors.Length < 9)
-			{
-				SetOfSelectedColors = new byte[9];
-				SetupDefaultPalColors();
-			}
+			EnsureColorArraySize();
 			for (var i = 0; i < SetOfSelectedColors.Length; ++i)
 			{
 				BrushCache[i]?.Dispose();
@@ -611,7 +672,7 @@ namespace FontMaker
 			var colors = ColorSets[nextColorSetIndex];
 
 			// Load the AtariPalette selection
-			SetOfSelectedColors = Convert.FromHexString(FixColorHexString(colors));
+			ApplyColorsFromHex(colors);
 			BuildBrushCache();
 
 			CurrentColorSetIndex = nextColorSetIndex;
@@ -690,12 +751,19 @@ namespace FontMaker
 				cmbColor9Menu.Refresh();
 		}
 
+		/// <summary>
+		/// Pad short color hex strings with zeros up to NumColors bytes.
+		/// Older .atrview files stored 6 colors (12 hex chars); Mode 10 / altercolors need 10.
+		/// </summary>
 		public string FixColorHexString(string inputHexString)
 		{
-			if (inputHexString.Length == 12)
-			{
-				return $"{inputHexString}161AB4BA";
-			}
+			var targetLen = Constants.NumColors * 2;
+			if (string.IsNullOrEmpty(inputHexString))
+				return new string('0', targetLen);
+			if (inputHexString.Length < targetLen)
+				return inputHexString.PadRight(targetLen, '0');
+			if (inputHexString.Length > targetLen)
+				return inputHexString[..targetLen];
 			return inputHexString;
 		}
 	}

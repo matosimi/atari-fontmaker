@@ -5,10 +5,10 @@ namespace FontMaker
 	public static class AtariFontRenderer
 	{
 		private static readonly Color[] AtariColors = new Color[256];
-		private static readonly byte[] MyPalette = new byte[Constants.NumColors]; // Mono (0 + 1) Color (1, 2, 3, 4, 5, [6,7,8,])
+		private static readonly byte[] MyPalette = new byte[Constants.NumColors]; // LUM + BAK/PF0-PF3 + PF0a/PF2a/PF3a/PF1a (Mode 10: colors 0-8)
 		private static readonly int[] CachedColors = new int[Constants.NumColors];
 
-		private static readonly int[] Mode4Colors = new int[8]; // Map from color index to actual color value
+		private static readonly int[] Mode4Colors = new int[9]; // BAK, PF0-PF3, PF0a, PF2a, PF3a, PF1a
 
 		// Map from a nibble to an actual color index
 		// 0-8 map to colors 0-8 (+1 for the CachedColors index)
@@ -54,7 +54,7 @@ namespace FontMaker
 			Mode4Colors[2] = CachedColors[3];
 			Mode4Colors[3] = CachedColors[4];
 			Mode4Colors[4] = CachedColors[5];*/
-			for (int i = 0; i < 8; i++)
+			for (int i = 0; i < Mode4Colors.Length; i++)
 				Mode4Colors[i] = CachedColors[i + 1];
 
 			for (var i = 0; i < 16; i++)
@@ -946,7 +946,7 @@ namespace FontMaker
 			BitmapFontBanks.UnlockBits(bmpData);
 		}
 
-        public static readonly byte[] translatex = { 0, 5, 2, 6, 7 };	//altercolor translator 
+        public static readonly byte[] translatex = { 0, 5, 8, 6, 7 };	// altercolor: BAK, PF0→PF0a, PF1→PF1a, PF2→PF2a, PF3→PF3a
 
         /// <summary>
         /// Render a single character into the correct font (in mono and in color)
